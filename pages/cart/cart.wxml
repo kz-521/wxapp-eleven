@@ -18,16 +18,16 @@
   <view class="main-content">
     <!-- 左侧分类栏 -->
     <view class="category-sidebar">
-      <view class="category-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="switchCategory" data-index="0">
+      <view class="category-item {{currentCategory == 0 ? 'active' : ''}}" bindtap="switchCategory" data-index="0">
         <text class="category-text">本草滋养茶<br/>9种体质</text>
       </view>
-      <view class="category-item {{currentCategory === 1 ? 'active' : ''}}" bindtap="switchCategory" data-index="1">
+      <view class="category-item {{currentCategory == 1 ? 'active' : ''}}" bindtap="switchCategory" data-index="1">
         <text class="category-text">本草滋养茶<br/>特调</text>
       </view>
-      <view class="category-item {{currentCategory === 2 ? 'active' : ''}}" bindtap="switchCategory" data-index="2">
+      <view class="category-item {{currentCategory == 2 ? 'active' : ''}}" bindtap="switchCategory" data-index="2">
         <text class="category-text">本草滋养茶<br/>特调</text>
       </view>
-      <view class="category-item {{currentCategory === 3 ? 'active' : ''}}" bindtap="switchCategory" data-index="3">
+      <view class="category-item {{currentCategory == 3 ? 'active' : ''}}" bindtap="switchCategory" data-index="3">
         <text class="category-text">本草滋养茶<br/>特调</text>
       </view>
     </view>

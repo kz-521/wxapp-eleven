@@ -106,7 +106,6 @@
 .category-sidebar {
   width: 150rpx;
   background-color: #F9F9F9;
-  padding: 20rpx 0;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -125,9 +124,7 @@
 }
 
 .category-item.active {
-  background-color: #FFFFFF;
-  border-left-color: #4CAF50;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+  background-color: #FFFFFF !important;
 }
 
 .category-item.active::after {
@@ -136,10 +133,10 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 1rpx;
+  width: 2rpx;
   height: 120rpx;
+  background-color: rgba(0,0,0,0.6);
   border-radius: 4rpx;
-  border: 2rpx solid rgba(0,0,0,0.6);
 }
 
 .category-item:active {
@@ -155,8 +152,8 @@
 }
 
 .category-item.active .category-text {
-  color: #4CAF50;
-  font-weight: 500;
+  color: #4CAF50 !important;
+  font-weight: 500 !important;
 }
 
 /* 右侧商品列表 */

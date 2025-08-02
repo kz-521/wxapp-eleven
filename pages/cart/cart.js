@@ -237,9 +237,14 @@ Page({
     // 切换分类
     switchCategory(event) {
         const index = event.currentTarget.dataset.index
+        console.log('点击了菜单项，索引:', index)
+        console.log('当前currentCategory:', this.data.currentCategory)
+        
         this.setData({
             currentCategory: index
         })
+        
+        console.log('设置后的currentCategory:', this.data.currentCategory)
         console.log('切换到分类:', index)
     }
 })
