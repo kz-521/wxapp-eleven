@@ -1,0 +1,16 @@
+<view style="height:{{statusHeight+navHeight}}px" hidden='{{false}}'></view>
+<view class='topbar'>
+    <view class='status' style="height:{{statusHeight}}px"></view>
+    <view class='navbar' style="height:{{navHeight}}px">
+
+<!--        <view class="navbar_back">
+
+        </view>-->
+
+        <view class='navbar_title navbar_back' style="height:{{navHeight}}px">
+            <image wx:if="{{customBackReturn}}" src="/imgs/reback.png" class="back" bindtap="backClick"></image>
+            <view class="navbar_title-a">{{title}}</view>
+            <!--<l-search-bar wx:if="{{searchOn}}" placeholder="搜索"  bg-color="#f6f6f6" shape="circle" front-text="北京" l-container-class="search-input-top" show-cancel="{{false}}"/>-->
+        </view>
+    </view>
+</view>

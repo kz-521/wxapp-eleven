@@ -1,0 +1,110 @@
+{
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/detail/detail",
+          "pathName": "pages/detail/detail",
+          "query": "pid=15",
+          "scene": null
+        },
+        {
+          "name": "无规格",
+          "pathName": "pages/detail/detail",
+          "query": "pid=11",
+          "scene": null
+        },
+        {
+          "name": "pages/home/test",
+          "pathName": "pages/test/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/category/category",
+          "pathName": "pages/category/category",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/search/search",
+          "pathName": "pages/search/search",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/cart/cart",
+          "pathName": "pages/cart/cart",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/home/home",
+          "pathName": "pages/home/home",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/detail/detail",
+          "pathName": "pages/detail/detail",
+          "query": "pid=15",
+          "scene": null
+        },
+        {
+          "name": "pay-success",
+          "pathName": "pages/pay-success/pay-success",
+          "query": "pid=15",
+          "scene": null
+        },
+        {
+          "name": "pages/my/my",
+          "pathName": "pages/my/my",
+          "query": "pid=15",
+          "scene": null
+        },
+        {
+          "name": "pages/theme-spu-list/theme-spu-list",
+          "pathName": "pages/theme-spu-list/theme-spu-list",
+          "query": "tname=t-2",
+          "scene": null
+        },
+        {
+          "name": "pages/theme-spu-list/theme-spu-list",
+          "pathName": "pages/theme-spu-list/theme-spu-list",
+          "query": "tname=t-2",
+          "scene": null
+        },
+        {
+          "name": "pages/detail/detail",
+          "pathName": "pages/detail/detail",
+          "query": "id=32",
+          "scene": null
+        },
+        {
+          "name": "pages/order/order",
+          "pathName": "pages/order/order",
+          "query": "way=cart",
+          "scene": null
+        },
+        {
+          "name": "pages/my-order/my-order",
+          "pathName": "pages/my-order/my-order",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/order-detail/order-detail",
+          "pathName": "pages/order-detail/order-detail",
+          "query": "/624",
+          "scene": null
+        }
+      ]
+    }
+  },
+  "description": "项目私有配置文件。此文件中的内容将覆盖 project.config.json 中的相同字段。项目的改动优先同步到此文件中。详见文档：https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
+  "projectname": "%E6%B8%85%E4%BC%B6"
+}

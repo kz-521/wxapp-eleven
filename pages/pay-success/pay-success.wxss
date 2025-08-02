@@ -1,0 +1,123 @@
+/* pages/pay-success/pay-success.wxss */
+.container{
+    width: 750rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.red-back{
+    width: 100%;
+    background-color: #EC4343;
+    height: 500rpx;
+    position: relative;
+}
+.text-code{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+}
+.text-code text{
+    color: #FFFFFF;
+
+}
+
+.text-one{
+    font-size: 30rpx;
+    line-height: 30rpx;
+    font-weight: 400;
+    margin-top: 148rpx;
+}
+
+.text-two{
+    font-size: 60rpx;
+    line-height: 60rpx;
+    font-weight: 900;
+    margin-top: 240rpx;
+}
+
+.text-san{
+    font-size: 24rpx;
+    line-height: 24rpx;
+    font-weight: 400;
+    margin-top: 79rpx;
+}
+.order-item-container {
+    box-sizing: border-box;
+    /* padding: 30rpx 30rpx; */
+    margin-top: 20rpx;
+    margin-bottom: 20rpx;
+    width: 690rpx;
+    border-radius: 10rpx;
+    background-color: #ffffff;
+    position: relative;
+    top: -95rpx;
+}
+
+
+.order-nav{
+
+    background-color: #ffffff;
+    height: 70rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10rpx 10rpx 0 0;
+    padding:0 20rpx;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.first-text{
+    font-size: 26rpx;
+    font-weight: 500;
+    color: #333333;
+}
+
+.second-text{
+    font-size: 26rpx;
+    font-weight: 400;
+    color: #EC4343;
+}
+.order-detail{
+    width: 690rpx;
+    background: #FFFFFF;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 10rpx 20rpx;
+
+}
+
+.order-detail>view{
+    margin-top: 20rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.order-detail-header{
+    border-bottom: 1px solid #f0f0f0;
+    height: 70rpx;
+}
+.order-detail-header > text{
+    font-size: 26rpx;
+    font-weight: 500;
+    color: #333333;
+
+}
+.detail-title{
+    font-size: 26rpx;
+    font-weight: 400;
+    color: #999999;
+}
+.detail-remark{
+    max-width: 80%;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}

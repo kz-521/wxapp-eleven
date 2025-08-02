@@ -1,0 +1,145 @@
+<l-capsule-bar  capsule-left-icon-width="30"
+                bg-color = "#EC4343"
+                title="点餐"
+                title-color = "#FFFFFF"
+                home-page="/pages/home/home"
+                capsule-left-icon-height="35"
+                capsule-right-icon-width="30"
+                capsule-right-icon-height="35"
+                capsule-color="white"
+                capsule-left-icon-path="/imgs/reback.png"
+                capsule-right-icon-path="/imgs/home.png">
+</l-capsule-bar>
+
+<view class="container" style="height: {{segHeight-statusBarHeight*2}}rpx">
+
+    <view class="main">
+        <l-segment
+                active-key="{{defaultRootId}}"
+                height="{{segHeight}}"
+                item-height="90"
+                even="{{false}}"
+                width="160"
+                scrollable
+                bind:linchange="onSegChange"
+                l-class="segment"
+                l-active-class="segment-item-active"
+                l-inactive-class="segment-item"
+                l-line-class="l-seg-line"
+                placement="left">
+            <block wx:for="{{roots}}" wx:key="index">
+               <l-segment-item key="{{item.id}}" tab="{{item.name}}"></l-segment-item>
+            </block>
+        </l-segment>
+
+
+        <!--<l-loadmore show end-text="- 到底啦 -" type="{{loadingType}}">-->
+        <!--<view class="right" >-->
+
+            <scroll-view scroll-top="{{scrollTop}}" enable-flex="true" slot="content" class="scroll-view_H-right spulist-container right" scroll-y="true" style="height: {{segHeight-statusBarHeight*2}}rpx" bindscrolltolower="spuscrolltolower">
+                <text class="title">- 全部分类 -</text>
+                <block wx:for="{{list}}" wx:key="index">
+                    <view class="grid-item" >
+                        <image mode="aspectFill" class="img" src="{{item.img}}"></image>
+                        <view class="grid-item-right">
+                            <text class="grid-title">{{item.title}}</text>
+                            <text class="grid-description">{{item.subtitle}}</text>
+                            <view class="grid-item-right-bottom">
+                                <text>￥{{item.price}}</text>
+                                <view class="count-select">
+
+                                    <view wx:if="{{item.is_have_spec}}"
+                                          bindtap="addCart"
+                                          data-id="{{item.id}}" class="select-spec-btn">
+                                        <text>选规格</text>
+                                    </view>
+                                    <l-badge wx:else show="{{item.cartCount}}" value="{{item.cartCount}}" shape="circle">
+                                        <image bindtap="addCart" data-id="{{item.id}}" class="add-button" src="/imgs/add-sku.png"></image>
+                                    </l-badge>
+                                </view>
+                            </view>
+                        </view>
+
+                    </view>
+                </block>
+                <view class="grid-item-empty"></view>
+            </scroll-view>
+<!--        <view class="spulist-container">
+
+        </view>-->
+
+        <!--</view>-->
+
+       <!--</l-loadmore>-->
+
+        <l-popup content-align="bottom" show="{{showRealm}}">
+            <s-realm bind:shopping="onShopping"
+                     bind:specchange="onSpecChange"
+                     order-way="{{orderWay}}"
+                     spu="{{spu}}"
+                     now-count="{{nowCount}}"></s-realm>
+        </l-popup>
+
+    </view>
+
+
+    <view class="cart-container">
+
+
+
+            <l-popup wx:if="{{carPopup}}" show="{{showCartPopup}}" l-class="popup circle" content-align="bottom" animation="hide" bind:lintap="onCloseCartPopup">
+
+                <view class="scroll-title circle">
+                    <text class="scroll-title-l">已选商品</text>
+                    <text class="scroll-title-r" bindtap="clearCartData">清空购物车</text>
+                </view>
+
+                <scroll-view class="scroll-view_H" scroll-y="true">
+
+                    <view wx:if="{{!isEmpty}}" class="container">
+                        <block wx:key="index" wx:for="{{cartItems}}">
+                            <s-cart-item bind:overflow="onOverflow"
+                                         bind:itemdelete="onDeleteItem"
+                                         bind:countfloat="onCountFloat"
+                                         bind:itemcheck="onSingleCheck"
+                                         cart-item="{{item}}">
+                            </s-cart-item>
+                        </block>
+                    </view>
+
+                </scroll-view>
+
+            </l-popup>
+
+        <view class="cart" wx:if="{{cart}}">
+            <view class="cart-left" bindtap="onCart">
+
+            <view class="cart-icon">
+                <l-badge show="{{cartItemCount!==0}}" value="{{cartItemCount}}" shape="circle">
+                    <l-icon name="cart" size="50" color="#FFFFFF"></l-icon>
+                </l-badge>
+            </view>
+
+
+
+                <!--<image src="/imgs/icon-购物车@2x.png" class="cart-icon"></image>-->
+
+
+
+                <l-price unit="￥"
+                         value="{{totalPrice}}"
+                         autofix
+                         value-size = "40"
+                         reserve-digit="2"
+                         color = "#ffffff"
+                         unit-color="#ffffff"
+                         unit-size="22"></l-price>
+            </view>
+
+            <view class="cart-right">
+                <text bindtap="onPay">去结算</text>
+            </view>
+        </view>
+    </view>
+
+</view>

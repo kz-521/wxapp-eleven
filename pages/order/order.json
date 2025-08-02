@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "s-order-sku-item": "/components/order-sku-item/index",
+    "s-coupon-picker": "/components/coupon-picker/index"
+  }
+}

@@ -1,0 +1,75 @@
+<view class="home-page">
+  <!-- 顶部背景区域 -->
+  <view class="banner-section">
+    <image src="/imgs/home/login-banner.png" class="banner-image"></image>
+  </view>
+
+  <!-- 登录区域 -->
+  <view class="login-card">
+    <view class="flexba" bindtap="goToLogin">
+      <view class="flexaifs">
+        <image src="/imgs/home/login-banner.png" class="login-title-img" wx:if="{{!isLogin}}"></image>
+        <text class="login-desc">即刻加入我们，一起享受自然</text>
+      </view>
+      <image src="/imgs/home/arrow-icon.png" class="arrow-icon"></image>
+    </view>
+    <view class="test-card" bindtap="goToTest">
+      <image src="/imgs/形状@2x.png" class="test-icon"></image>
+      <text class="test-text">去测测体质</text>
+      <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>
+    </view>
+  </view>
+
+  <!-- 快捷操作区域 -->
+  <view class="action-section">
+    <view class="action-item" bindtap="goToCart">
+      <image src="/imgs/home/to-drink.png" class="action-icon"></image>
+      <view class="flexda">
+        <text class="action-subtitle">HAVE A DRINK</text>
+        <image src="/imgs/home/to-drink-text.png" class="action-title-img"></image>
+      </view>
+    </view>
+    <view class="action-item" bindtap="goToActivity">
+      <image src="/imgs/home/activity-icon.png" class="action-icon"></image>
+      <view class="flexda">
+        <text class="action-subtitle">RECENT ACTIVITIES</text>
+        <image src="/imgs/home/to-drink-text.png" class="action-title-img"></image>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐茶饮区域 -->
+  <view class="recommend-card">
+    <view class="flexba" bindtap="goToCart">
+      <view class="flexaifs">
+        <text class="section-title">今日推荐茶饮</text>
+        <text class="section-desc">来一杯自然的味道/适合木行体质的味道</text>
+      </view>
+      <image src="/imgs/home/arrow-icon.png" class="arrow-icon"></image>
+    </view>
+    <scroll-view class="drink-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
+      <view class="drink-container">
+        <view class="drink-card" wx:for="{{drinks}}" wx:key="index" bindtap="goToCart">
+          <image src="{{item.image}}" class="drink-img"></image>
+          <view class="drink-content">
+            <text class="drink-name">{{item.name}}</text>
+            <text class="drink-price">¥ {{item.price}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 当前门店区域 -->
+  <view class="store-card">
+    <view class="flexba">
+      <view class="flexaifs">
+        <image src="/imgs/home/location-icon.png" class="location-icon"></image>
+        <text class="section-title">当前门店</text>
+        <text class="section-desc">这里是门店地址</text>
+      </view>
+      <text class="store-distance">3.2km</text>
+    </view>
+    <image src="/imgs/home/store-image.png" class="store-img"></image>
+  </view>
+</view>

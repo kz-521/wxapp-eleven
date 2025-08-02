@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "l-segment": "/miniprogram_npm/lin-ui/segment/index",
+    "s-realm": "/components/realm/index",
+    "s-cart-item": "/components/cart-item/index",
+    "l-badge": "/miniprogram_npm/lin-ui/badge/index",
+    "s-tabbar": "/components/tab-bar/index",
+    "l-segment-item": "/miniprogram_npm/lin-ui/segment-item/index"
+  }
+
+}
