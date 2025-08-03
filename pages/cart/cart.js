@@ -181,7 +181,7 @@ Page({
             })
             return
         }
-        
+
         this.setData({
             showPopup: true,
             showCartDetail: false
@@ -329,7 +329,7 @@ Page({
         api.getBannerByName('b1').then(res => {
             if (res.code === 200 && res.result && res.result.items) {
                 console.log('获取banner成功:', res.result.items)
-                this.setData({
+        this.setData({
                     bannerList: res.result.items
                 })
             }
@@ -345,7 +345,7 @@ Page({
         api.getUserDetail().then(res => {
             if (res.code === 0 && res.result) {
                 console.log('获取用户信息成功:', res.result)
-                this.setData({
+        this.setData({
                     userInfo: res.result
                 })
             }
@@ -430,7 +430,7 @@ Page({
         api.submitConstitutionTest(answers).then(res => {
             if (res.code === 0 && res.result) {
                 console.log('体质测试提交成功:', res.result)
-                this.setData({
+        this.setData({
                     testResult: res.result
                 })
                 

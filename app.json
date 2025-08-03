@@ -9,7 +9,6 @@
     "pages/spu-list/spu-list",
     "pages/order-detail/order-detail",
     "pages/order/order",
-    "pages/coupon/coupon",
     "pages/my-order/my-order",
     "pages/my-coupon/my-coupon",
     "pages/pay-success/pay-success",
@@ -18,7 +17,8 @@
   "window": {
     "navigationBarTextStyle": "white",
     "navigationStyle" :"custom",
-    "onReachBottomDistance": 50
+    "onReachBottomDistance": 50,
+    "backgroundColor": "#FFFFFF"
   },
   "tabBar": {
     "borderStyle": "black",

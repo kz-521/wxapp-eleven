@@ -6,6 +6,11 @@
   flex-direction: column;
 }
 
+/* 确保页面背景为白色 */
+page {
+  background-color: #FFFFFF;
+}
+
 /* 隐藏滚动条 */
 ::-webkit-scrollbar {
   display: none;

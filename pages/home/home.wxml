@@ -1,11 +1,13 @@
 <view class="home-page">
   <!-- 顶部背景区域 -->
   <view class="banner-section">
-    <swiper class="banner-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="3000" duration="500">
+    <swiper class="banner-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="3000" duration="500" wx:if="{{bannerList.length > 0}}">
       <swiper-item wx:for="{{bannerList}}" wx:key="id">
         <image src="{{item.img}}" class="banner-image" mode="aspectFill"></image>
       </swiper-item>
     </swiper>
+    <!-- 默认banner，当没有数据时显示 -->
+    <image wx:if="{{bannerList.length === 0}}" src="/imgs/home/login-banner.png" class="banner-image" mode="aspectFill"></image>
   </view>
 
   <!-- 登录区域 -->
