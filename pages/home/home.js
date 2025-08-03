@@ -1,59 +1,55 @@
 // pages/home/home.js
-
-import {User} from "../../models/user";
+const { api } = require('../../utils/api.js')
 
 Page({
-
-    /**
-     * 页面的初始数据
-     */
     data: {
-        isLogin:true,
-        loadingType: 'loading',
+        isLogin: false,
         drinks: [
             {
-                name: '西柚牛油果奶昔',
-                price: '23',
+                name: '清照竹影茶',
+                price: '20',
                 image: '/imgs/home/drink-item.png'
             },
             {
-                name: '西柚牛油果奶昔',
-                price: '23',
+                name: '清照竹影茶',
+                price: '20',
                 image: '/imgs/home/drink-item.png'
             },
             {
-                name: '西柚牛油果奶昔',
-                price: '23',
+                name: '清照竹影茶',
+                price: '20',
                 image: '/imgs/home/drink-item.png'
             }
-        ]
+        ],
+        bannerList: [] // banner数据
     },
 
-    async onLoad(options) {
-        wx.hideTabBar({});
-
-        this.initAllData()
-        //this.initBottomSpuList()
+    onLoad() {
+        // 获取banner数据
+        this.getBannerData()
     },
 
-    async initAllData() {
-        let that = this
-        const shopInfo = await User.getShopInfo()
-        that.setData({
-            shopInfo
+    /**
+     * 获取banner数据
+     */
+    getBannerData() {
+        api.getBannerByName('b1').then(res => {
+            if (res.code === 200 && res.result && res.result.items) {
+                console.log('获取banner成功:', res.result.items)
+                this.setData({
+                    bannerList: res.result.items
+                })
+            }
+        }).catch(err => {
+            console.error('获取banner失败:', err)
         })
     },
 
     // 跳转到登录页面
     goToLogin() {
-        wx.showToast({
-            title: '跳转到登录页面',
-            icon: 'none'
+        wx.navigateTo({
+            url: '/pages/login/login'
         })
-        // 如果有登录页面，可以取消注释下面的代码
-        // wx.navigateTo({
-        //     url: '/pages/login/login'
-        // })
     },
 
     // 跳转到购物车页面
@@ -65,54 +61,16 @@ Page({
 
     // 跳转到测试体质页面
     goToTest() {
-        wx.showToast({
-            title: '跳转到测试体质页面',
-            icon: 'none'
+        wx.navigateTo({
+            url: '/pages/test/test'
         })
-        // 如果有测试页面，可以取消注释下面的代码
-        // wx.navigateTo({
-        //     url: '/pages/test/test'
-        // })
     },
 
     // 跳转到活动页面
     goToActivity() {
-        wx.showToast({
-            title: '跳转到活动页面',
-            icon: 'none'
-        })
-        // 如果有活动页面，可以取消注释下面的代码
-        // wx.navigateTo({
-        //     url: '/pages/activity/activity'
-        // })
-    },
-
-    onGoToCategory(){
         wx.navigateTo({
-            url: `/pages/category/category`
+            url: '/pages/activity/activity'
         })
-    },
-
-    onGoToMyOrder(){
-        wx.navigateTo({
-            url: `/pages/my-order/my-order`
-        })
-    },
-
-    getPhoneNumber (e) {
-        console.log(e.detail.errMsg)
-        console.log(e.detail.iv)
-        console.log(e.detail.encryptedData)
-
-        this.initAllData()
-    },
-
-    onPullDownRefresh: function () {
-
-    },
-
-    onShareAppMessage: function () {
-
     }
 })
 

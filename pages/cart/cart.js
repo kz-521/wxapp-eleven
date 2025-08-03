@@ -1,4 +1,5 @@
 // pages/cart/cart.js
+const { api } = require('../../utils/api.js')
 
 Page({
     /**
@@ -8,43 +9,14 @@ Page({
         currentCategory: 0,
         showPopup: false,
         showCartDetail: false,
-        products: [
-            {
-                name: '清照竹影茶',
-                tag1: '土形体质',
-                tag2: '阴虚体质专属',
-                price: '20',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                name: '清照竹影茶',
-                tag1: '土形体质',
-                tag2: '阴虚体质专属',
-                price: '20',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                name: '清照竹影茶',
-                tag1: '土形体质',
-                tag2: '阴虚体质专属',
-                price: '20',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                name: '清照竹影茶',
-                tag1: '土形体质',
-                tag2: '阴虚体质专属',
-                price: '20',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                name: '清照竹影茶',
-                tag1: '土形体质',
-                tag2: '阴虚体质专属',
-                price: '20',
-                image: '/imgs/home/drink-item.png'
-            }
-        ],
+        bannerList: [], // banner数据
+        userInfo: null, // 用户信息
+        allProducts: [], // 所有商品数据
+        constitutionQuestions: [], // 体质测试问题
+        currentQuestionIndex: 0, // 当前问题索引
+        testAnswers: [], // 测试答案
+        testResult: null, // 测试结果
+        products: [],
         cartItems: [],
         cartCount: 0,
         totalPrice: 0
@@ -57,6 +29,16 @@ Page({
         // 隐藏tabbar
         wx.hideTabBar()
         this.loadCartData()
+        // 获取推荐商品数据
+        this.getRecommendData()
+        // 获取banner数据
+        this.getBannerData()
+        // 获取用户信息
+        this.getUserInfo()
+        // 获取所有商品数据
+        this.getAllProducts()
+        // 初始化加载第一个分类的商品
+        this.loadProductsByCategory(1)
     },
 
     /**
@@ -237,14 +219,272 @@ Page({
     // 切换分类
     switchCategory(event) {
         const index = event.currentTarget.dataset.index
-        console.log('点击了菜单项，索引:', index)
-        console.log('当前currentCategory:', this.data.currentCategory)
         
         this.setData({
             currentCategory: index
         })
+        // 根据分类加载商品数据
+        const categoryId = Number(index) + 1 // 分类ID从1开始
+        this.loadProductsByCategory(categoryId)
+    },
+
+    /**
+     * 根据分类加载商品数据
+     */
+    loadProductsByCategory(categoryId) {
+        console.log('开始加载分类商品，categoryId:', categoryId)
+        console.log('API调用: /qingting/v1/spu/category/' + categoryId)
         
-        console.log('设置后的currentCategory:', this.data.currentCategory)
-        console.log('切换到分类:', index)
+        api.getSpuByCategory(categoryId).then(res => {
+            console.log('API响应:', res)
+            if (res.code === 200 && res.result && res.result.list) {
+                console.log('获取分类商品成功:', res.result.list)
+                // 更新商品列表数据
+                const categoryProducts = res.result.list.map(item => ({
+                    id: item.id,
+                    name: item.title,
+                    tag1: item.tags ? item.tags.split(',')[0] : '',
+                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    price: item.discount_price || item.price,
+                    image: item.img,
+                    subtitle: item.subtitle,
+                    description: item.description,
+                    originalPrice: item.price,
+                    skuList: item.skuList || item.sku_list || [],
+                    categoryId: item.category_id
+                }))
+                
+                this.setData({
+                    products: categoryProducts
+                })
+            }
+        }).catch(err => {
+            console.error('获取分类商品失败:', err)
+        })
+    },
+
+    /**
+     * 获取所有商品列表
+     */
+    getAllProducts() {
+        api.getSpuList().then(res => {
+            if (res.code === 200 && res.result && res.result.list) {
+                console.log('获取所有商品成功:', res.result.list)
+                const allProducts = res.result.list.map(item => ({
+                    id: item.id,
+                    name: item.title,
+                    tag1: item.tags ? item.tags.split(',')[0] : '',
+                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    price: item.discount_price || item.price,
+                    image: item.img,
+                    subtitle: item.subtitle,
+                    description: item.description,
+                    originalPrice: item.price,
+                    categoryId: item.category_id
+                }))
+                
+                this.setData({
+                    allProducts: allProducts
+                })
+            }
+        }).catch(err => {
+            console.error('获取所有商品失败:', err)
+        })
+    },
+
+    /**
+     * 获取推荐商品数据
+     */
+    getRecommendData() {
+        api.getRecommendSpu(3).then(res => {
+            if (res.code === 200 && res.result && res.result.list) {
+                console.log('获取推荐商品成功:', res.result.list)
+                // 更新商品列表数据
+                const recommendProducts = res.result.list.map(item => ({
+                    id: item.id,
+                    name: item.title,
+                    tag1: item.tags ? item.tags.split(',')[0] : '',
+                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    price: item.discount_price || item.price,
+                    image: item.img,
+                    subtitle: item.subtitle,
+                    description: item.description,
+                    originalPrice: item.price,
+                    skuList: item.skuList || []
+                }))
+                
+                this.setData({
+                    products: recommendProducts
+                })
+            }
+        }).catch(err => {
+            console.error('获取推荐商品失败:', err)
+        })
+    },
+
+    /**
+     * 获取banner数据
+     */
+    getBannerData() {
+        api.getBannerByName('b1').then(res => {
+            if (res.code === 200 && res.result && res.result.items) {
+                console.log('获取banner成功:', res.result.items)
+                this.setData({
+                    bannerList: res.result.items
+                })
+            }
+        }).catch(err => {
+            console.error('获取banner失败:', err)
+        })
+    },
+
+    /**
+     * 获取用户信息
+     */
+    getUserInfo() {
+        api.getUserDetail().then(res => {
+            if (res.code === 0 && res.result) {
+                console.log('获取用户信息成功:', res.result)
+                this.setData({
+                    userInfo: res.result
+                })
+            }
+        }).catch(err => {
+            console.error('获取用户信息失败:', err)
+        })
+    },
+
+    /**
+     * 更新用户信息
+     */
+    updateUserInfo(userData) {
+        api.updateUser(userData).then(res => {
+            if (res.code === 0) {
+                console.log('更新用户信息成功:', res)
+                wx.showToast({
+                    title: '更新成功',
+                    icon: 'success'
+                })
+            }
+        }).catch(err => {
+            console.error('更新用户信息失败:', err)
+        })
+    },
+
+    /**
+     * 获取商品详情
+     */
+    getSpuDetail(spuId) {
+        api.getSpuDetail(spuId).then(res => {
+            if (res.code === 200 && res.result) {
+                console.log('获取商品详情成功:', res.result)
+                return res.result
+            }
+        }).catch(err => {
+            console.error('获取商品详情失败:', err)
+        })
+    },
+
+    /**
+     * 点击商品项
+     */
+    onProductClick(event) {
+        const index = event.currentTarget.dataset.index
+        const product = this.data.products[index]
+        console.log('点击商品:', product)
+        
+        // 获取商品详情
+        this.getSpuDetail(product.id).then(detail => {
+            if (detail) {
+                // 这里可以跳转到商品详情页或显示详情弹窗
+                wx.showToast({
+                    title: '商品详情功能开发中',
+                    icon: 'none'
+                })
+            }
+        })
+    },
+
+    /**
+     * 获取体质测试问题
+     */
+    getConstitutionQuestions() {
+        api.getConstitutionQuestions().then(res => {
+            if (res.code === 0 && res.result && res.result.questions) {
+                console.log('获取体质测试问题成功:', res.result.questions)
+                this.setData({
+                    constitutionQuestions: res.result.questions,
+                    currentQuestionIndex: 0,
+                    testAnswers: []
+                })
+            }
+        }).catch(err => {
+            console.error('获取体质测试问题失败:', err)
+        })
+    },
+
+    /**
+     * 提交体质测试
+     */
+    submitConstitutionTest(answers) {
+        api.submitConstitutionTest(answers).then(res => {
+            if (res.code === 0 && res.result) {
+                console.log('体质测试提交成功:', res.result)
+                this.setData({
+                    testResult: res.result
+                })
+                
+                wx.showToast({
+                    title: '测试完成',
+                    icon: 'success'
+                })
+                
+                // 这里可以跳转到结果页面或显示结果
+                this.showTestResult(res.result)
+            }
+        }).catch(err => {
+            console.error('体质测试提交失败:', err)
+        })
+    },
+
+    /**
+     * 显示测试结果
+     */
+    showTestResult(result) {
+        const { primary_constitution, scores } = result.result
+        
+        wx.showModal({
+            title: '体质测试结果',
+            content: `主要体质：${primary_constitution.type}\n特征：${primary_constitution.features}\n建议：${primary_constitution.keywords}`,
+            showCancel: false,
+            confirmText: '确定'
+        })
+    },
+
+    /**
+     * 支付功能
+     */
+    payOrder(orderData) {
+        api.payPreorder(orderData).then(res => {
+            console.log('支付请求成功:', res)
+            // 处理支付结果
+            if (res.code === 0) {
+                wx.showToast({
+                    title: '支付成功',
+                    icon: 'success'
+                })
+            } else {
+                wx.showToast({
+                    title: res.msg || '支付失败',
+                    icon: 'none'
+                })
+            }
+        }).catch(err => {
+            console.error('支付失败:', err)
+            wx.showToast({
+                title: '支付失败',
+                icon: 'none'
+            })
+        })
     }
 })

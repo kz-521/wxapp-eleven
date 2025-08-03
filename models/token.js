@@ -12,12 +12,9 @@ import {promisic} from "../utils/util";
 class Token {
     // 1. 携带Token
     // server 请求Token
-
     // 登录 token -> storage
-
     // token 1. token不存在 2.token 过期时间
     // 静默登录
-
     constructor() {
         this.tokenUrl = config.apiBaseUrl + "token"
         this.verifyUrl = config.apiBaseUrl + "token/verify"

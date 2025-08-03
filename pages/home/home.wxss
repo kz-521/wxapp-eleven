@@ -14,20 +14,22 @@
   display: none;
 }
 
-/* 顶部背景区域 */
+/* Banner区域 */
 .banner-section {
-  width: 650rpx;
-  height: 338rpx;
-  margin: 226rpx auto 80rpx auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 400rpx;
+  position: relative;
+}
+
+.banner-swiper {
+  width: 100%;
+  height: 100%;
 }
 
 .banner-image {
-  width: 387rpx;
-  height: 338rpx;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 20rpx 20rpx;
 }
 
 /* 登录区域 */

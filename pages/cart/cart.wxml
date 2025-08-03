@@ -10,7 +10,6 @@
     </view>
     <view class="slipper-icons">
       <image src="/imgs/编组 3@2x.png" class="slipper-icon"></image>
-      <image src="/imgs/编组 3@2x.png" class="slipper-icon"></image>
     </view>
   </view>
 
@@ -25,10 +24,13 @@
         <text class="category-text">本草滋养茶<br/>特调</text>
       </view>
       <view class="category-item {{currentCategory == 2 ? 'active' : ''}}" bindtap="switchCategory" data-index="2">
-        <text class="category-text">本草滋养茶<br/>特调</text>
+        <text class="category-text">本草滋养茶<br/>经典</text>
       </view>
       <view class="category-item {{currentCategory == 3 ? 'active' : ''}}" bindtap="switchCategory" data-index="3">
-        <text class="category-text">本草滋养茶<br/>特调</text>
+        <text class="category-text">本草滋养茶<br/>新品</text>
+      </view>
+      <view class="category-item {{currentCategory == 4 ? 'active' : ''}}" bindtap="switchCategory" data-index="4">
+        <text class="category-text">本草滋养茶<br/>热销</text>
       </view>
     </view>
 
@@ -36,7 +38,7 @@
     <view class="product-section">
       <text class="section-title">本草滋养茶·9种体质</text>
       <scroll-view class="product-list" scroll-y="{{true}}" show-scrollbar="{{true}}">
-        <view class="product-item" wx:for="{{products}}" wx:key="index">
+        <view class="product-item" wx:for="{{products}}" wx:key="index" bindtap="onProductClick" data-index="{{index}}">
           <view class="product-content">
             <image src="{{item.image}}" class="product-image"></image>
             <view class="product-info">
@@ -51,9 +53,9 @@
                 <view class="product-price">
                   <text class="price-symbol">¥</text>
                   <text class="price-value">{{item.price}}</text>
-                  <text class="price-unit">起</text>
+                  <text class="price-unit" wx:if="{{item.originalPrice && item.originalPrice != item.price}}">起</text>
                 </view>
-                <image src="/imgs/home/add-icon.png" class="add-btn" bindtap="addToCart" data-index="{{index}}"></image>
+                <image src="/imgs/add.png" class="add-btn" bindtap="addToCart" data-index="{{index}}"></image>
               </view>
             </view>
           </view>

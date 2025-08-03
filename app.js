@@ -4,25 +4,10 @@ import {Token} from "./models/token";
 
 App({
     async onLaunch() {
-
-
         const r = await wx.login()
         const code = r.code
-
-        console.log(code)
-/*
-
-        const cart = new Cart()
-        if (!cart.isEmpty()) {
-            wx.showTabBarRedDot({
-                index: 2
-            })
-        }
-*/
+        console.log(code, 'code')
         const token = new Token()
         token.verify()
-
-
     }
-
 })
