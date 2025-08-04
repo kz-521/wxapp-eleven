@@ -1,7 +1,5 @@
 {
   "usingComponents": {
-    "s-cart-item": "/components/cart-item/index",
-    "l-badge": "/miniprogram_npm/lin-ui/badge/index"
+    "s-cart-item": "/components/cart-item/index"
   }
-
 }

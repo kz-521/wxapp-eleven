@@ -1,8 +1,0 @@
-{
-  "usingComponents": {
-    "s-my-order-item": "/components/my-order-item/index",
-    "l-segment": "/miniprogram_npm/lin-ui/segment/index",
-    "n-bar": "/components/navigation-bar/index",
-    "l-segment-item": "/miniprogram_npm/lin-ui/segment-item/index"
-  }
-}

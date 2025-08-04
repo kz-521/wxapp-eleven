@@ -1,27 +1,20 @@
 {
   "pages": [
     "pages/home/home",
-    "pages/detail/detail",
     "pages/cart/cart",
-    "pages/category/category",
-    "pages/my/my",
-    "pages/search/search",
-    "pages/spu-list/spu-list",
-    "pages/order-detail/order-detail",
-    "pages/order/order",
-    "pages/my-order/my-order",
-    "pages/my-coupon/my-coupon",
-    "pages/pay-success/pay-success",
-    "pages/theme-spu-list/theme-spu-list"
+    "pages/test/index",
+    "pages/test-result/index",
+    "pages/order-submit/index",
+    "pages/my-order/index",
+    "pages/coupon-select/index"
   ],
   "window": {
-    "navigationBarTextStyle": "white",
-    "navigationStyle" :"custom",
-    "onReachBottomDistance": 50,
-    "backgroundColor": "#FFFFFF"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "navigationBarBackgroundColor": "#FFFFFF"
   },
   "tabBar": {
-    "borderStyle": "black",
+    "borderStyle": "white",
     "color": "#333333",
     "selectedColor": "#333333",
     "list": [
@@ -41,18 +34,6 @@
   },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
-      "l-popup": "/miniprogram_npm/lin-ui/popup/index",
-      "l-slide-view": "/miniprogram_npm/lin-ui/slide-view/index",
-      "l-counter": "/miniprogram_npm/lin-ui/counter/index",
-      "l-icon": "/miniprogram_npm/lin-ui/icon/index",
-      "l-loadmore": "/miniprogram_npm/lin-ui/loadmore/index",
-      "n-bar": "/components/navigation-bar/index",
-      "l-capsule-bar": "/miniprogram_npm/lin-ui/capsule-bar/index",
-      "s-counter": "/components/counter/index",
-      "l-button": "/miniprogram_npm/lin-ui/button/index",
-      "l-loading": "/miniprogram_npm/lin-ui/loading/index",
-      "l-price": "/miniprogram_npm/lin-ui/price/index",
-      "l-tag": "/miniprogram_npm/lin-ui/tag/index",
       "s-empty": "/components/empty/index"
   }
 }
