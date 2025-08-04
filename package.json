@@ -6,10 +6,6 @@
   "main": "app.js",
   "detail": "新全栈课包含小程序、vue、java和SpringBoot",
   "author": "7七月",
-  "dependencies": {
-    "lin-ui": "^0.9.4"
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
