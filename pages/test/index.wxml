@@ -1,0 +1,40 @@
+<view class="page">
+    <view class="group_2" bind:tap="toSuccess">
+      <text lines="1" class="text_3">你是男生还是女生？</text>
+      <view class="box_3">
+        <view class="text-wrapper_1">
+          <text lines="1" class="text_4">我是男生</text>
+        </view>
+        <view class="text-wrapper_2">
+          <text lines="1" class="text_5">我是女生</text>
+        </view>
+      </view>
+      <text lines="1" class="text_6">选择你的生日</text>
+      <view class="text-wrapper_3">
+        <text lines="1" class="text_7">完善生日可以更准确计算体质哦～</text>
+      </view>
+      <text lines="1" class="text_8">第一部分：基础特征（单选）</text>
+      <text lines="1" class="text_9">你的体形特征是？</text>
+      <view class="box_4">
+        <text lines="1" class="text_10">请选择</text>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_3"></image>
+      </view>
+      <text lines="1" class="text_11">平时有什么日常状态？</text>
+      <view class="box_4">
+        <text lines="1" class="text_12">请选择</text>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_4"></image>
+      </view>
+      <text lines="1" class="text_8">第二部分：性格倾向（多选）</text>
+      <text lines="1" class="text_9">遇到压力时你会怎么做？</text>
+      <view class="box_4">
+        <text lines="1" class="text_15">请选择</text>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_5"></image>
+      </view>
+      <text lines="1" class="text_9" style="margin: 30rpx 0 16rpx 0;">社交场合你通常喜欢？</text>
+      <view class="box_4">
+        <text lines="1" class="text_17">请选择</text>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_6"></image>
+      </view>
+    </view>
+    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_7"></image>
+</view>

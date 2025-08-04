@@ -76,9 +76,8 @@ Page({
 
     // 跳转到测试体质页面
     goToTest() {
-        wx.showToast({
-            title: '测试功能开发中',
-            icon: 'none'
+        wx.navigateTo({
+            url: '/pages/test/index'
         })
     },
 

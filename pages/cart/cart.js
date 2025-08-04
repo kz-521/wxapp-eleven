@@ -181,10 +181,10 @@ Page({
             })
             return
         }
-
-        this.setData({
-            showPopup: true,
-            showCartDetail: false
+        
+        // 直接跳转到提交订单页面
+        wx.navigateTo({
+            url: '/pages/order-submit/index'
         })
     },
 

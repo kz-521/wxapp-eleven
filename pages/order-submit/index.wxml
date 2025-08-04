@@ -1,0 +1,113 @@
+<view class="page">
+  <!-- 配送信息 -->
+  <view class="delivery-section">
+    <view class="section-title">配送信息</view>
+    
+    <!-- 上部分：到店取和店铺信息 -->
+    <view class="store-info">
+      <view class="pickup-tag">到店取</view>
+      <view class="store-details">
+        <text class="store-name">这里是店铺的名称</text>
+        <text class="store-address">地址</text>
+      </view>
+    </view>
+    
+    <!-- 中部分：堂食和外带选项 -->
+    <view class="dining-options">
+      <view class="option-item {{diningType === 'dine-in' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="dine-in">
+        <text class="option-text">堂食</text>
+      </view>
+      <view class="option-item {{diningType === 'takeaway' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="takeaway">
+        <text class="option-text">外带</text>
+      </view>
+    </view>
+  </view>
+  <view class="group_7">
+    <view class="block_4">
+      <view class="image-text_6">
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng82bfc13238b25fe5c6aef2c1cd6a93c4eacf63ef7ae5050cbab106a3e4bf4e61" class="label_4"></image>
+        <text lines="1" class="text-group_3">预计时间</text>
+      </view>
+      <view class="text-wrapper_3">
+        <text lines="1" class="text_11">6</text>
+        <text lines="1" class="text_12">分钟</text>
+      </view>
+    </view>
+    <view class="block_3">
+      <view class="section_3"></view>
+    </view>
+    <view class="text-wrapper_4">
+      <text lines="1" class="text_13">前方还有3杯/</text>
+      <text lines="1" class="text_14">共6杯商品制作</text>
+    </view>
+  </view>
+  <view class="group_8">
+    <text lines="1" class="text_15">商品明细</text>
+    <view class="box_8">
+      <view class="image-text_7">
+        <view class="image-wrapper_1">
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_3"></image>
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_4"></image>
+        </view>
+        <view class="text-group_10">
+          <text lines="1" class="text_16">清照竹影茶</text>
+          <text lines="1" class="text_17">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
+        </view>
+      </view>
+      <text lines="1" class="text_18">¥20</text>
+    </view>
+    <view class="box_8">
+      <view class="image-text_7">
+        <view class="image-wrapper_1">
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_3"></image>
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_4"></image>
+        </view>
+        <view class="text-group_10">
+          <text lines="1" class="text_16">清照竹影茶</text>
+          <text lines="1" class="text_17">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
+        </view>
+      </view>
+      <text lines="1" class="text_18">¥20</text>
+    </view>
+  </view>
+    <view class="text-wrapper_5">
+      <text lines="1" class="text_22">备注</text>
+      <text lines="1" class="text_23">建议先与商家沟通一致再留言哦～</text>
+    </view>
+    <view class="group_10" bindtap="selectCoupon">
+      <text lines="1" class="text_24">优惠劵</text>
+      <view class="image-text_9">
+        <view class="text-group_6">
+          <text lines="1" class="text_25">新人减免劵</text>
+          <text lines="1" class="text_26" />
+          <text lines="1" class="text_27">-5.00</text>
+        </view>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngacf8924448c4ce8f2415448371f32a072dd475293efad3f87092bff5766d6d36" class="thumbnail_1"></image>
+      </view>
+    </view>
+    <view class="group_11">
+      <view class="image-text_10">
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng383bccb25a75f3389f2968da6f8f0c85674571006659114c8f857f3424ccafd0" class="image_8"></image>
+        <view class="text-group_12">
+          <text lines="1" class="text_28">微信支付</text>
+          <text lines="1" class="text_29">使用微信快捷支付</text>
+        </view>
+      </view>
+      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng489e6c5e30e7a2f99f23232f84395da2bef9e6cc02ce2d3d59008979a0b8a9de" class="label_5"></image>
+    </view>
+    <view class="cart-bar">
+    <view class="cart-info">
+      <view class="cart-icon-wrapper" bindtap="showCartDetail">
+        <text lines="1" class="text_30">待支付</text>
+      </view>
+      <view class="cart-price">
+        <text lines="1" class="text_31">¥</text>
+          <text lines="1" class="text_32">20</text>
+      </view>
+    </view>
+    <view class="checkout-btn" bindtap="goToCheckout">
+      <text class="checkout-text">提交订单</text>
+    </view>
+  </view>
+
+</view>
