@@ -79,7 +79,7 @@
   flex-direction: row;
   display: flex;
   justify-content: space-between;
-  margin: 39rpx 83rpx 0 89rpx;
+  margin: 0rpx 83rpx 0 89rpx;
 }
 .text_3 {
   overflow-wrap: break-word;
@@ -90,7 +90,14 @@
   text-align: center;
   white-space: nowrap;
   line-height: 40rpx;
+  cursor: pointer;
 }
+
+.text_3.active {
+  color: rgba(0,0,0,0.85);
+  font-weight: 600;
+}
+
 .text_4 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.65);
@@ -100,7 +107,14 @@
   text-align: center;
   white-space: nowrap;
   line-height: 40rpx;
+  cursor: pointer;
 }
+
+.text_4.active {
+  color: rgba(0,0,0,0.85);
+  font-weight: 600;
+}
+
 .text_5 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.65);
@@ -110,6 +124,12 @@
   text-align: center;
   white-space: nowrap;
   line-height: 40rpx;
+  cursor: pointer;
+}
+
+.text_5.active {
+  color: rgba(0,0,0,0.85);
+  font-weight: 600;
 }
 .image_3 {
   width: 56rpx;
@@ -134,7 +154,6 @@
   margin: 39rpx 0 46rpx 0;
 }
 .text-wrapper_2 {
-  width: 105rpx;
   height: 92rpx;
   overflow-wrap: break-word;
   font-size: 0rpx;
@@ -187,7 +206,7 @@
   font-size: 32rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 45rpx;
   margin-right: 31rpx;
@@ -198,7 +217,7 @@
   font-size: 24rpx;
   font-family: PingFang-SC-Medium;
   font-weight: normal;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 33rpx;
   margin: 16rpx 119rpx 0 0;
@@ -509,7 +528,7 @@
   margin: 39rpx 0 46rpx 0;
 }
 .text-wrapper_5 {
-  width: 105rpx;
+  /* width: 105rpx; */
   height: 92rpx;
   overflow-wrap: break-word;
   font-size: 0rpx;
@@ -562,7 +581,7 @@
   font-size: 32rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 45rpx;
   margin-right: 31rpx;
@@ -573,7 +592,7 @@
   font-size: 24rpx;
   font-family: PingFang-SC-Medium;
   font-weight: normal;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 33rpx;
   margin: 16rpx 119rpx 0 0;
@@ -642,7 +661,7 @@
   margin: 39rpx 0 46rpx 0;
 }
 .text-wrapper_6 {
-  width: 105rpx;
+  /* width: 105rpx; */
   height: 92rpx;
   overflow-wrap: break-word;
   font-size: 0rpx;
@@ -695,7 +714,7 @@
   font-size: 32rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 45rpx;
   margin-right: 31rpx;
@@ -706,7 +725,7 @@
   font-size: 24rpx;
   font-family: PingFang-SC-Medium;
   font-weight: normal;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   line-height: 33rpx;
   margin: 16rpx 119rpx 0 0;

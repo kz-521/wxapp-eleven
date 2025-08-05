@@ -6,14 +6,24 @@
 
   <!-- 登录区域 -->
   <view class="login-card">
-    <view class="flexba" bindtap="goToLogin">
+    <!-- 未登录状态：显示登录信息 -->
+    <view class="flexba" bindtap="goToLogin" wx:if="{{!isLogin}}">
       <view class="flexaifs">
-        <image src="/imgs/home/login-banner.png" class="login-title-img" wx:if="{{!isLogin}}"></image>
+        <image src="/imgs/home/login-banner.png" class="login-title-img"></image>
         <text class="login-desc">即刻加入我们，一起享受自然</text>
       </view>
-      <image src="/imgs/home/arrow-icon.png" class="arrow-icon"></image>
+      <image src="/imgs/right-icon.png" class="arrow-icon"></image>
     </view>
-    <view class="test-card" bindtap="goToTest">
+    
+    <!-- 已登录状态：只显示去测测体质 -->
+    <view class="test-card" bindtap="goToTest" wx:if="{{isLogin}}">
+      <image src="/imgs/形状@2x.png" class="test-icon"></image>
+      <text class="test-text">去测测体质</text>
+      <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>
+    </view>
+    
+    <!-- 未登录状态：显示去测测体质 -->
+    <view class="test-card" bindtap="goToTest" wx:if="{{!isLogin}}">
       <image src="/imgs/形状@2x.png" class="test-icon"></image>
       <text class="test-text">去测测体质</text>
       <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>
@@ -43,15 +53,15 @@
     <view class="recommend-header">
       <text class="section-title">今日推荐茶饮</text>
       <text class="section-desc">来一杯自然的味道/适合木行体质的味道</text>
-      <image src="/imgs/home/arrow-icon.png" class="arrow-icon"></image>
+      <image src="/imgs/right-icon.png" class="arrow-icon"></image>
     </view>
     <scroll-view class="drink-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
       <view class="drink-container">
-        <view class="drink-card" wx:for="{{drinks}}" wx:key="index" bindtap="goToCart">
-          <image src="{{item.image}}" class="drink-img"></image>
+        <view class="drink-card" wx:for="{{drinks}}" wx:key="id" bindtap="goToCart">
+          <image src="{{item.image}}" class="drink-img" mode="aspectFill"></image>
           <view class="drink-content">
             <text class="drink-name">{{item.name}}</text>
-            <text class="drink-price">¥ {{item.price}}</text>
+            <text class="drink-price">¥{{item.price}}</text>
           </view>
         </view>
       </view>
@@ -63,8 +73,9 @@
     <view class="store-header">
       <text class="section-title">当前门店</text>
       <image src="/imgs/home/location-icon.png" class="location-icon"></image>
-      <text class="store-address">这里是门店地址</text>
-      <text class="store-distance">3.2km</text>
+      <text class="store-address">{{storeLocation.name}}</text>
+      <text class="store-distance" wx:if="{{distance}}">{{distance}}</text>
+      <text class="store-distance" wx:else>计算中...</text>
     </view>
     <image src="/imgs/home/store-image.png" class="store-img"></image>
   </view>

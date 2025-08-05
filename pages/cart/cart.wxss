@@ -287,8 +287,8 @@ page {
 }
 
 .add-btn {
-  width: 60rpx;
-  height: 60rpx;
+  width: 40rpx;
+  height: 40rpx;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -707,4 +707,29 @@ page {
 .confirm-btn {
   background-color: #477676;
   color: #FFFFFF;
+}
+
+/* 空状态样式 */
+.empty-product-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400rpx;
+  width: 100%;
+}
+
+.empty-logo {
+  width: 200rpx;
+  height: 175rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  line-height: 40rpx;
+  text-align: center;
 }

@@ -7,8 +7,8 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/my-order/index",
-          "pathName": "pages/my-order/index",
+          "name": "pages/cart/cart",
+          "pathName": "pages/cart/cart",
           "query": "",
           "launchMode": "default",
           "scene": null

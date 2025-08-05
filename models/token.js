@@ -16,12 +16,14 @@ class Token {
     // token 1. token不存在 2.token 过期时间
     // 静默登录
     constructor() {
-        this.tokenUrl = config.apiBaseUrl + "token"
-        this.verifyUrl = config.apiBaseUrl + "token/verify"
+        // 使用正确的token URL
+        this.tokenUrl = config.apiBaseUrl + "qingting/v1/token"
+        this.verifyUrl = config.apiBaseUrl + "qingting/v1/token/verify"
     }
 
     async verify() {
-        const token = wx.getStorageSync('token')
+        // 使用新的token获取方式
+        const token = wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token')
         if (!token) {
             await this.getTokenFromServer()
         } else {
@@ -30,20 +32,23 @@ class Token {
     }
 
     async getTokenFromServer() {
-        // code
+        // 获取微信登录凭证
         const r = await wx.login()
         const code = r.code
 
+        // 调用正确的token接口
         const res = await promisic(wx.request)({
             url: this.tokenUrl,
             method: 'POST',
             data: {
-                account: code,
-                type: 0
+                code: code
             },
         })
-        wx.setStorageSync('token', res.data.token)
-        return res.data.token
+        
+        // 保存新的token
+        const newToken = res.data.token || res.data.access_token
+        wx.setStorageSync('wechat_token', newToken)
+        return newToken
     }
 
     async _verifyFromServer(token) {

@@ -1,18 +1,49 @@
 // utils/api.js
 const BASE_URL = 'https://api.jixiangjiaoyu.com'
 
+// 获取token
+const getToken = () => {
+  // 使用另一个token，这里需要根据实际情况调整
+  // 可能是从其他地方获取的token，比如微信登录后的token
+  const wechatToken = wx.getStorageSync('wechat_token')
+  const accessToken = wx.getStorageSync('access_token')
+  const token = wechatToken || accessToken || ''
+  
+  console.log('Token获取状态:', {
+    wechatToken: wechatToken ? '存在' : '不存在',
+    accessToken: accessToken ? '存在' : '不存在',
+    finalToken: token ? '已获取' : '未获取'
+  })
+  
+  return token
+}
+
 // 请求封装
 const request = (options) => {
   return new Promise((resolve, reject) => {
+    const token = getToken()
+    console.log('API请求 - URL:', options.url, 'Token:', token ? '已获取' : '未获取')
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.header
+    }
+    
+    // 如果有token，添加到请求头
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+      console.log('API请求 - 已添加Authorization header')
+    } else {
+      console.log('API请求 - 未添加Authorization header，token不存在')
+    }
+
     wx.request({
       url: BASE_URL + options.url,
       method: options.method || 'GET',
       data: options.data || {},
-      header: {
-        'Content-Type': 'application/json',
-        ...options.header
-      },
+      header: headers,
       success: (res) => {
+        console.log('API响应 - URL:', options.url, 'Status:', res.statusCode, 'Data:', res.data)
         if (res.statusCode === 200) {
           resolve(res.data)
         } else {
@@ -23,6 +54,7 @@ const request = (options) => {
         }
       },
       fail: (err) => {
+        console.error('API请求失败 - URL:', options.url, 'Error:', err)
         reject({
           code: -1,
           message: '网络请求失败',
@@ -112,12 +144,38 @@ const api = {
     })
   },
 
-  // 支付接口
-  payPreorder: (orderData) => {
+  // 提交订单
+  submitOrder: () => {
     return request({
-      url: '/qingting/v1/pay/preorder',
+      url: '/qingting/v1/order/place',
       method: 'POST',
-      data: orderData
+    })
+  },
+
+  // 支付接口
+  payPreorder: (orderId) => {
+    return request({
+      url: `/qingting/v1/pay/preorder?XDEBUG_SESSION_START=PHPSTORM`,
+      method: 'POST',
+      data: { order_id: orderId }
+    })
+  },
+
+  // 微信登录相关
+  wxLogin: (code) => {
+    return request({
+      url: '/qingting/v1/token',
+      method: 'POST',
+      data: { code }
+    })
+  },
+
+  // 更新用户信息
+  updateUserInfo: (userInfo) => {
+    return request({
+      url: '/user/update',
+      method: 'POST',
+      data: userInfo
     })
   }
 }
