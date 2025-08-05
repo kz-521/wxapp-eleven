@@ -74,7 +74,7 @@
         </view>
       </view>
       <view class="cart-price">
-        <text class="price-symbol">¥</text>
+        <text class="price-symbol2">¥</text>
         <text class="price-value">{{totalPrice}}</text>
       </view>
     </view>

@@ -1,13 +1,7 @@
 <view class="home-page">
-  <!-- 顶部背景区域 -->
-  <view class="banner-section">
-    <swiper class="banner-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="3000" duration="500" wx:if="{{bannerList.length > 0}}">
-      <swiper-item wx:for="{{bannerList}}" wx:key="id">
-        <image src="{{item.img}}" class="banner-image" mode="aspectFill"></image>
-      </swiper-item>
-    </swiper>
-    <!-- 默认banner，当没有数据时显示 -->
-    <image wx:if="{{bannerList.length === 0}}" src="/imgs/home/login-banner.png" class="banner-image" mode="aspectFill"></image>
+  <!-- 顶部logo区域 -->
+  <view style="margin:226rpx 0 40rpx 0;display:flex;justify-content:center;">
+    <image src="/imgs/logo.png" style="width: 387rpx;height: 338rpx;"></image>
   </view>
 
   <!-- 登录区域 -->
@@ -46,11 +40,9 @@
 
   <!-- 推荐茶饮区域 -->
   <view class="recommend-card">
-    <view class="flexba" bindtap="goToCart">
-      <view class="flexaifs">
-        <text class="section-title">今日推荐茶饮</text>
-        <text class="section-desc">来一杯自然的味道/适合木行体质的味道</text>
-      </view>
+    <view class="recommend-header">
+      <text class="section-title">今日推荐茶饮</text>
+      <text class="section-desc">来一杯自然的味道/适合木行体质的味道</text>
       <image src="/imgs/home/arrow-icon.png" class="arrow-icon"></image>
     </view>
     <scroll-view class="drink-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
@@ -68,12 +60,10 @@
 
   <!-- 当前门店区域 -->
   <view class="store-card">
-    <view class="flexba">
-      <view class="flexaifs">
-        <image src="/imgs/home/location-icon.png" class="location-icon"></image>
-        <text class="section-title">当前门店</text>
-        <text class="section-desc">这里是门店地址</text>
-      </view>
+    <view class="store-header">
+      <text class="section-title">当前门店</text>
+      <image src="/imgs/home/location-icon.png" class="location-icon"></image>
+      <text class="store-address">这里是门店地址</text>
       <text class="store-distance">3.2km</text>
     </view>
     <image src="/imgs/home/store-image.png" class="store-img"></image>

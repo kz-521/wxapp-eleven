@@ -151,13 +151,13 @@ page {
 
 .category-text {
   font-size: 24rpx;
-  color: #333333;
+  color: rgba(0,0,0,0.65);
   line-height: 32rpx;
   transition: color 0.3s ease;
 }
 
 .category-item.active .category-text {
-  color: #4CAF50 !important;
+  color: rgba(0,0,0,0.85) !important;
   font-weight: 500 !important;
 }
 
@@ -238,6 +238,7 @@ page {
 .product-tags {
   display: flex;
   gap: 10rpx;
+  margin-top: 8rpx;
 }
 
 .tag {
@@ -269,7 +270,10 @@ page {
   font-size: 20rpx;
   color: #000000;
 }
-
+.price-symbol2 {
+  font-size: 32rpx;
+  color: #000000;
+}
 .price-value {
   font-size: 28rpx;
   color: #000000;
@@ -308,7 +312,7 @@ page {
 .cart-info {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  /* gap: 20rpx; */
 }
 
 .cart-icon-wrapper {
@@ -349,8 +353,11 @@ page {
 }
 
 .cart-price {
+  margin-top: 16rpx;
   display: flex;
   align-items: baseline;
+  align-items: center;
+  /* justify-content: center; */
   margin-left: 38rpx;
 }
 
@@ -358,8 +365,8 @@ page {
   content: '';
   width: 1rpx;
   height: 44rpx;
-  border-radius: 4rpx;
-  border: 2rpx solid rgba(0,0,0,0.6);
+  /* border-radius: 4rpx; */
+  border-left: 2rpx solid rgba(0,0,0,0.6);
   margin-right: 24rpx;
 }
 
