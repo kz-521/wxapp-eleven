@@ -1,0 +1,80 @@
+<view class="page">
+  <view class="box_1">
+    <view class="block_1">
+      <!-- 头部标签 -->
+      <view class="text-wrapper_1">
+        <text lines="1" class="text_3 {{activeTab === 'available' ? 'active' : ''}}" bindtap="switchTab" data-tab="available">未使用</text>
+        <text lines="1" class="text_4 {{activeTab === 'used' ? 'active' : ''}}" bindtap="switchTab" data-tab="used">已使用</text>
+        <text lines="1" class="text_5 {{activeTab === 'expired' ? 'active' : ''}}" bindtap="switchTab" data-tab="expired">已过期</text>
+      </view>
+      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
+      
+      <!-- 可用优惠券 -->
+      <view class="section_3" wx:if="{{activeTab === 'available'}}" wx:for="{{availableCoupons}}" wx:key="id">
+        <view class="section_4">
+          <view class="text-wrapper_2">
+            <text lines="1" class="text_6">{{item.amount}}</text>
+            <text lines="1" class="text_7">元</text>
+          </view>
+          <text lines="1" class="text_8">优惠劵</text>
+        </view>
+        <view class="text-group_1">
+          <text lines="1" class="text_9">{{item.name}}</text>
+          <text lines="1" class="text_10">{{item.condition}}</text>
+          <text lines="1" decode="true" class="text_11">{{item.validDate}}</text>
+        </view>
+        <view class="section_5">
+          <view class="block_2" bindtap="useCoupon" data-coupon="{{item}}">
+            <text lines="1" class="text_12">去使用</text>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_4"></image>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 已使用优惠券 -->
+      <view class="section_3" wx:if="{{activeTab === 'used'}}" wx:for="{{usedCoupons}}" wx:key="id">
+        <view class="box_3">
+          <view class="text-wrapper_5">
+            <text lines="1" class="text_6">{{item.amount}}</text>
+            <text lines="1" class="text_7">元</text>
+          </view>
+          <text lines="1" class="text_8">优惠劵</text>
+        </view>
+        <view class="text-group_4">
+          <text lines="1" class="text_30">{{item.name}}</text>
+          <text lines="1" class="text_31">{{item.condition}}</text>
+          <text lines="1" decode="true" class="text_32">{{item.validDate}}</text>
+        </view>
+        <view class="box_4">
+          <view class="group_3">
+            <text lines="1" class="text_33">已使用</text>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_7"></image>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 已过期优惠券 -->
+      <view class="section_3" wx:if="{{activeTab === 'expired'}}" wx:for="{{expiredCoupons}}" wx:key="id">
+        <view class="box_5">
+          <view class="text-wrapper_6">
+            <text lines="1" class="text_6">{{item.amount}}</text>
+            <text lines="1" class="text_7">元</text>
+          </view>
+          <text lines="1" class="text_8">优惠劵</text>
+        </view>
+        <view class="text-group_5">
+          <text lines="1" class="text_37">{{item.name}}</text>
+          <text lines="1" class="text_38">{{item.condition}}</text>
+          <text lines="1" decode="true" class="text_39">{{item.validDate}}</text>
+        </view>
+        <view class="box_6">
+          <view class="group_4">
+            <text lines="1" class="text_40">已过期</text>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_8"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_9"></image>
+  </view>
+</view>

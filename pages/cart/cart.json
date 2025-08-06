@@ -1,5 +1,4 @@
 {
-  "usingComponents": {
-    "s-cart-item": "/components/cart-item/index"
-  }
+  "navigationStyle": "custom",
+  "usingComponents": {}
 }

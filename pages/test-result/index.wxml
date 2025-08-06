@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="box_2">
+    <text lines="1" class="text_3">您的体质是</text>
+    <view class="box_3">
+      <view class="text-group_1">
+        <text lines="1" class="text_4">火行</text>
+        <text lines="1" class="text_5">核心特征：肝气旺盛，追求效率</text>
+        <text lines="1" class="text_6">易患问题：偏头疼、月经不调</text>
+      </view>
+      <text lines="1" class="text_7">养生关键词：疏肝理气，晨起拉伸</text>
+    </view>
+  </view>
+  <view class="box_4">
+    <text lines="1" class="text_8">推荐饮品</text>
+    <view class="list_1">
+      <view class="list-items_1-0">
+        <view class="group_1-0">
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng792af329c1c6cb0d593540ae1d68fc204e9d5ab32db254fdb6e4ac23ce1926cb" class="image_4-0"></image>
+          <view class="group_2-0">
+            <text lines="1" class="text_9-0">清照竹影茶</text>
+            <view class="section_3-0">
+              <view class="text-wrapper_1-0">
+                <text lines="1" class="text_10-0">土形体质</text>
+              </view>
+              <view class="text-wrapper_2-0">
+                <text lines="1" class="text_11-0">阴虚体质专属</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="group_3-0">
+          <view class="text-wrapper_3-0">
+            <text lines="1" class="text_12-0">¥</text>
+            <text lines="1" class="text_13-0">20</text>
+            <text lines="1" class="text_14-0" />
+            <text lines="1" class="text_15-0">起</text>
+          </view>
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng34b1c27668891eff54b0dc5347194192b7e67daeacfcd577793073a3d7838b58" class="label_4-0"></image>
+        </view>
+        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPnge9e0c9f87ebc9759984b0447f26d1f8a8644a0ddf2cf6d4b0b19d35f7a8bb4db" class="image_5-0"></image>
+      </view>
+    </view>
+  </view>
+</view>

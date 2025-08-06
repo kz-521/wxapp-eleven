@@ -7,6 +7,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pages/cart/cart",
+          "pathName": "pages/cart/cart",
+          "query": "",
+          "launchMode": "default",
+          "scene": null
+        },
+        {
           "name": "pages/detail/detail",
           "pathName": "pages/detail/detail",
           "query": "pid=15",

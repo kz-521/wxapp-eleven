@@ -9,7 +9,6 @@ Page({
         currentCategory: 0,
         showPopup: false,
         showCartDetail: false,
-        bannerList: [], // banner数据
         userInfo: null, // 用户信息
         allProducts: [], // 所有商品数据
         constitutionQuestions: [], // 体质测试问题
@@ -22,58 +21,34 @@ Page({
         totalPrice: 0
     },
 
-    /**
-     * 生命周期函数--监听页面加载
-     */
     onLoad(options) {
         // 隐藏tabbar
         wx.hideTabBar()
         this.loadCartData()
-        // 获取推荐商品数据
-        this.getRecommendData()
-        // 获取banner数据
-        this.getBannerData()
-        // 获取用户信息
-        this.getUserInfo()
         // 获取所有商品数据
         this.getAllProducts()
         // 初始化加载第一个分类的商品
         this.loadProductsByCategory(1)
     },
-
-    /**
-     * 生命周期函数--监听页面显示
-     */
     onShow() {
-        // 隐藏tabbar
         wx.hideTabBar()
         this.loadCartData()
     },
-
-    /**
-     * 生命周期函数--监听页面隐藏
-     */
     onHide() {
-        // 页面隐藏时显示tabbar
         wx.showTabBar()
     },
-
-    /**
-     * 生命周期函数--监听页面卸载
-     */
     onUnload() {
-        // 页面卸载时显示tabbar
         wx.showTabBar()
     },
 
     // 加载购物车数据
     loadCartData() {
-        const cartItems = wx.getStorageSync('cartItems') || []
+        // 只使用页面级别的缓存，不读取本地存储
+        const cartItems = this.data.cartItems || []
         const cartCount = cartItems.reduce((total, item) => total + item.count, 0)
         const totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
         
-        this.setData({
-            cartItems,
+            this.setData({
             cartCount,
             totalPrice: totalPrice.toFixed(2)
         })
@@ -84,7 +59,7 @@ Page({
         const index = event.currentTarget.dataset.index
         const product = this.data.products[index]
         
-        let cartItems = wx.getStorageSync('cartItems') || []
+        let cartItems = this.data.cartItems || []
         const existingItem = cartItems.find(item => item.name === product.name)
         
         if (existingItem) {
@@ -95,8 +70,10 @@ Page({
                 count: 1
             })
         }
-        
-        wx.setStorageSync('cartItems', cartItems)
+
+        this.setData({
+            cartItems: cartItems
+        })
         this.loadCartData()
         
         wx.showToast({
@@ -108,11 +85,13 @@ Page({
     // 增加商品数量
     increaseQuantity(event) {
         const index = event.currentTarget.dataset.index
-        let cartItems = wx.getStorageSync('cartItems') || []
+        let cartItems = this.data.cartItems || []
         
         if (cartItems[index]) {
             cartItems[index].count += 1
-            wx.setStorageSync('cartItems', cartItems)
+            this.setData({
+                cartItems: cartItems
+            })
             this.loadCartData()
         }
     },
@@ -120,16 +99,20 @@ Page({
     // 减少商品数量
     decreaseQuantity(event) {
         const index = event.currentTarget.dataset.index
-        let cartItems = wx.getStorageSync('cartItems') || []
+        let cartItems = this.data.cartItems || []
         
         if (cartItems[index] && cartItems[index].count > 1) {
             cartItems[index].count -= 1
-            wx.setStorageSync('cartItems', cartItems)
+            this.setData({
+                cartItems: cartItems
+            })
             this.loadCartData()
         } else if (cartItems[index] && cartItems[index].count === 1) {
             // 如果数量为1，则移除商品
             cartItems.splice(index, 1)
-            wx.setStorageSync('cartItems', cartItems)
+            this.setData({
+                cartItems: cartItems
+            })
             this.loadCartData()
             
             wx.showToast({
@@ -160,7 +143,9 @@ Page({
             content: '确定要清空购物车吗？',
             success: (res) => {
                 if (res.confirm) {
-                    wx.setStorageSync('cartItems', [])
+                    this.setData({
+                        cartItems: []
+                    })
                     this.loadCartData()
                     this.closeCartDetail()
                     wx.showToast({
@@ -182,9 +167,19 @@ Page({
             return
         }
         
-        this.setData({
-            showPopup: true,
-            showCartDetail: false
+        // 将购物车数据存储到globalData中
+        const app = getApp()
+        app.globalData.cartItems = this.data.cartItems
+        app.globalData.cartCount = this.data.cartCount
+        app.globalData.totalPrice = this.data.totalPrice
+        
+        console.log('存储到globalData的购物车数据:', app.globalData.cartItems)
+        console.log('购物车总数:', app.globalData.cartCount)
+        console.log('总价格:', app.globalData.totalPrice)
+        
+        // 跳转到提交订单页面
+        wx.navigateTo({
+            url: '/pages/order-submit/index'
         })
     },
 
@@ -212,14 +207,15 @@ Page({
         })
         
         // 清空购物车
-        wx.setStorageSync('cartItems', [])
+        this.setData({
+            cartItems: []
+        })
         this.loadCartData()
     },
 
     // 切换分类
     switchCategory(event) {
         const index = event.currentTarget.dataset.index
-        
         this.setData({
             currentCategory: index
         })
@@ -234,6 +230,10 @@ Page({
     loadProductsByCategory(categoryId) {
         console.log('开始加载分类商品，categoryId:', categoryId)
         console.log('API调用: /qingting/v1/spu/category/' + categoryId)
+        
+        // 检查token是否存在
+        const token = wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token')
+        console.log('购物车页面 - Token检查:', token ? '存在' : '不存在')
         
         api.getSpuByCategory(categoryId).then(res => {
             console.log('API响应:', res)
@@ -323,29 +323,13 @@ Page({
     },
 
     /**
-     * 获取banner数据
-     */
-    getBannerData() {
-        api.getBannerByName('b1').then(res => {
-            if (res.code === 200 && res.result && res.result.items) {
-                console.log('获取banner成功:', res.result.items)
-                this.setData({
-                    bannerList: res.result.items
-                })
-            }
-        }).catch(err => {
-            console.error('获取banner失败:', err)
-        })
-    },
-
-    /**
      * 获取用户信息
      */
     getUserInfo() {
         api.getUserDetail().then(res => {
             if (res.code === 0 && res.result) {
                 console.log('获取用户信息成功:', res.result)
-                this.setData({
+        this.setData({
                     userInfo: res.result
                 })
             }
@@ -430,7 +414,7 @@ Page({
         api.submitConstitutionTest(answers).then(res => {
             if (res.code === 0 && res.result) {
                 console.log('体质测试提交成功:', res.result)
-                this.setData({
+        this.setData({
                     testResult: res.result
                 })
                 

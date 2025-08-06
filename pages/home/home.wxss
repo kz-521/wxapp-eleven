@@ -9,6 +9,11 @@
   box-sizing: border-box;
 }
 
+/* 确保页面背景为白色 */
+page {
+  background-color: #FFFFFF;
+}
+
 /* 隐藏滚动条 */
 ::-webkit-scrollbar {
   display: none;
@@ -43,7 +48,7 @@
 
 .login-title-img {
   width: 137rpx;
-  height: 41rpx;
+  height: 34rpx;
   margin-bottom: 6rpx;
 }
 
@@ -57,6 +62,8 @@
 .arrow-icon {
   width: 18rpx;
   height: 12rpx;
+  margin-left: 0;
+  flex-shrink: 0;
 }
 
 .test-card {
@@ -137,19 +144,38 @@
   box-sizing: border-box;
 }
 
+.recommend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
 .section-title {
   font-size: 26rpx;
   color: #000000;
   font-family: AaBanSongNon-CommercialUse;
   line-height: 37rpx;
-  margin-bottom: 6rpx;
+  margin-bottom: 0;
+  flex-shrink: 0;
 }
-
 .section-desc {
   font-size: 20rpx;
   color: rgba(0,0,0,0.45);
   font-family: PingFang-SC-Medium;
   line-height: 28rpx;
+  margin-left: 16rpx;
+  margin-right: 16rpx;
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.arrow-icon {
+  width: 18rpx;
+  height: 12rpx;
+  margin-left: 0;
+  flex-shrink: 0;
 }
 
 .drink-scroll {
@@ -223,17 +249,40 @@
   box-sizing: border-box;
 }
 
+.store-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40rpx;
+}
+.section-title {
+  font-size: 26rpx;
+  color: #000000;
+  font-family: AaBanSongNon-CommercialUse;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
 .location-icon {
   width: 14rpx;
   height: 19rpx;
-  margin-right: 15rpx;
+  margin-left: 15rpx;
+  margin-right: 8rpx;
+  flex-shrink: 0;
+  vertical-align: middle;
 }
-
+.store-address {
+  font-size: 20rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Medium;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
 .store-distance {
   font-size: 20rpx;
   color: rgba(0,0,0,0.45);
   font-family: PingFang-SC-Medium;
-  line-height: 28rpx;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .store-img {
