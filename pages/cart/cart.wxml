@@ -47,7 +47,7 @@
                 <view>
                   <text class="product-name">{{item.name}}</text>
                   <view class="product-tags">
-                    <text class="tag" wx:for="{{item.tags}}" wx:key="index" wx:if="{{item}}">{{item}}</text>
+                    <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
                   </view>
                 </view>
                 <view class="product-price-section">

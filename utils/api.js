@@ -143,11 +143,10 @@ const api = {
   },
 
   // 提交订单
-  submitOrder: (orderData) => {
+  submitOrder: () => {
     return request({
       url: '/qingting/v1/order/place',
       method: 'POST',
-      data: orderData
     })
   },
 

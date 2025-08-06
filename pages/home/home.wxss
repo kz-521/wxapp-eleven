@@ -286,7 +286,6 @@ page {
 
 .store-img {
   width: 590rpx;
-  /* height: auto; */
   border-radius: 4rpx;
   object-fit: cover;
   margin-top: 32rpx;

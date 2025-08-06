@@ -164,26 +164,18 @@ Page({
             return
         }
         
-        // 构建sku_info_list格式的数据
-        const sku_info_list = this.data.cartItems.map(item => ({
-            id: item.id,
-            count: item.count
-        }))
-        
         // 将购物车数据存储到globalData中
         const app = getApp()
         app.globalData.cartItems = this.data.cartItems
         app.globalData.cartCount = this.data.cartCount
         app.globalData.totalPrice = this.data.totalPrice
-        app.globalData.sku_info_list = sku_info_list // 添加sku_info_list格式数据
         
         console.log('存储到globalData的购物车数据:', app.globalData.cartItems)
-        console.log('存储到globalData的sku_info_list:', app.globalData.sku_info_list)
         console.log('购物车总数:', app.globalData.cartCount)
         console.log('总价格:', app.globalData.totalPrice)
         
-        // 跳转到提交订单页面
-        wx.navigateTo({
+        // 跳转到提交订单页面，使用redirectTo避免返回按钮
+        wx.redirectTo({
             url: '/pages/order-submit/index'
         })
     },

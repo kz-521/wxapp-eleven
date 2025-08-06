@@ -2,13 +2,12 @@
   background-color: rgba(249,248,250,1);
   position: relative;
   width: 750rpx;
-  /* height: 1791rpx; */
+  height: 1791rpx;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20rpx;
-  padding-bottom: 60rpx;
 }
 .group_14 {
   display: flex;
@@ -843,9 +842,7 @@
 
 /* 配送信息区域 */
 .delivery-section {
-  position: relative;
   background: #FFFFFF;
-  /* background:pink; */
   border-radius: 8rpx;
   padding: 30rpx;
   margin: 20rpx;
@@ -861,20 +858,8 @@
 
 /* 上部分：店铺信息 */
 .store-info {
-  /* position: relative; */
   display: flex;
   align-items: flex-start;
-  position: relative;
-  /* background-color: red; */
-}
-
-.order-bg {
-  position: absolute;
-  top: -30rpx;
-  right: -30rpx;
-  width: 200rpx;
-  height: 140rpx;
-  z-index: 1;
 }
 
 .pickup-tag {
