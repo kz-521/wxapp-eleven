@@ -5,12 +5,22 @@ Page({
     data: {
         address: null,
         orderProducts: [],
+        sku_info_list: [], // 添加sku_info_list字段
         selectedCoupon: null,
         remark: '',
         totalAmount: 0,
         couponAmount: 0,
         payAmount: 0,
-        diningType: 'dine-in' // 默认选择堂食
+        diningType: 'dine-in', // 默认选择堂食
+        // 添加地址相关数据
+        userLocation: null,
+        distance: '计算中...',
+        storeLocation: {
+            latitude: 30.3972, // 杭州市余杭区瓶窑镇的经纬度
+            longitude: 120.0183,
+            name: '清汀.新养生空间',
+            address: '余杭区瓶窑镇南山村横山60号1幢1楼106室'
+        }
     },
 
     onLoad(options) {
@@ -21,6 +31,8 @@ Page({
         this.getDefaultAddress()
         // 检查是否有缓存的优惠券数据
         this.checkCachedCoupon()
+        // 获取用户位置并计算距离
+        this.findUserLocation()
     },
 
     onShow() {
@@ -34,8 +46,10 @@ Page({
     loadCartDataFromGlobal() {
         const app = getApp()
         const cartItems = app.globalData.cartItems || []
+        const sku_info_list = app.globalData.sku_info_list || []
         
         console.log('从globalData获取的购物车数据:', cartItems)
+        console.log('从globalData获取的sku_info_list:', sku_info_list)
         
         if (cartItems.length === 0) {
             wx.showToast({
@@ -57,11 +71,13 @@ Page({
 
         this.setData({
             orderProducts: cartItems,
+            sku_info_list: sku_info_list, // 存储sku_info_list数据
             totalAmount: totalAmount.toFixed(2),
             payAmount: totalAmount.toFixed(2)
         })
         
         console.log('设置到页面的数据:', this.data.orderProducts, this.data.totalAmount)
+        console.log('设置到页面的sku_info_list:', this.data.sku_info_list)
     },
 
     /**
@@ -109,7 +125,7 @@ Page({
      * 提交订单并支付
      */
     goToCheckout() {
-        if (this.data.cartCount <= 0) {
+        if (!this.data.sku_info_list || this.data.sku_info_list.length === 0) {
             wx.showToast({
                 title: '购物车为空',
                 icon: 'none'
@@ -121,14 +137,21 @@ Page({
             title: '提交中...'
         })
 
+        // 构建订单参数，使用新的格式
+        const orderData = {
+            sku_info_list: this.data.sku_info_list,
+            remark: this.data.remark || ''
+        }
+
+        console.log('提交订单参数:', orderData)
+
         // 调用订单提交接口
-        api.submitOrder().then(res => {
+        api.submitOrder(orderData).then(res => {
             wx.hideLoading()
             console.log('订单提交响应:', res)
             
             if (res.code === 0 && res.result && res.result.order_id) {
                 console.log('订单提交成功，订单ID:', res.result.order_id)
-                
                 // 使用返回的order_id调用支付接口
                 this.callPayment(res.result.order_id)
             } else {
@@ -254,7 +277,12 @@ Page({
             // 计算优惠后的价格
             const originalAmount = parseFloat(this.data.totalAmount)
             const couponAmount = parseFloat(selectedCoupon.amount)
-            const payAmount = Math.max(0, originalAmount - couponAmount)
+            let payAmount = Math.max(0, originalAmount - couponAmount)
+            
+            // 如果金额为0，变成0.01
+            if (payAmount === 0) {
+                payAmount = 0.01
+            }
             
             this.setData({
                 selectedCoupon: selectedCoupon,
@@ -273,15 +301,28 @@ Page({
             // 如果没有从globalData获取到优惠券，尝试从本地存储获取
             const cachedCoupon = wx.getStorageSync('selectedCoupon')
             const cachedCouponAmount = wx.getStorageSync('couponAmount')
-            const cachedPayAmount = wx.getStorageSync('payAmount')
             
             if (cachedCoupon) {
                 console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
+                
+                // 重新计算支付金额，而不是使用缓存的金额
+                const originalAmount = parseFloat(this.data.totalAmount)
+                const couponAmount = parseFloat(cachedCouponAmount) || 0
+                let payAmount = Math.max(0, originalAmount - couponAmount)
+                
+                // 如果金额为0，变成0.01
+                if (payAmount === 0) {
+                    payAmount = 0.01
+                }
+                
                 this.setData({
                     selectedCoupon: cachedCoupon,
-                    couponAmount: cachedCouponAmount || '0.00',
-                    payAmount: cachedPayAmount || this.data.totalAmount
+                    couponAmount: couponAmount.toFixed(2),
+                    payAmount: payAmount.toFixed(2)
                 })
+                
+                // 更新缓存的支付金额
+                wx.setStorageSync('payAmount', payAmount.toFixed(2))
             }
         }
     },
@@ -292,16 +333,88 @@ Page({
     checkCachedCoupon() {
         const cachedCoupon = wx.getStorageSync('selectedCoupon')
         const cachedCouponAmount = wx.getStorageSync('couponAmount')
-        const cachedPayAmount = wx.getStorageSync('payAmount')
 
         if (cachedCoupon) {
             console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
+            
+            // 重新计算支付金额，而不是使用缓存的金额
+            const originalAmount = parseFloat(this.data.totalAmount)
+            const couponAmount = parseFloat(cachedCouponAmount) || 0
+            let payAmount = Math.max(0, originalAmount - couponAmount)
+            
+            // 如果金额为0，变成0.01
+            if (payAmount === 0) {
+                payAmount = 0.01
+            }
+            
             this.setData({
                 selectedCoupon: cachedCoupon,
-                couponAmount: cachedCouponAmount || '0.00',
-                payAmount: cachedPayAmount || this.data.totalAmount
+                couponAmount: couponAmount.toFixed(2),
+                payAmount: payAmount.toFixed(2)
             })
+            
+            // 更新缓存的支付金额
+            wx.setStorageSync('payAmount', payAmount.toFixed(2))
         }
+    },
+
+    /**
+     * 获取用户位置并计算距离
+     */
+    findUserLocation() {
+        wx.getLocation({
+            type: 'gcj02', // 返回国测局坐标
+            success: (res) => {
+                const latitude = res.latitude
+                const longitude = res.longitude
+                this.setData({
+                    userLocation: { latitude, longitude }
+                })
+                this.getDistance()
+            },
+            fail: (err) => {
+                console.error('获取用户位置失败:', err)
+                this.setData({
+                    userLocation: null,
+                    distance: '获取位置失败'
+                })
+            }
+        })
+    },
+
+    /**
+     * 计算用户位置与店铺位置的距离
+     */
+    getDistance() {
+        if (!this.data.userLocation || !this.data.storeLocation) {
+            this.setData({
+                distance: '无法计算距离'
+            })
+            return
+        }
+
+        const R = 6371000; // 地球半径，单位米
+        const dLat = this.Rad(this.data.storeLocation.latitude - this.data.userLocation.latitude);
+        const dLng = this.Rad(this.data.storeLocation.longitude - this.data.userLocation.longitude);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(this.Rad(this.data.userLocation.latitude)) * Math.cos(this.Rad(this.data.storeLocation.latitude)) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distanceInMeters = R * c; // 距离，单位米
+        
+        // 转换为公里
+        const distanceInKm = distanceInMeters / 1000;
+        
+        this.setData({
+            distance: distanceInKm.toFixed(2) + 'km'
+        })
+    },
+
+    /**
+     * 角度转弧度
+     */
+    Rad(d) {
+        return d * Math.PI / 180.0;
     },
 
     /**

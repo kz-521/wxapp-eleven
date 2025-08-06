@@ -2,7 +2,7 @@
   <!-- 问候区域 -->
   <view class="greeting-section">
     <view class="greeting-content">
-      <image src="/imgs/编组 5@2x.png" class="leaf-icon"></image>
+      <image src="/imgs/cartlogo.png" class="leaf-icon"></image>
       <view class="greeting-text">
         <text class="greeting-title">Hello! 下午好</text>
         <text class="greeting-subtitle">暖阳午后，一杯清茶，熨帖所有心绪。</text>
@@ -47,8 +47,7 @@
                 <view>
                   <text class="product-name">{{item.name}}</text>
                   <view class="product-tags">
-                    <text class="tag">{{item.tag1}}</text>
-                    <text class="tag">{{item.tag2}}</text>
+                    <text class="tag" wx:for="{{item.tags}}" wx:key="index" wx:if="{{item}}">{{item}}</text>
                   </view>
                 </view>
                 <view class="product-price-section">
@@ -109,11 +108,6 @@
         </view>
         <view wx:else class="cart-items">
           <view class="cart-item-row" wx:for="{{cartItems}}" wx:key="name">
-            <!-- 选择指示器 -->
-            <view class="selection-indicator">
-              <view class="check-icon"></view>
-            </view>
-            
             <!-- 商品图片 -->
             <view class="product-image-container">
               <image src="{{item.image}}" class="product-thumbnail"></image>

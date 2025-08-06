@@ -28,8 +28,8 @@ Component({
                 this.triggerEvent("customBackReturn")
             } else {
                 if (getCurrentPages().length == 1) {
-                    wx.switchTab({
-                        url: '/pages/index/index',
+                    wx.navigateTo({
+                        url: '/pages/home/home',
                     })
                 } else {
                     wx.navigateBack({

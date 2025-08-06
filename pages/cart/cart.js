@@ -22,8 +22,6 @@ Page({
     },
 
     onLoad(options) {
-        // 隐藏tabbar
-        wx.hideTabBar()
         this.loadCartData()
         // 获取所有商品数据
         this.getAllProducts()
@@ -31,14 +29,13 @@ Page({
         this.loadProductsByCategory(1)
     },
     onShow() {
-        wx.hideTabBar()
         this.loadCartData()
     },
     onHide() {
-        wx.showTabBar()
+        // 移除tabBar相关代码
     },
     onUnload() {
-        wx.showTabBar()
+        // 移除tabBar相关代码
     },
 
     // 加载购物车数据
@@ -167,13 +164,21 @@ Page({
             return
         }
         
+        // 构建sku_info_list格式的数据
+        const sku_info_list = this.data.cartItems.map(item => ({
+            id: item.id,
+            count: item.count
+        }))
+        
         // 将购物车数据存储到globalData中
         const app = getApp()
         app.globalData.cartItems = this.data.cartItems
         app.globalData.cartCount = this.data.cartCount
         app.globalData.totalPrice = this.data.totalPrice
+        app.globalData.sku_info_list = sku_info_list // 添加sku_info_list格式数据
         
         console.log('存储到globalData的购物车数据:', app.globalData.cartItems)
+        console.log('存储到globalData的sku_info_list:', app.globalData.sku_info_list)
         console.log('购物车总数:', app.globalData.cartCount)
         console.log('总价格:', app.globalData.totalPrice)
         
@@ -243,8 +248,7 @@ Page({
                 const categoryProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,
@@ -273,8 +277,7 @@ Page({
                 const allProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,
@@ -303,8 +306,7 @@ Page({
                 const recommendProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,

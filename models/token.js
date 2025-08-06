@@ -27,14 +27,19 @@ class Token {
         if (!token) {
             await this.getTokenFromServer()
         } else {
-            await this._verifyFromServer(token)
+            // 暂时跳过token验证，避免重复获取
+            // await this._verifyFromServer(token)
+            console.log('Token已存在，跳过验证')
         }
     }
 
     async getTokenFromServer() {
+        console.log('Token类 - 开始获取token')
+        
         // 获取微信登录凭证
         const r = await wx.login()
         const code = r.code
+        console.log('Token类 - 获取到微信登录code:', code)
 
         // 调用正确的token接口
         const res = await promisic(wx.request)({
@@ -45,9 +50,13 @@ class Token {
             },
         })
         
+        console.log('Token类 - v1/token接口响应:', res.data)
+        
         // 保存新的token
         const newToken = res.data.token || res.data.access_token
         wx.setStorageSync('wechat_token', newToken)
+        console.log('Token类 - token已保存到本地存储:', newToken)
+        
         return newToken
     }
 

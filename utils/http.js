@@ -31,7 +31,7 @@ class Http {
                     'content-type': 'application/json',
                     'version': 'v1',
                     appkey: config.appkey,
-                    'token': `${wx.getStorageSync('token')}`
+                    'token': wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token') || ''
                 }
             })
         } catch (e) {
@@ -73,8 +73,11 @@ class Http {
     }
 
     static async _refetch(data) {
-        const token = new Token()
-        await token.getTokenFromServer()
+        const app = getApp()
+        // 使用app.js中的ensureToken方法，避免重复获取token
+        if (app && app.ensureToken) {
+            await app.ensureToken()
+        }
         data.refetch = false
         return await Http.request(data)
     }

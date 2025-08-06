@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "提交订单",
-  "usingComponents": {}
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index"
+  }
 }

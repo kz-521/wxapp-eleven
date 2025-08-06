@@ -48,7 +48,7 @@ page {
   align-items: center;
   padding: 20rpx 30rpx 30rpx 30rpx;
   background-color: #FFFFFF;
-  margin-top: 202rpx;
+  margin-top: 40rpx;
   margin-bottom: 55rpx;
 }
 
@@ -184,7 +184,7 @@ page {
 
 .product-list {
   margin-top: 30rpx;
-  height: calc(100vh - 600rpx);
+  height: calc(100vh - 450rpx);
 }
 
 .product-item {
@@ -233,12 +233,17 @@ page {
   line-height: 40rpx;
   text-align: right;
   font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-tags {
   display: flex;
   gap: 10rpx;
   margin-top: 8rpx;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .tag {

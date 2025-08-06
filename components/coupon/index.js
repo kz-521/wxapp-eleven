@@ -39,8 +39,8 @@ Component({
     methods: {
         async onGetCoupon(event) {
             if (this.data.userCollected) {
-                wx.switchTab({
-                    url: `/pages/category/category`
+                wx.navigateTo({
+                    url: `/pages/cart/cart`
                 })
                 return
             }
