@@ -57,8 +57,8 @@ Component({
             };
         },
         onTap(event) {
-            wx.switchTab({
-                url:`/pages/category/category`
+            wx.navigateTo({
+                url:`/pages/cart/cart`
             })
         }
     }

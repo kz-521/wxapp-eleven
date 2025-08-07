@@ -73,10 +73,10 @@
     <view class="store-header">
       <text class="section-title">当前门店</text>
       <image src="/imgs/home/location-icon.png" class="location-icon"></image>
-      <text class="store-address">{{storeLocation.name}}</text>
+      <text class="store-address">{{storeLocation.address}}</text>
       <text class="store-distance" wx:if="{{distance}}">{{distance}}</text>
       <text class="store-distance" wx:else>计算中...</text>
     </view>
-    <image src="/imgs/home/store-image.png" class="store-img"></image>
+    <image src="/imgs/address.jpg" class="store-img"></image>
   </view>
 </view>

@@ -48,12 +48,34 @@ Page({
             return
         }
 
-        // 计算总金额
+        // 计算总金额 - 使用SKU价格计算
         const totalAmount = cartItems.reduce((total, item) => {
-            return total + (parseFloat(item.price) * item.count)
+            let itemPrice = 0
+            
+            // 优先使用SKU价格
+            if (item.sku && item.sku.price) {
+                itemPrice = item.sku.discount_price || item.sku.price
+            } 
+            // 如果有skuPrice字段
+            else if (item.skuPrice) {
+                itemPrice = item.skuPrice
+            }
+            // fallback到商品price字段
+            else {
+                itemPrice = parseFloat(item.price) || 0
+            }
+            
+            console.log('订单商品价格计算:', {
+                name: item.name,
+                count: item.count,
+                itemPrice: itemPrice,
+                total: itemPrice * item.count
+            })
+            
+            return total + (itemPrice * item.count)
         }, 0)
 
-        console.log('计算的总金额:', totalAmount)
+        console.log('订单计算的总金额:', totalAmount)
 
         this.setData({
             orderProducts: cartItems,
@@ -100,8 +122,19 @@ Page({
      * 选择用餐类型
      */
     selectDiningType(e) {
+        const type = e.currentTarget.dataset.type
+        console.log('选择用餐类型:', type)
         this.setData({
-            diningType: e.currentTarget.dataset.type
+            diningType: type
+        })
+    },
+
+    /**
+     * 备注输入
+     */
+    onRemarkInput(e) {
+        this.setData({
+            remark: e.detail.value
         })
     },
 
@@ -109,9 +142,39 @@ Page({
      * 提交订单并支付
      */
     goToCheckout() {
-        if (this.data.cartCount <= 0) {
+        // 检查购物车数据
+        if (!this.data.orderProducts || this.data.orderProducts.length === 0) {
             wx.showToast({
                 title: '购物车为空',
+                icon: 'none'
+            })
+            return
+        }
+
+        // 验证用餐类型
+        if (!this.data.diningType) {
+            wx.showToast({
+                title: '请选择用餐类型',
+                icon: 'none'
+            })
+            return
+        }
+
+        // 验证购物车商品数据格式
+        const invalidItems = this.data.orderProducts.filter(item => !item.id || !item.count)
+        if (invalidItems.length > 0) {
+            console.error('购物车中存在无效商品数据:', invalidItems)
+            wx.showToast({
+                title: '商品数据异常，请重新添加',
+                icon: 'none'
+            })
+            return
+        }
+
+        // 验证价格数据
+        if (!this.data.totalAmount || parseFloat(this.data.totalAmount) <= 0) {
+            wx.showToast({
+                title: '订单金额异常',
                 icon: 'none'
             })
             return
@@ -121,19 +184,67 @@ Page({
             title: '提交中...'
         })
 
+        // 构建sku_info_list参数 - 确保使用正确的SKU ID和数量
+        const sku_info_list = this.data.orderProducts.map(item => {
+            console.log('处理商品项:', item)
+            
+            // 优先使用SKU ID，这是订单接口需要的
+            let skuId = null
+            if (item.skuId) {
+                skuId = item.skuId
+            } else if (item.sku && item.sku.id) {
+                skuId = item.sku.id
+            } else {
+                // fallback到商品ID（可能不准确，应该有SKU ID）
+                skuId = item.id
+                console.warn('商品缺少SKU ID，使用商品ID:', item)
+            }
+            
+            return {
+                id: skuId, // 这里应该是SKU ID，不是SPU ID
+                count: parseInt(item.count) || 1
+            }
+        })
+        
+        console.log('构建的sku_info_list:', sku_info_list)
+        
+        // 构建完整的订单数据
+        const orderData = {
+            sku_info_list: sku_info_list,
+            remark: this.data.remark || '', // 备注
+            dining_type: this.data.diningType, // 用餐类型：dine-in(堂食) 或 take-out(外带)
+            total_amount: parseFloat(this.data.totalAmount), // 商品总金额
+            coupon_amount: parseFloat(this.data.couponAmount) || 0, // 优惠券优惠金额
+            pay_amount: parseFloat(this.data.payAmount), // 实际支付金额
+            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null // 优惠券ID
+        }
+
+        // 如果有地址信息，添加到订单数据中
+        if (this.data.address) {
+            orderData.address = {
+                name: this.data.address.name,
+                phone: this.data.address.phone,
+                detail: this.data.address.detail,
+                province: this.data.address.province,
+                city: this.data.address.city,
+                district: this.data.address.district
+            }
+        }
+
+        console.log('完整的订单数据:', orderData)
+
         // 调用订单提交接口
-        api.submitOrder().then(res => {
+        api.submitOrder(orderData).then(res => {
             wx.hideLoading()
             console.log('订单提交响应:', res)
             
             if (res.code === 0 && res.result && res.result.order_id) {
                 console.log('订单提交成功，订单ID:', res.result.order_id)
-                
                 // 使用返回的order_id调用支付接口
                 this.callPayment(res.result.order_id)
             } else {
                 wx.showToast({
-                    title: res.msg || '订单提交失败',
+                    title: res.msg || res.message || '订单提交失败',
                     icon: 'none'
                 })
             }
@@ -254,7 +365,12 @@ Page({
             // 计算优惠后的价格
             const originalAmount = parseFloat(this.data.totalAmount)
             const couponAmount = parseFloat(selectedCoupon.amount)
-            const payAmount = Math.max(0, originalAmount - couponAmount)
+            let payAmount = Math.max(0, originalAmount - couponAmount)
+            
+            // 如果金额为0，变成0.01
+            if (payAmount === 0) {
+                payAmount = 0.01
+            }
             
             this.setData({
                 selectedCoupon: selectedCoupon,
@@ -277,10 +393,17 @@ Page({
             
             if (cachedCoupon) {
                 console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
+                let payAmount = parseFloat(cachedPayAmount) || parseFloat(this.data.totalAmount)
+                
+                // 如果金额为0，变成0.01
+                if (payAmount === 0) {
+                    payAmount = 0.01
+                }
+                
                 this.setData({
                     selectedCoupon: cachedCoupon,
                     couponAmount: cachedCouponAmount || '0.00',
-                    payAmount: cachedPayAmount || this.data.totalAmount
+                    payAmount: payAmount.toFixed(2)
                 })
             }
         }
@@ -296,10 +419,17 @@ Page({
 
         if (cachedCoupon) {
             console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
+            let payAmount = parseFloat(cachedPayAmount) || parseFloat(this.data.totalAmount)
+            
+            // 如果金额为0，变成0.01
+            if (payAmount === 0) {
+                payAmount = 0.01
+            }
+            
             this.setData({
                 selectedCoupon: cachedCoupon,
                 couponAmount: cachedCouponAmount || '0.00',
-                payAmount: cachedPayAmount || this.data.totalAmount
+                payAmount: payAmount.toFixed(2)
             })
         }
     },

@@ -1,8 +1,7 @@
-import { config } from "../../mental3/config/config";
-import { promisic } from "../../mental3/utils/util";
-import { Token } from "../../mental3/models/token";
-import { codes } from "../../mental3/config/exception-config";
-import { HttpException } from "../../mental3/core/http-exception";
+import { config } from "../config/config";
+import { promisic } from "../utils/util";
+import { codes } from "../config/exception-config";
+import { HttpException } from "../core/http-exception";
 
 const UNAUTHORIZED = '401';
 
@@ -23,6 +22,7 @@ class Http {
                     "datetime": timestamp,
                     "token": token,
                     'authorization': `VDNlbFZ6QmNsM1BUN0VwVEpQU2NhNm1ldmZNSTdxOUUveUVHNGp2SGh6L1I0ZUNra3NMbUx3PT0=`
+
                 }
             });
         } catch (e) {
@@ -65,14 +65,17 @@ class Http {
     }
 
     static async handleUnauthorized(url, data, method) {
-        const token = new Token();
-        await token.getTokenFromServer();
+        const app = getApp()
+        // 使用app.js中的ensureToken方法，避免重复获取token
+        if (app && app.ensureToken) {
+            await app.ensureToken()
+        }
         return await this.request({ url, data, method, retry: false });
     }
 
     static handleLogout() {
         wx.clearStorageSync();
-        wx.reLaunch({ url: '/pages/login/index' });
+        wx.reLaunch({ url: '/pages/home/home' });
     }
 
     static showError(error_code, serverError) {
@@ -86,7 +89,21 @@ class Http {
     }
 
     static getToken() {
-        return wx.getStorageSync('token');
+        // 统一从wechat_token获取token，与其他文件保持一致
+        const wechatToken = wx.getStorageSync('wechat_token');
+        const accessToken = wx.getStorageSync('access_token');
+        const legacyToken = wx.getStorageSync('token');
+        
+        const token = wechatToken || accessToken || legacyToken || '';
+        
+        console.log('Http.getToken - Token获取状态:', {
+            wechatToken: wechatToken ? '存在' : '不存在',
+            accessToken: accessToken ? '存在' : '不存在', 
+            legacyToken: legacyToken ? '存在' : '不存在',
+            finalToken: token ? '已获取' : '未获取'
+        });
+        
+        return token;
     }
 }
 

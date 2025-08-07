@@ -48,7 +48,7 @@ page {
   align-items: center;
   padding: 20rpx 30rpx 30rpx 30rpx;
   background-color: #FFFFFF;
-  margin-top: 202rpx;
+  margin-top: 40rpx;
   margin-bottom: 55rpx;
 }
 
@@ -184,7 +184,7 @@ page {
 
 .product-list {
   margin-top: 30rpx;
-  height: calc(100vh - 600rpx);
+  height: calc(100vh - 450rpx);
 }
 
 .product-item {
@@ -221,6 +221,7 @@ page {
   flex-direction: column;
   justify-content: space-between;
   gap: 8rpx;
+  min-width: 0;
 }
 
 .product-name {
@@ -233,6 +234,9 @@ page {
   line-height: 40rpx;
   text-align: right;
   font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-tags {
@@ -252,7 +256,10 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap;
+  word-wrap: break-word;
+  word-break: break-all;
+  max-width: 120rpx;
+  text-align: center;
 }
 
 .product-price-section {
@@ -474,17 +481,16 @@ page {
 
 .cart-items {
   box-sizing: border-box;
-  height: 220rpx;
   padding: 30rpx 0;
   display: flex;
   flex-direction: column;
-  border-bottom: 1rpx solid rgba(0,0,0,0.1);
 }
 
 .cart-item-row {
   display: flex;
   align-items: center;
-  height: 220rpx;
+  padding: 34rpx 0 30rpx 0;
+  min-height: 120rpx;
 }
 
 .selection-indicator {
@@ -608,8 +614,8 @@ page {
 .divider-line {
   width: 650rpx;
   height: 1rpx;
-  margin: 20rpx 0;
-  border: 1rpx solid rgba(0,0,0,0.6);
+  background-color: rgba(0,0,0,0.6);
+  margin: 0 auto;
 }
 
 /* 结算确认弹出层样式 */

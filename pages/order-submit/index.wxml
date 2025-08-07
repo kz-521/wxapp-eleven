@@ -54,7 +54,10 @@
         </view>
         <view class="text-group_10">
           <text lines="1" class="text_16">{{item.name}}</text>
-          <text lines="1" class="text_17">{{item.tag1}} {{item.tag2}} 数量：{{item.count}}杯</text>
+          <text lines="1" class="text_17">
+                  <text wx:for="{{item.tags}}" wx:key="index">{{item}} </text>
+                  数量：{{item.count}}杯
+                </text>
         </view>
       </view>
       <text lines="1" class="text_18">¥{{item.price}}</text>
@@ -84,7 +87,7 @@
           <text lines="1" class="text_26" />
           <text lines="1" class="text_27">-{{couponAmount}}</text>
         </view>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngacf8924448c4ce8f2415448371f32a072dd475293efad3f87092bff5766d6d36" class="thumbnail_1"></image>
+        <van-icon name="arrow" size="32rpx" color="#999" />
       </view>
       <view class="image-text_9" wx:else>
         <view class="text-group_6">
@@ -92,7 +95,7 @@
           <text lines="1" class="text_26" />
           <text lines="1" class="text_27">-0.00</text>
         </view>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngacf8924448c4ce8f2415448371f32a072dd475293efad3f87092bff5766d6d36" class="thumbnail_1"></image>
+        <van-icon name="arrow" size="32rpx" color="#999" />
       </view>
     </view>
     <view class="group_11">
@@ -103,7 +106,9 @@
           <text lines="1" class="text_29">使用微信快捷支付</text>
         </view>
       </view>
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng489e6c5e30e7a2f99f23232f84395da2bef9e6cc02ce2d3d59008979a0b8a9de" class="label_5"></image>
+      <view style="display: flex; align-items: center;">
+        <icon class="icon-box-img" type="success" size="18"></icon>
+      </view>
     </view>
     <view class="cart-bar">
     <view class="cart-info">

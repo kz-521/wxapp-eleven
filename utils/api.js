@@ -3,8 +3,6 @@ const BASE_URL = 'https://api.jixiangjiaoyu.com'
 
 // 获取token
 const getToken = () => {
-  // 使用另一个token，这里需要根据实际情况调整
-  // 可能是从其他地方获取的token，比如微信登录后的token
   const wechatToken = wx.getStorageSync('wechat_token')
   const accessToken = wx.getStorageSync('access_token')
   const token = wechatToken || accessToken || ''
@@ -20,23 +18,23 @@ const getToken = () => {
 
 // 请求封装
 const request = (options) => {
-  return new Promise((resolve, reject) => {
-    const token = getToken()
-    console.log('API请求 - URL:', options.url, 'Token:', token ? '已获取' : '未获取')
-    
-    const headers = {
-      'Content-Type': 'application/json',
-      ...options.header
-    }
-    
-    // 如果有token，添加到请求头
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`
-      console.log('API请求 - 已添加Authorization header')
-    } else {
-      console.log('API请求 - 未添加Authorization header，token不存在')
-    }
+  const token = getToken()
+  console.log('API请求 - URL:', options.url, 'Token:', token ? '已获取' : '未获取')
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    "token": token || '',
+    ...options.header
+  }
+  
+  // 如果有token，添加到请求头
+  if (token) {
+    console.log('API请求 - 已添加token header')
+  } else {
+    console.log('API请求 - 未添加token header，token不存在')
+  }
 
+  return new Promise((resolve, reject) => {
     wx.request({
       url: BASE_URL + options.url,
       method: options.method || 'GET',
@@ -145,17 +143,18 @@ const api = {
   },
 
   // 提交订单
-  submitOrder: () => {
+  submitOrder: (orderData) => {
     return request({
       url: '/qingting/v1/order/place',
       method: 'POST',
+      data: orderData
     })
   },
 
   // 支付接口
   payPreorder: (orderId) => {
     return request({
-      url: `/qingting/v1/pay/preorder?XDEBUG_SESSION_START=PHPSTORM`,
+      url: `/qingting/v1/pay/preorder`,
       method: 'POST',
       data: { order_id: orderId }
     })

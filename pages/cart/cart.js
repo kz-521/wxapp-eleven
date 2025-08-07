@@ -22,8 +22,6 @@ Page({
     },
 
     onLoad(options) {
-        // 隐藏tabbar
-        wx.hideTabBar()
         this.loadCartData()
         // 获取所有商品数据
         this.getAllProducts()
@@ -31,14 +29,13 @@ Page({
         this.loadProductsByCategory(1)
     },
     onShow() {
-        wx.hideTabBar()
         this.loadCartData()
     },
     onHide() {
-        wx.showTabBar()
+        // 移除tabBar相关代码
     },
     onUnload() {
-        wx.showTabBar()
+        // 移除tabBar相关代码
     },
 
     // 加载购物车数据
@@ -46,11 +43,43 @@ Page({
         // 只使用页面级别的缓存，不读取本地存储
         const cartItems = this.data.cartItems || []
         const cartCount = cartItems.reduce((total, item) => total + item.count, 0)
-        const totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
         
-            this.setData({
+        // 价格计算：优先使用SKU价格，fallback到SPU价格
+        const totalPrice = cartItems.reduce((total, item) => {
+            let itemPrice = 0
+            
+            // 优先使用SKU价格
+            if (item.sku && item.sku.price) {
+                itemPrice = item.sku.discount_price || item.sku.price
+            } 
+            // 如果有skuPrice字段
+            else if (item.skuPrice) {
+                itemPrice = item.skuPrice
+            }
+            // fallback到商品price字段
+            else {
+                itemPrice = parseFloat(item.price) || 0
+            }
+            
+            console.log('购物车商品价格计算:', {
+                name: item.name,
+                count: item.count,
+                itemPrice: itemPrice,
+                total: itemPrice * item.count
+            })
+            
+            return total + (itemPrice * item.count)
+        }, 0)
+        
+        this.setData({
             cartCount,
             totalPrice: totalPrice.toFixed(2)
+        })
+        
+        console.log('购物车数据更新:', {
+            cartCount,
+            totalPrice: totalPrice.toFixed(2),
+            cartItems: cartItems.length
         })
     },
 
@@ -59,16 +88,73 @@ Page({
         const index = event.currentTarget.dataset.index
         const product = this.data.products[index]
         
-        let cartItems = this.data.cartItems || []
-        const existingItem = cartItems.find(item => item.name === product.name)
+        console.log('添加商品到购物车:', product)
         
-        if (existingItem) {
-            existingItem.count += 1
-        } else {
-            cartItems.push({
-                ...product,
-                count: 1
+        // 检查商品是否有SKU列表
+        if (!product.skuList || product.skuList.length === 0) {
+            wx.showToast({
+                title: '商品暂不可购买',
+                icon: 'none'
             })
+            return
+        }
+        
+        // 如果商品只有一个SKU，直接使用
+        let selectedSku = null
+        if (product.skuList.length === 1) {
+            selectedSku = product.skuList[0]
+        } else {
+            // 多个SKU的情况，应该跳转到商品详情页选择规格
+            // 这里暂时使用第一个可用的SKU
+            selectedSku = product.skuList.find(sku => sku.stock > 0) || product.skuList[0]
+        }
+        
+        if (!selectedSku) {
+            wx.showToast({
+                title: '商品缺少规格信息',
+                icon: 'none'
+            })
+            return
+        }
+        
+        let cartItems = this.data.cartItems || []
+        
+        // 查找是否已存在相同的SKU
+        const existingItemIndex = cartItems.findIndex(item => 
+            item.skuId === selectedSku.id || (item.id === product.id && item.name === product.name)
+        )
+        
+        if (existingItemIndex >= 0) {
+            // 已存在，增加数量
+            cartItems[existingItemIndex].count += 1
+        } else {
+            // 新增商品到购物车
+            const cartItem = {
+                id: product.id, // SPU ID
+                skuId: selectedSku.id, // SKU ID，订单提交时使用
+                name: product.name,
+                image: product.image,
+                count: 1,
+                // 价格使用SKU价格
+                price: selectedSku.discount_price || selectedSku.price, // 显示价格
+                originalPrice: selectedSku.price, // 原价
+                skuPrice: selectedSku.discount_price || selectedSku.price, // SKU价格
+                // 存储完整的SKU信息
+                sku: {
+                    id: selectedSku.id,
+                    price: selectedSku.price,
+                    discount_price: selectedSku.discount_price,
+                    stock: selectedSku.stock,
+                    title: selectedSku.title || product.name
+                },
+                // 其他商品信息
+                tags: product.tags,
+                subtitle: product.subtitle,
+                categoryId: product.categoryId
+            }
+            
+            console.log('新建购物车项:', cartItem)
+            cartItems.unshift(cartItem)
         }
 
         this.setData({
@@ -177,8 +263,8 @@ Page({
         console.log('购物车总数:', app.globalData.cartCount)
         console.log('总价格:', app.globalData.totalPrice)
         
-        // 跳转到提交订单页面
-        wx.navigateTo({
+        // 跳转到提交订单页面，使用redirectTo避免返回按钮
+        wx.redirectTo({
             url: '/pages/order-submit/index'
         })
     },
@@ -243,8 +329,7 @@ Page({
                 const categoryProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,
@@ -273,8 +358,7 @@ Page({
                 const allProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,
@@ -303,8 +387,7 @@ Page({
                 const recommendProducts = res.result.list.map(item => ({
                     id: item.id,
                     name: item.title,
-                    tag1: item.tags ? item.tags.split(',')[0] : '',
-                    tag2: item.tags ? item.tags.split(',')[1] : '',
+                    tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
                     price: item.discount_price || item.price,
                     image: item.img,
                     subtitle: item.subtitle,

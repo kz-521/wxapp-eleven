@@ -9,21 +9,25 @@ Page({
         userLocation: null, // 用户位置
         distance: '', // 距离
         storeLocation: {
-            latitude: 39.917990,
-            longitude: 116.397027,
-            name: '当前门店'
+            latitude: 30.3972, // 杭州市余杭区瓶窑镇的经纬度
+            longitude: 120.0183,
+            name: '清汀.新养生空间',
+            address: '余杭区瓶窑镇南山村横山60号1幢1楼106室'
         }
     },
 
-    onLoad() {
+  async onLoad() {
         console.log('Home页面加载')
+        // 检查登录状态
+        this.checkLoginStatus()
+        
+        // 获取今日推荐数据
+        await this.getRecommendData()
+        // 获取banner数据
+        await this.getBannerData()
+        
         // 获取用户位置和计算距离
         this.findUserLocation()
-        // 获取banner数据
-        this.getBannerData()
-        // 获取今日推荐数据
-        this.getRecommendData()
-        this.checkLoginStatus()
     },
 
     onShow() {
@@ -109,7 +113,7 @@ Page({
         
         // 调用正确的token接口
         api.wxLogin(code).then(res => {
-            console.log('Token API响应:', res)
+          console.log(res, 'resxcxxcxc');
             if (res.code === 200 && res.result && res.result.token) {
                 // 保存token
                 wx.setStorageSync('wechat_token', res.result.token)
@@ -196,7 +200,7 @@ Page({
 
     // 跳转到购物车页面
     goToCart() {
-        wx.switchTab({
+        wx.navigateTo({
             url: '/pages/cart/cart'
         })
     },
