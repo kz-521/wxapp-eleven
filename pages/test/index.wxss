@@ -342,3 +342,38 @@
   height: 68rpx;
   margin: 1551rpx 0 0 -750rpx;
 }
+.gender-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16rpx;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+}
+.text-wrapper_1, .text-wrapper_2 {
+  position: relative;
+  overflow: hidden;
+}
+.text-wrapper_1 .text_4,
+.text-wrapper_2 .text_5 {
+  position: relative;
+  z-index: 1;
+}
+.submit-btn {
+  width: 528rpx;
+  height: 82rpx;
+  background: linear-gradient(180deg, #477676 0%, #080E0E 100%), #F9F8FA;
+  border-radius: 41rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 60rpx auto 40rpx auto;
+  border: none;
+  outline: none;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+}

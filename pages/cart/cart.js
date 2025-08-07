@@ -263,8 +263,8 @@ Page({
         console.log('购物车总数:', app.globalData.cartCount)
         console.log('总价格:', app.globalData.totalPrice)
         
-        // 跳转到提交订单页面，使用redirectTo避免返回按钮
-        wx.redirectTo({
+        // 跳转到提交订单页面，使用navigateTo保留返回按钮
+        wx.navigateTo({
             url: '/pages/order-submit/index'
         })
     },

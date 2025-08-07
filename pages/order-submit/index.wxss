@@ -261,13 +261,13 @@
 .group_7 {
   box-sizing: border-box;
   width: 690rpx;
-  height: 188rpx;
+  /* height: 188rpx; */
   background: #FFFFFF;
   /* background-color:aqua; */
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;
-  padding:  30rpx  ;
+  padding: 30rpx;
 }
 .block_4 {
   width: 624rpx;
@@ -842,13 +842,20 @@
 
 /* 配送信息区域 */
 .delivery-section {
+  position: relative;
   background: #FFFFFF;
   border-radius: 8rpx;
   padding: 30rpx;
   margin: 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
 }
-
+.order-bg{
+  position: absolute;
+  top: -0rpx;
+  right: -0rpx;
+  width: 154rpx;
+  height: 124rpx;
+}
 .section-title {
   font-size: 28rpx;
   color: #333333;
@@ -911,6 +918,7 @@
 
 /* 中部分：堂食和外带选项 */
 .dining-options {
+  position: relative;
   display: flex;
   gap: 20rpx;
   margin-top: 30rpx;
@@ -927,6 +935,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 .option-tip{
   font-family: PingFang-SC, PingFang-SC;
@@ -954,6 +963,30 @@
   font-weight: 600;
 }
 
+/* 三角形样式 */
+.triangle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-left: 40rpx solid transparent;
+  border-bottom: 40rpx solid #477676;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  transform: rotate(270deg);
+}
+
+/* yes图片样式 */
+.yes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20rpx;
+  height: 20rpx;
+  z-index: 1;
+}
 
 /* 底部购物车栏 */
 .cart-bar {

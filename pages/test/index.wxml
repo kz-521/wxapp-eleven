@@ -3,9 +3,11 @@
       <text lines="1" class="text_3">你是男生还是女生？</text>
       <view class="box_3">
         <view class="text-wrapper_1">
+          <image src="/imgs/boy.png" class="gender-img"></image>
           <text lines="1" class="text_4">我是男生</text>
         </view>
         <view class="text-wrapper_2">
+          <image src="/imgs/woman.png" class="gender-img"></image>
           <text lines="1" class="text_5">我是女生</text>
         </view>
       </view>
@@ -36,5 +38,5 @@
         <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_6"></image>
       </view>
     </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_7"></image>
+    <button class="submit-btn" bindtap="submitTest">提交</button>
 </view>

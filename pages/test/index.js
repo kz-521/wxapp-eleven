@@ -1,70 +1,48 @@
 // pages/test/index.js
+const { api } = require('../../utils/api.js')
+
 Page({
+  data: {},
 
-  /**
-   * 页面的初始数据
-   */
-  data: {
+  onLoad(options) {},
 
-  },
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-
-  },
   toSuccess() {
     wx.navigateTo({
-      url:`/pages/test-result/index`
-  })
-  },
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
+      url: `/pages/test-result/index`
+    })
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  submitTest() {
+    // 模拟答案
+    const answers = [
+      { question_id: 1, answer: 'A' },
+      { question_id: 2, answer: 'C' },
+      { question_id: 3, answer: 'E' },
+      { question_id: 4, answer: 'B' },
+      { question_id: 5, answer: 'D' },
+      { question_id: 6, answer: 'A' },
+      { question_id: 7, answer: 'F' },
+      { question_id: 8, answer: 'G' }
+    ]
+    wx.showLoading({ title: '提交中...' })
+    api.submitConstitutionTest({ answers }).then(res => {
+      wx.hideLoading()
+      if (res.code === 0) {
+        wx.navigateTo({
+          url: '/pages/test-result/index',
+          success: function (navRes) {
+            // 通过eventChannel传递数据
+            if (navRes.eventChannel) {
+              navRes.eventChannel.emit('testResult', res.result)
+            }
+          }
+        })
+      } else {
+        wx.showToast({ title: res.msg || '提交失败', icon: 'none' })
+      }
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '提交失败', icon: 'none' })
+    })
   }
 })

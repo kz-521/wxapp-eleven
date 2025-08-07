@@ -10,7 +10,14 @@ Page({
         totalAmount: 0,
         couponAmount: 0,
         payAmount: 0,
-        diningType: 'dine-in' // 默认选择堂食
+        diningType: 'dine-in', // 默认选择堂食
+        storeLocation: {
+          latitude: 30.3972,
+          longitude: 120.0183,
+          name: '清汀.新养生空间',
+          address: '浙江省杭州市余杭区瓶窑镇南山村横山60号1幢1楼106室'
+        },
+        distance: ''
     },
 
     onLoad(options) {
@@ -21,6 +28,8 @@ Page({
         this.getDefaultAddress()
         // 检查是否有缓存的优惠券数据
         this.checkCachedCoupon()
+        // 获取门店距离
+        this.getStoreDistance()
     },
 
     onShow() {
@@ -490,5 +499,37 @@ Page({
                 })
             }
         })
+    },
+
+    getStoreDistance() {
+        const that = this
+        wx.getLocation({
+          type: 'gcj02',
+          success(res) {
+            const distance = that.getDistance(
+              res.latitude, res.longitude,
+              that.data.storeLocation.latitude, that.data.storeLocation.longitude
+            )
+            that.setData({ distance })
+          },
+          fail() {
+            that.setData({ distance: '定位失败' })
+          }
+        })
+    },
+    Rad(d) {
+      return d * Math.PI / 180.0
+    },
+    getDistance(lat1, lng1, lat2, lng2) {
+      var radLat1 = this.Rad(lat1)
+      var radLat2 = this.Rad(lat2)
+      var a = radLat1 - radLat2
+      var b = this.Rad(lng1) - this.Rad(lng2)
+      var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+        Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
+      s = s * 6378.137
+      s = Math.round(s * 10000) / 10000
+      s = s.toFixed(2) + '公里'
+      return s
     },
 }) 
