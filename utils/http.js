@@ -1,106 +1,94 @@
-import {config} from "../config/config";
-import {promisic} from "./util";
-import {Token} from "../models/token";
-import {codes} from "../config/exception-config";
-import {HttpException} from "../core/http-exception";
+import { config } from "../../mental3/config/config";
+import { promisic } from "../../mental3/utils/util";
+import { Token } from "../../mental3/models/token";
+import { codes } from "../../mental3/config/exception-config";
+import { HttpException } from "../../mental3/core/http-exception";
 
-/**
- * @作者 7七月
- * @微信公号 林间有风
- * @开源项目 $ http://7yue.pro
- * @免费专栏 $ http://course.7yue.pro
- * @我的课程 $ http://imooc.com/t/4294850
- * @创建时间 2019-09-22 05:30
- */
+const UNAUTHORIZED = '401';
 
 class Http {
-    static async request({
-                             url,
-                             data,
-                             method = 'GET',
-                             refetch = true,
-                             throwError = false
-                         }) {
+    static async request({ url, data, method = 'GET', retry = true, throwError = false, preurl = config.apiBaseUrl}) {
+        const timestamp = Date.parse(new Date()) / 1000;
+        const token = this.getToken();
+
         let res;
         try {
             res = await promisic(wx.request)({
-                url: `${config.apiBaseUrl}${url}`,
+                url: `${preurl}${url}`,
                 data,
                 method,
                 header: {
-                    'content-type': 'application/json',
-                    'version': 'v1',
-                    appkey: config.appkey,
-                    'token': `${wx.getStorageSync('token')}`
+                    "Content-Type": "application/json",
+                    "platform": config.nano,
+                    "datetime": timestamp,
+                    "token": token,
+                    'authorization': `VDNlbFZ6QmNsM1BUN0VwVEpQU2NhNm1ldmZNSTdxOUUveUVHNGp2SGh6L1I0ZUNra3NMbUx3PT0=`
                 }
-            })
+            });
         } catch (e) {
             if (throwError) {
-                throw new HttpException(-1, codes[-1])
+                throw new HttpException(-1, codes[-1]);
             }
-            Http.showError(-1)
-            return null
+            this.showError(-1);
+            return null;
         }
-        const code = res.statusCode.toString()
+
+        const code = res.statusCode.toString();
         if (code.startsWith('2')) {
-            return res.data
+            return res.data;
         } else {
-            if (code === '401') {
-                // 二次重发
-                if (data.refetch) {
-                    Http._refetch({
-                        url,
-                        data,
-                        method
-                    })
-                }
-            } else {
-                if (throwError) {
-                    throw new HttpException(res.data.code, res.data.message, code)
-                }
-                if (code === '404') {
-                    if (res.data.code !== undefined) {
-                        return null
-                    }
-                    return res.data
-                }
-                const error_code = res.data.code;
-                Http.showError(error_code, res.data)
-            }
-            // 403 404 500
+            return this.handleNon200Response(res, throwError, url, data, method, retry);
         }
-        return res.data
     }
 
-    static async _refetch(data) {
-        const token = new Token()
-        await token.getTokenFromServer()
-        data.refetch = false
-        return await Http.request(data)
+    static async handleNon200Response(res, throwError, url, data, method, retry) {
+        const code = res.statusCode.toString();
+
+        if (code === UNAUTHORIZED) {
+            // Handle unauthorized error
+            if (retry) {
+                return await this.handleUnauthorized(url, data, method);
+            } else {
+                this.handleLogout();
+                return null;
+            }
+        } else {
+            if (throwError) {
+                throw new HttpException(res.data.code, res.data.message, code);
+            }
+            if (code === '404' && res.data.code !== undefined) {
+                return null;
+            }
+            this.showError(res.data.code, res.data);
+            return res.data;
+        }
+    }
+
+    static async handleUnauthorized(url, data, method) {
+        const token = new Token();
+        await token.getTokenFromServer();
+        return await this.request({ url, data, method, retry: false });
+    }
+
+    static handleLogout() {
+        wx.clearStorageSync();
+        wx.reLaunch({ url: '/pages/login/index' });
     }
 
     static showError(error_code, serverError) {
-        let tip
-        console.log(error_code)
-
-        if (!error_code) {
-            tip = codes[9999]
-        } else {
-            if (codes[error_code] === undefined) {
-                tip = serverError.message
-            } else {
-                tip = codes[error_code]
-            }
-        }
+        const tip = !error_code ? codes[9999] : codes[error_code] || serverError.message;
 
         wx.showToast({
             icon: "none",
             title: tip,
             duration: 3000
-        })
+        });
+    }
+
+    static getToken() {
+        return wx.getStorageSync('token');
     }
 }
-
 
 export {
     Http
