@@ -1,4 +1,4 @@
-<view class="home-page">
+<view class="home-page  safe-bottom">
   <!-- 顶部logo区域 -->
   <view style="margin:226rpx 0 40rpx 0;display:flex;justify-content:center;">
     <image src="/imgs/logo.png" style="width: 387rpx;height: 338rpx;"></image>
@@ -77,6 +77,6 @@
       <text class="store-distance" wx:if="{{distance}}">{{distance}}</text>
       <text class="store-distance" wx:else>计算中...</text>
     </view>
-    <image src="/imgs/address.jpg" class="store-img"></image>
+    <image src="https://qn.jixiangjiaoyu.com/2025/08/78d97202508071516116854.png" mode="widthFix" class="store-img"></image>
   </view>
 </view>
