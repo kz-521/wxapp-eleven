@@ -41,7 +41,7 @@ Component({
         onGotoMyOrder(event) {
             const key = event.currentTarget.dataset.key
             wx.navigateTo({
-                url: `/pages/my-order/my-order?key=${key}`
+                url: `/pages/my-order/index?key=${key}`
             })
         }
     }

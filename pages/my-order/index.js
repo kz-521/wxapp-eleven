@@ -1,119 +1,147 @@
-// pages/coupon-select/index.js
+// pages/my-order/my-order.js
+import {Order} from "../../models/order";
+import {OrderStatus} from "../../core/enum";
+
 Page({
+
+    /**
+     * 页面的初始数据
+     */
     data: {
-        activeTab: 'available', // 当前选中的标签
-        couponList: [
-            {
-                id: 1,
-                title: '新人减免券',
-                description: '新用户专享优惠，全场通用',
-                amount: 30,
-                condition: 50,
-                expireDate: '2025.12.30',
-                status: 'available',
-                statusText: ''
-            },
-            {
-                id: 2,
-                title: '满减优惠券',
-                description: '满100减20，仅限茶饮类商品',
-                amount: 20,
-                condition: 100,
-                expireDate: '2025.11.30',
-                status: 'used',
-                statusText: '已使用'
-            },
-            {
-                id: 3,
-                title: '生日特惠券',
-                description: '生日当月专享，全场8折优惠',
-                amount: 50,
-                condition: 200,
-                expireDate: '2025.10.30',
-                status: 'expired',
-                statusText: '已过期'
-            },
-            {
-                id: 4,
-                title: '周末特惠券',
-                description: '周末专享，满80减15',
-                amount: 15,
-                condition: 80,
-                expireDate: '2025.12.15',
-                status: 'available',
-                statusText: ''
+        activeKey: 0, // 当前选中的tab，0=全部, 1=待付款, 2=待取茶, 3=已完成, 4=已取消
+        activeTab: 0, // 与activeKey同步
+        orders: [], // 订单列表
+        loading: false,
+        page: 1,
+        per_page: 10,
+        hasMore: true
+    },
+
+    /**
+     * 生命周期函数--监听页面加载
+     */
+    onLoad: async function (options) {
+        // 从参数中获取默认tab
+        const activeKey = parseInt(options.key) || 0
+        this.setData({ activeKey, activeTab: activeKey })
+        await this.loadOrders(true)
+    },
+
+    onShow() {
+        // 页面显示时重新加载数据
+        this.loadOrders(true)
+    },
+
+    /**
+     * 加载订单数据
+     * @param {boolean} refresh 是否刷新数据
+     */
+    async loadOrders(refresh = false) {
+        if (this.data.loading) return
+        
+        this.setData({ loading: true })
+        
+        try {
+            // 如果是刷新，重置页码
+            if (refresh) {
+                this.setData({ 
+                    orders: [], 
+                    page: 1, 
+                    hasMore: true 
+                })
             }
-        ]
-    },
-
-    onLoad(options) {
-        console.log('优惠券页面加载')
-        // 根据传入的参数设置默认选中的标签
-        if (options.tab) {
-            this.setData({
-                activeTab: options.tab
-            })
-        }
-        this.filterCoupons()
-    },
-
-    /**
-     * 切换标签
-     */
-    switchTab(e) {
-        const tab = e.currentTarget.dataset.tab
-        this.setData({
-            activeTab: tab
-        })
-        this.filterCoupons()
-    },
-
-    /**
-     * 根据标签筛选优惠券
-     */
-    filterCoupons() {
-        // 这里可以根据activeTab筛选不同状态的优惠券
-        // 目前使用静态数据，实际项目中应该从API获取
-        console.log('当前选中标签:', this.data.activeTab)
-    },
-
-    /**
-     * 选择优惠券
-     */
-    selectCoupon(e) {
-        const coupon = e.currentTarget.dataset.coupon
-        
-        // 只有可用状态的优惠券才能选择
-        if (coupon.status !== 'available') {
-            wx.showToast({
-                title: '该优惠券不可使用',
-                icon: 'none'
-            })
-            return
-        }
-
-        // 将选中的优惠券信息传递回上一页
-        const pages = getCurrentPages()
-        const prevPage = pages[pages.length - 2]
-        
-        if (prevPage) {
-            // 更新上一页的优惠券信息
-            prevPage.setData({
-                selectedCoupon: coupon
+            
+            // 根据activeKey确定状态参数
+            const status = this.getStatusByActiveKey(this.data.activeKey)
+            
+            console.log('开始加载订单数据:', {
+                page: this.data.page,
+                status: status,
+                activeKey: this.data.activeKey
             })
             
-            // 重新计算支付金额
-            prevPage.calculatePayAmount()
+            const response = await Order.getOrderList(this.data.page, this.data.per_page, status)
+            console.log('订单API响应:', response)
+            
+            const formattedOrders = Order.formatOrderListData(response)
+            
+            if (formattedOrders.length > 0) {
+                const newOrders = refresh ? formattedOrders : [...this.data.orders, ...formattedOrders]
+                
+                this.setData({
+                    orders: newOrders,
+                    page: this.data.page + 1,
+                    hasMore: response.result?.current_page < response.result?.last_page
+                })
+            } else if (refresh) {
+                // 刷新时没有数据，使用默认数据或显示空状态
+                this.setData({
+                    orders: [],
+                    hasMore: false
+                })
+            }
+            
+        } catch (error) {
+            console.error('获取订单失败:', error)
+            if (refresh) {
+                // API失败时使用默认数据
+                const defaultOrders = Order.getDefaultOrderData()
+                this.setData({
+                    orders: defaultOrders,
+                    hasMore: false
+                })
+            }
+            wx.showToast({
+                title: '获取订单失败',
+                icon: 'error'
+            })
+        } finally {
+            this.setData({ loading: false })
         }
+    },
 
-        wx.showToast({
-            title: '优惠券已选择',
-            icon: 'success'
+    /**
+     * 根据activeKey获取订单状态参数
+     * @param {number} activeKey tab索引
+     */
+    getStatusByActiveKey(activeKey) {
+        const statusMap = {
+            0: null,    // 全部
+            1: 1,       // 待付款
+            2: 2,       // 待取茶
+            3: 3,       // 已完成
+            4: 4        // 已取消
+        }
+        return statusMap[activeKey]
+    },
+
+    /**
+     * 切换tab
+     */
+    switchTab(event) {
+        const activeKey = parseInt(event.currentTarget.dataset.tab)
+        this.setData({ 
+            activeKey, 
+            activeTab: activeKey 
         })
+        this.loadOrders(true)
+    },
 
-        // 返回上一页
-        setTimeout(() => {
-            wx.navigateBack()
-        }, 1000)
+    /**
+     * 下拉刷新
+     */
+    onPullDownRefresh() {
+        this.loadOrders(true).then(() => {
+            wx.stopPullDownRefresh()
+        })
+    },
+
+    /**
+     * 上拉加载更多
+     */
+    onReachBottom() {
+        if (this.data.hasMore && !this.data.loading) {
+            this.loadOrders(false)
+        }
     }
 })

@@ -24,6 +24,92 @@ class Coupon {
         })
     }
 
+    /**
+     * 获取用户优惠券列表（新API）
+     */
+    static async getUserCoupons() {
+        return await Http.request({
+            url: 'qingting/v1/self/coupons',
+            method: 'GET'
+        })
+    }
+
+    /**
+     * 处理优惠券数据，按状态分类
+     */
+    static processCouponsData(response) {
+        const availableCoupons = []
+        const usedCoupons = []
+        const expiredCoupons = []
+
+        // 检查响应数据结构
+        const coupons = response?.result?.data || []
+        
+        coupons.forEach(item => {
+            const couponData = Coupon.formatCouponData(item)
+            
+            // 根据status分类，由于缺少actual_status字段，使用status字段
+            if (item.status === 1) {
+                // 未使用 - 还需要检查是否过期
+                const now = new Date()
+                const endTime = new Date(item.coupon.end_time)
+                
+                if (now <= endTime) {
+                    availableCoupons.push(couponData)
+                } else {
+                    expiredCoupons.push(couponData)
+                }
+            } else {
+                // 已使用或其他状态
+                usedCoupons.push(couponData)
+            }
+        })
+
+        return {
+            availableCoupons,
+            usedCoupons,
+            expiredCoupons
+        }
+    }
+
+    /**
+     * 格式化优惠券数据以适配UI
+     */
+    static formatCouponData(item) {
+        const coupon = item.coupon
+        let amount = ''
+        let condition = ''
+
+        if (coupon.type === 1) {
+            // 满减券
+            amount = coupon.minus
+            condition = `满${coupon.full_money}可用`
+        } else if (coupon.type === 2) {
+            // 折扣券
+            if (coupon.rate) {
+                const discount = Math.round((1 - parseFloat(coupon.rate)) * 10)
+                amount = `${discount}折`
+            } else {
+                amount = '折扣券'
+            }
+            condition = '全场通用'
+        }
+
+        return {
+            id: item.id,
+            coupon_id: coupon.id,
+            name: coupon.title,
+            amount: amount,
+            condition: condition,
+            validDate: `${coupon.start_time.split(' ')[0]} - ${coupon.end_time.split(' ')[0]}`,
+            status: item.status,
+            type: coupon.type,
+            rate: coupon.rate,
+            full_money: coupon.full_money,
+            minus: coupon.minus,
+            originalData: item
+        }
+    }
 
     static async getCouponsByCategory(cid) {
         return await Http.request({

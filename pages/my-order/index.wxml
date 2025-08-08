@@ -1,58 +1,84 @@
 <view class="page">
+  <!-- 顶部标签栏 -->
   <view class="group_1">
     <view class="text-wrapper_1">
-      <text lines="1" class="text_3">全部</text>
-      <text lines="1" class="text_4">待取茶</text>
-      <text lines="1" class="text_5">已完成</text>
-      <text lines="1" class="text_6">已取消</text>
+      <text lines="1" class="text_3 {{activeTab == 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">全部</text>
+      <text lines="1" class="text_4 {{activeTab == 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">待取茶</text>
+      <text lines="1" class="text_5 {{activeTab == 3 ? 'active' : ''}}" bindtap="switchTab" data-tab="3">已完成</text>
+      <text lines="1" class="text_6 {{activeTab == 4 ? 'active' : ''}}" bindtap="switchTab" data-tab="4">已取消</text>
     </view>
     <view class="image-wrapper_1">
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
     </view>
   </view>
-  <view class="group_2">
-    <view class="section_1">
-     <view style="display: flex;">
-      <view class="text-wrapper_2">
-        <text lines="1" class="text_7">堂食</text>
+
+  <!-- 订单列表 -->
+  <view wx:if="{{orders.length > 0}}">
+    <view class="group_2" wx:for="{{orders}}" wx:key="id">
+      <!-- 订单头部信息 -->
+      <view class="section_1">
+        <view style="display: flex;">
+          <view class="text-wrapper_2">
+            <text lines="1" class="text_7">堂食</text>
+          </view>
+          <text lines="1" class="text_8">订单号：{{item.order_no}}</text>
+        </view>
+        <text lines="1" class="text_9 {{item.status_class}}">{{item.status_text}}</text>
       </view>
-      <text lines="1" class="text_8">这里是店铺的名称</text>
-     </view>
-      <text lines="1" class="text_9">待取茶</text>
-    </view>
-    <view class="section_2">
-      <view class="image-text_1">
-        <view class="image-wrapper_2">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_5"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
-        </view>
-        <view class="text-group_1">
-          <text lines="1" class="text_10">清照竹影茶</text>
-          <text lines="1" class="text_11">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
-        </view>
-      </view>
-      <text lines="1" decode="true" class="text_12">x&nbsp;1</text>
-    </view>
-    <view class="section_3">
-      <view class="image-text_2">
-        <view class="image-wrapper_3">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_8"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_9"></image>
-        </view>
-        <view class="text-group_2">
-          <text lines="1" class="text_13">清照竹影茶</text>
-          <text lines="1" class="text_14">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
+
+      <!-- 订单商品列表 -->
+      <view wx:if="{{item.items.length > 0}}">
+        <view class="section_2" wx:for="{{item.items}}" wx:key="index" wx:for-item="product">
+          <view class="image-text_1">
+            <view class="image-wrapper_2">
+              <image src="{{product.image || '/imgs/home/drink-item.png'}}" class="image_5"></image>
+              <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
+            </view>
+            <view class="text-group_1">
+              <text lines="1" class="text_10">{{product.name || product.title}}</text>
+              <text lines="1" class="text_11">{{product.specs || product.description || '大、热、不额外加糖、脱脂牛奶'}}</text>
+            </view>
+          </view>
+          <text lines="1" decode="true" class="text_12">x&nbsp;{{product.quantity || product.count || 1}}</text>
         </view>
       </view>
-      <text lines="1" decode="true" class="text_15">x&nbsp;1</text>
-    </view>
-    <view class="section_4">
-      <text lines="1" decode="true" class="text_16">2025/08/04&nbsp;13:05</text>
-      <view class="text-wrapper_3">
-        <text lines="1" decode="true" class="text_17">共1件商品&nbsp;合计：</text>
-        <text lines="1" class="text_18">¥40</text>
+
+      <!-- 默认商品显示（如果没有items数据） -->
+      <view wx:else class="section_2">
+        <view class="image-text_1">
+          <view class="image-wrapper_2">
+            <image src="/imgs/home/drink-item.png" class="image_5"></image>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
+          </view>
+          <view class="text-group_1">
+            <text lines="1" class="text_10">清照竹影茶</text>
+            <text lines="1" class="text_11">大、热、不额外加糖、脱脂牛奶</text>
+          </view>
+        </view>
+        <text lines="1" decode="true" class="text_12">x&nbsp;1</text>
+      </view>
+
+      <!-- 订单底部信息 -->
+      <view class="section_4">
+        <text lines="1" decode="true" class="text_16">{{item.formatted_time}}</text>
+        <view class="text-wrapper_3">
+          <text lines="1" decode="true" class="text_17">共{{item.items.length || 1}}件商品&nbsp;合计：</text>
+          <text lines="1" class="text_18">¥{{item.total_price}}</text>
+        </view>
       </view>
     </view>
   </view>
+
+  <!-- 空状态 -->
+  <view wx:else class="empty-state">
+    <image src="/imgs/logo.png" class="empty-logo"></image>
+    <text class="empty-text">暂无订单</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
   <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_10"></image>
 </view>
