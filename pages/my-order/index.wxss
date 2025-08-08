@@ -10,7 +10,7 @@
 .group_1 {
   display: flex;
   flex-direction: column;
-  padding: 29rpx 6rpx 31rpx 0;
+  padding: 0rpx 6rpx 31rpx 0;
 }
 .box_1 {
   flex-direction: row;
@@ -156,6 +156,7 @@
   padding: 30rpx;
   width: 690rpx;
 background: #FFFFFF;
+margin: 20rpx auto;
 /* background-color: aqua; */
 border-radius: 4rpx;
 }

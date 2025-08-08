@@ -20,9 +20,15 @@ Page({
      * 生命周期函数--监听页面加载
      */
     onLoad: async function (options) {
+        console.log('订单列表页面加载，参数:', options)
+        
         // 从参数中获取默认tab
         const activeKey = parseInt(options.key) || 0
+        console.log('解析后的activeKey:', activeKey)
+        
         this.setData({ activeKey, activeTab: activeKey })
+        console.log('设置页面状态:', { activeKey, activeTab: activeKey })
+        
         await this.loadOrders(true)
     },
 
@@ -64,6 +70,20 @@ Page({
             console.log('订单API响应:', response)
             
             if (response.code === 0 && response.result && response.result.data) {
+                console.log('API返回的订单数据:', response.result.data)
+                console.log('订单数据长度:', response.result.data.length)
+                
+                // 检查第一个订单的数据结构
+                if (response.result.data.length > 0) {
+                    const firstOrder = response.result.data[0]
+                    console.log('第一个订单数据结构:', {
+                        id: firstOrder.id,
+                        snap_items: firstOrder.snap_items,
+                        snap_items_type: typeof firstOrder.snap_items,
+                        is_array: Array.isArray(firstOrder.snap_items)
+                    })
+                }
+                
                 const formattedOrders = this.formatOrderData(response.result.data)
                 
                 if (formattedOrders.length > 0) {
@@ -112,16 +132,31 @@ Page({
      */
     formatOrderData(orderList) {
         return orderList.map(order => {
-            // 处理商品列表
-            const products = order.snap_items.map(item => ({
-                id: item.id,
-                name: item.title,
-                image: item.img,
-                count: item.count,
-                price: item.final_price,
-                specs: item.specs || '默认规格',
-                totalPrice: item.total_price
-            }))
+            // 处理商品列表 - 添加安全检查
+            let products = []
+            if (order.snap_items && Array.isArray(order.snap_items)) {
+                products = order.snap_items.map(item => ({
+                    id: item.id,
+                    name: item.title,
+                    image: item.img,
+                    count: item.count,
+                    price: item.final_price,
+                    specs: item.specs || '默认规格',
+                    totalPrice: item.total_price
+                }))
+            } else {
+                console.warn('订单商品数据异常:', order.id, order.snap_items)
+                // 如果没有商品数据，创建一个默认商品
+                products = [{
+                    id: order.id || 'default',
+                    name: order.snap_title || '未知商品',
+                    image: order.snap_img || '/imgs/default-product.png',
+                    count: order.total_count || 1,
+                    price: order.total_price || '0.00',
+                    specs: '默认规格',
+                    totalPrice: order.total_price || '0.00'
+                }]
+            }
 
             // 获取订单状态文本
             const statusText = this.getOrderStatusText(order.status)

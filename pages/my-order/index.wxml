@@ -12,7 +12,7 @@
   </view>
   
   <!-- 订单列表 -->
-  <view wx:if="{{orders.length > 0}}">
+  <view style="padding-bottom: 80rpx;" wx:if="{{orders.length > 0}}">
     <view class="group_2" wx:for="{{orders}}" wx:key="id" bindtap="goToOrderDetail" data-order-id="{{item.id}}">
       <view class="section_1">
         <view style="display: flex;">

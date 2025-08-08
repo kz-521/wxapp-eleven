@@ -87,10 +87,17 @@ Page({
             wx.hideLoading()
             console.log('订单详情响应:', res)
             
-            if (res.code === 0 && res.result) {
-                const orderInfo = res.result
-                this.setOrderDetailData(orderInfo)
+            if (res.code === 0 && res.result && res.result.data && res.result.data.length > 0) {
+                // 找到对应的订单
+                const orderInfo = res.result.data.find(order => order.id == orderId)
+                if (orderInfo) {
+                    this.setOrderDetailData(orderInfo)
+                } else {
+                    console.log('未找到对应订单，使用第一个订单数据')
+                    this.setOrderDetailData(res.result.data[0])
+                }
             } else {
+                console.log('API返回错误或数据为空:', res)
                 wx.showToast({
                     title: res.msg || '获取订单详情失败',
                     icon: 'none'
@@ -103,9 +110,6 @@ Page({
                 title: '获取订单详情失败',
                 icon: 'none'
             })
-            
-            // 如果API调用失败，使用模拟数据
-            this.setMockOrderData()
         })
     },
 
@@ -115,140 +119,61 @@ Page({
     setOrderDetailData(orderInfo) {
         console.log('设置订单详情数据:', orderInfo)
         
-        // 处理订单商品数据 - 支持两种数据格式
+        // 处理商品列表
         let orderProducts = []
-        if (orderInfo.products && Array.isArray(orderInfo.products)) {
-            // 从订单提交页面传递的数据格式
-            orderProducts = orderInfo.products
-            console.log('处理从订单提交页面传递的商品数据:', orderProducts)
-        } else if (orderInfo.sku_list && Array.isArray(orderInfo.sku_list)) {
-            // 从API返回的数据格式
-            orderProducts = orderInfo.sku_list
-            console.log('处理从API返回的商品数据:', orderProducts)
-        } else {
-            orderProducts = []
-            console.log('没有找到商品数据')
+        if (orderInfo.snap_items && Array.isArray(orderInfo.snap_items)) {
+            orderProducts = orderInfo.snap_items.map(item => ({
+                id: item.id,
+                name: item.title,
+                image: item.img,
+                count: item.count,
+                price: item.final_price,
+                specs: item.specs || '默认规格',
+                totalPrice: item.total_price
+            }))
         }
         
-        // 计算总金额
-        const totalAmount = orderProducts.reduce((total, item) => {
-            const itemPrice = parseFloat(item.price) || parseFloat(item.sku_price) || 0
-            const count = parseInt(item.count) || 1
-            const itemTotal = itemPrice * count
-            console.log('商品价格计算:', {
-                name: item.name,
-                price: itemPrice,
-                count: count,
-                total: itemTotal
-            })
-            return total + itemTotal
-        }, 0)
-
-        console.log('计算的总金额:', totalAmount)
-
-        // 设置页面数据
-        const pageData = {
+        // 获取订单状态
+        const orderStatus = this.getOrderStatus(orderInfo.status)
+        const orderStatusText = this.getOrderStatusText(orderInfo.status)
+        
+        // 格式化时间
+        const createTime = orderInfo.create_time || orderInfo.placed_time || ''
+        const payTime = orderInfo.paid_time || ''
+        
+        this.setData({
             orderInfo: orderInfo,
             orderProducts: orderProducts,
-            totalAmount: parseFloat(orderInfo.totalAmount || totalAmount).toFixed(2),
-            payAmount: parseFloat(orderInfo.payAmount || totalAmount).toFixed(2),
-            couponAmount: parseFloat(orderInfo.couponAmount || 0).toFixed(2),
-            remark: orderInfo.remark || '',
-            diningType: orderInfo.diningType || 'dine-in',
-            orderStatus: orderInfo.status || 'pending',
-            orderStatusText: this.getOrderStatusText(orderInfo.status || 'pending'),
-            createTime: orderInfo.createTime || orderInfo.create_time || '',
-            payTime: orderInfo.payTime || orderInfo.pay_time || '',
-            completeTime: orderInfo.completeTime || orderInfo.complete_time || '',
-            pickupNumber: orderInfo.pickupNumber || orderInfo.pickup_number || '8195',
-            estimatedTime: orderInfo.estimatedTime || orderInfo.estimated_time || '6',
-            storePhone: orderInfo.storePhone || orderInfo.store_phone || '1342137123'
-        }
-
-        console.log('设置的页面数据:', pageData)
-
-        this.setData(pageData, () => {
-            console.log('数据设置完成，当前页面数据:')
-            console.log('orderProducts:', this.data.orderProducts)
-            console.log('createTime:', this.data.createTime)
-            console.log('remark:', this.data.remark)
-            console.log('totalAmount:', this.data.totalAmount)
+            totalAmount: orderInfo.total_price || '0.00',
+            orderStatus: orderStatus,
+            orderStatusText: orderStatusText,
+            createTime: createTime,
+            payTime: payTime,
+            remark: orderInfo.remark || '无备注',
+            pickupNumber: Math.floor(Math.random() * 9000) + 1000, // 随机生成取茶号
+            estimatedTime: '6', // 预计时间（分钟）
+            storePhone: '1342137123' // 店铺电话
         })
-
-        // 如果有优惠券信息，设置优惠券数据
-        if (orderInfo.coupon) {
-            this.setData({
-                selectedCoupon: orderInfo.coupon
-            })
-        }
+        
+        console.log('订单详情数据设置完成:', {
+            orderProducts: orderProducts.length,
+            totalAmount: orderInfo.total_price,
+            orderStatus: orderStatus,
+            orderStatusText: orderStatusText,
+            createTime: createTime
+        })
     },
 
     /**
-     * 设置模拟订单数据（用于测试）
+     * 获取订单状态
      */
-    setMockOrderData() {
-        console.log('使用模拟订单数据')
-        
-        const mockOrderInfo = {
-            order_id: this.data.orderId || 'TEST001',
-            status: 'preparing',
-            create_time: new Date().toLocaleString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }).replace(/\//g, '/'),
-            pay_time: new Date().toLocaleString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }).replace(/\//g, '/'),
-            complete_time: '',
-            dining_type: 'dine-in',
-            remark: '少糖，谢谢',
-            total_amount: 68.00,
-            coupon_amount: 10.00,
-            pay_amount: 58.00,
-            pickup_number: '8195',
-            estimated_time: '6',
-            store_phone: '1342137123',
-            products: [
-                {
-                    id: '1',
-                    name: '清汀养生茶',
-                    price: 28.00,
-                    count: 2,
-                    image: '/imgs/home/drink-item.png',
-                    tags: ['养生', '推荐'],
-                    specs: '大、热、不额外加糖、脱脂牛奶'
-                },
-                {
-                    id: '2',
-                    name: '桂花乌龙茶',
-                    price: 32.00,
-                    count: 1,
-                    image: '/imgs/home/drink-item.png',
-                    tags: ['清香', '热销'],
-                    specs: '中、温、微糖、全脂牛奶'
-                }
-            ],
-            coupon: {
-                id: 1,
-                name: '满50减10券',
-                amount: 10,
-                type: 1
-            }
+    getOrderStatus(status) {
+        const statusMap = {
+            1: 'ready',      // 待取茶
+            2: 'completed',  // 已完成
+            3: 'cancelled'   // 已取消
         }
-
-        console.log('模拟订单数据:', mockOrderInfo)
-        this.setOrderDetailData(mockOrderInfo)
+        return statusMap[status] || 'pending'
     },
 
     /**
