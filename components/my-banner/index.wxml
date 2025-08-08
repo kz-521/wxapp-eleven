@@ -1,8 +1,18 @@
 <view class="container">
     <view class="inner-container">
-        <l-avatar size="140" class="avatar-container"
+        <!-- 用户头像显示 -->
+        <l-avatar wx:if="{{userInfo && userInfo.avatarUrl}}" 
+                  size="140" class="avatar-container"
                   l-class="avatar" shape="square"
-                  open-data="{{['userAvatarUrl','userNickName']}}"
+                  src="{{userInfo.avatarUrl}}"
+                  bind:tap="onAvatarTap">
+        </l-avatar>
+        
+        <!-- 默认头像 -->
+        <l-avatar wx:else
+                  size="140" class="avatar-container"
+                  l-class="avatar" shape="square"
+                  src="/imgs/logo.png"
                   bind:tap="onAvatarTap">
         </l-avatar>
         

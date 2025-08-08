@@ -45,12 +45,14 @@ Component({
             // 如果用户信息完整或已授权，隐藏登录按钮
             if ((userInfo && userInfo.avatarUrl && userInfo.nickName) || hasAuth) {
                 this.setData({
-                    showLoginBtn: false
+                    showLoginBtn: false,
+                    userInfo: userInfo
                 })
                 console.log('用户信息完整，隐藏登录按钮')
             } else {
                 this.setData({
-                    showLoginBtn: true
+                    showLoginBtn: true,
+                    userInfo: null
                 })
                 console.log('用户信息不完整，显示登录按钮')
             }
@@ -78,6 +80,9 @@ Component({
             
             // 检查是否已经有完整的用户信息
             const userInfo = wx.getStorageSync('userInfo')
+            console.log('当前存储的用户信息:', userInfo)
+            console.log('当前组件状态:', this.data)
+            
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
                 console.log('用户信息已完整，显示用户信息')
                 wx.showToast({
@@ -260,16 +265,20 @@ Component({
         refreshUserInfo() {
             console.log('刷新用户信息状态')
             const userInfo = wx.getStorageSync('userInfo')
+            console.log('从本地存储获取的用户信息:', userInfo)
+            
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
                 this.setData({
-                    showLoginBtn: false
+                    showLoginBtn: false,
+                    userInfo: userInfo
                 })
-                console.log('用户信息完整，隐藏登录按钮')
+                console.log('用户信息完整，隐藏登录按钮，更新用户信息')
             } else {
                 this.setData({
-                    showLoginBtn: true
+                    showLoginBtn: true,
+                    userInfo: null
                 })
-                console.log('用户信息不完整，显示登录按钮')
+                console.log('用户信息不完整，显示登录按钮，清空用户信息')
             }
         },
 

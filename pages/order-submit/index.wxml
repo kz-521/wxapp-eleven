@@ -59,9 +59,9 @@
         <view class="text-group_10">
           <text lines="1" class="text_16">{{item.name}}</text>
           <text lines="1" class="text_17">
-                  <text wx:for="{{item.tags}}" wx:key="index">{{item}} </text>
-                  数量：{{item.count}}杯
-                </text>
+            <text>{{item.specs}} </text>
+            数量：{{item.count}}杯
+          </text>
         </view>
       </view>
       <text lines="1" class="text_18">¥{{item.price}}</text>
