@@ -7,6 +7,13 @@
     "miniprogram": {
       "list": [
         {
+          "name": "pages/order-detail/index",
+          "pathName": "pages/order-detail/index",
+          "query": "orderId=53",
+          "scene": null,
+          "launchMode": "default"
+        },
+        {
           "name": "pages/cart/cart",
           "pathName": "pages/cart/cart",
           "query": "",

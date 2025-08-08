@@ -142,5 +142,17 @@ Page({
         if (this.data.hasMore && !this.data.loading) {
             this.loadOrders(false)
         }
+    },
+
+    /**
+     * 跳转到订单详情
+     */
+    goToOrderDetail(event) {
+        const orderId = event.currentTarget.dataset.orderId
+        console.log('跳转到订单详情，订单ID:', orderId)
+        
+        wx.navigateTo({
+            url: `/pages/order-detail/index?orderId=${orderId}`
+        })
     }
 })

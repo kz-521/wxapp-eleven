@@ -10,7 +10,7 @@
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
     </view>
   </view>
-  <view class="group_2">
+  <view class="group_2" bindtap="goToOrderDetail" data-order-id="test_order_001">
     <view class="section_1">
      <view style="display: flex;">
       <view class="text-wrapper_2">

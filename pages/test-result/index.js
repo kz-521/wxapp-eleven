@@ -23,7 +23,8 @@ Page({
       const eventChannel = this.getOpenerEventChannel && this.getOpenerEventChannel()
       if (eventChannel) {
         eventChannel.on('testResult', function(data) {
-          that.setData({ result: data })
+          // 处理接收到的数据，设置图片
+          that.handleTestResultData(data)
         })
       }
     }
@@ -65,34 +66,56 @@ Page({
   handleTestResult(response) {
     if (response.code === 0 && response.result) {
       const result = response.result
-      
-      // 根据体质类型设置背景图片
-      const typeImageMap = {
-        '木行': '/imgs/test1.png',
-        '金行': '/imgs/test2.png', 
-        '水行': '/imgs/test3.png',
-        '土行': '/imgs/test4.png',
-        '火行': '/imgs/test5.png'
-      }
-      
-      const backgroundImage = typeImageMap[result.primary_constitution.type] || '/imgs/test1.png'
-      
-      // 设置体质测评结果数据
-      this.setData({
-        result: {
-          primary_constitution: result.primary_constitution,
-          secondary_constitution: result.secondary_constitution,
-          scores: result.scores,
-          result_id: result.result_id
-        },
-        backgroundImage: backgroundImage
-      })
+      this.handleTestResultData(result)
     }
+  },
+
+  // 处理体质测评结果数据（通用方法）
+  handleTestResultData(result) {
+    console.log('处理体质测评结果数据:', result)
+    
+    // 根据体质类型设置背景图片和右侧图片
+    const typeImageMap = {
+      '木行': '/imgs/test1.png',
+      '金行': '/imgs/test2.png', 
+      '水行': '/imgs/test4.png',
+      '土行': '/imgs/test3.png',
+      '火行': '/imgs/test5.png'
+    }
+    
+    const typeRightImageMap = {
+      '木行': '/imgs/test3right.png',
+      '金行': '/imgs/test2right.png', 
+      '水行': '/imgs/test4right.png',
+      '土行': '/imgs/test1right.png',
+      '火行': '/imgs/test5right.png'
+    }
+    
+    const backgroundImage = typeImageMap[result.primary_constitution.type] || '/imgs/test1.png'
+    const rightImage = typeRightImageMap[result.primary_constitution.type] || '/imgs/test1right.png'
+    
+    console.log('体质类型:', result.primary_constitution.type)
+    console.log('背景图片:', backgroundImage)
+    console.log('右侧图片:', rightImage)
+    
+    // 设置体质测评结果数据
+    this.setData({
+      result: {
+        primary_constitution: result.primary_constitution,
+        secondary_constitution: result.secondary_constitution,
+        scores: result.scores,
+        result_id: result.result_id
+      },
+      backgroundImage: backgroundImage,
+      rightImage: rightImage
+    })
   },
 
   // 获取今日推荐商品
   getRecommendProducts() {
     api.getRecommendSpu(3).then(res => {
+      console.log('推荐商品接口响应:', res)
+      
       if (res.code === 200 && res.result && res.result.list) {
         const recommendProducts = res.result.list.map(item => ({
           id: item.id,
@@ -105,9 +128,13 @@ Page({
           originalPrice: item.price
         }))
         
+        console.log('处理后的推荐商品:', recommendProducts)
+        
         this.setData({
           recommendProducts: recommendProducts
         })
+      } else {
+        console.log('推荐商品接口返回错误或数据为空:', res)
       }
     }).catch(err => {
       console.error('获取推荐商品失败:', err)
@@ -119,55 +146,72 @@ Page({
     const index = event.currentTarget.dataset.index
     const product = this.data.recommendProducts[index]
     
-    console.log('添加推荐商品到购物车:', product)
+    console.log('=== 添加推荐商品到购物车 ===')
+    console.log('商品索引:', index)
+    console.log('商品信息:', product)
     
-    // 获取商品详情，包括SKU信息
-    this.getProductDetailAndAddToCart(product.id)
+    // 直接添加到购物车，使用商品ID
+    this.addProductToCartDirectly(product)
   },
 
-  // 获取商品详情并添加到购物车
-  getProductDetailAndAddToCart(spuId) {
-    wx.showLoading({ title: '加载中...' })
+  // 直接添加到购物车
+  addProductToCartDirectly(product) {
+    console.log('直接添加商品到购物车:', product)
     
-    // 获取商品详情
-    api.getSpuDetail(spuId).then(res => {
-      wx.hideLoading()
-      
-      if (res.code === 200 && res.result) {
-        const productDetail = res.result
-        
-        // 检查商品是否有SKU列表
-        if (!productDetail.skuList || productDetail.skuList.length === 0) {
-          wx.showToast({
-            title: '商品暂不可购买',
-            icon: 'none'
-          })
-          return
-        }
-        
-        // 如果商品只有一个SKU，直接添加到购物车
-        if (productDetail.skuList.length === 1) {
-          this.addProductToCart(productDetail, productDetail.skuList[0])
-        } else {
-          // 多个SKU的情况，跳转到商品详情页选择规格
-          wx.navigateTo({
-            url: `/pages/detail/detail?id=${spuId}&from=test-result`
-          })
-        }
-      } else {
-        wx.showToast({
-          title: '商品信息获取失败',
-          icon: 'none'
-        })
+    // 获取当前购物车数据
+    let cartItems = wx.getStorageSync('cartItems') || []
+    
+    // 查找是否已存在相同的商品
+    const existingItemIndex = cartItems.findIndex(item => item.id === product.id)
+    
+    if (existingItemIndex >= 0) {
+      // 已存在，增加数量
+      cartItems[existingItemIndex].count += 1
+      console.log('商品已存在，增加数量到:', cartItems[existingItemIndex].count)
+    } else {
+      // 新增商品到购物车
+      const cartItem = {
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        count: 1,
+        price: parseFloat(product.price) || 0,
+        originalPrice: parseFloat(product.originalPrice) || 0,
+        tags: product.tags || [],
+        subtitle: product.subtitle || '',
+        description: product.description || ''
       }
-    }).catch(err => {
-      wx.hideLoading()
-      console.error('获取商品详情失败:', err)
-      wx.showToast({
-        title: '商品信息获取失败',
-        icon: 'none'
-      })
+      
+      cartItems.unshift(cartItem)
+      console.log('新增商品到购物车:', cartItem)
+    }
+    
+    // 保存到本地存储
+    wx.setStorageSync('cartItems', cartItems)
+    
+    // 同步到globalData
+    const app = getApp()
+    app.globalData.cartItems = cartItems
+    app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+    app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+    
+    console.log('购物车数据已更新:', {
+      cartItems: cartItems,
+      cartCount: app.globalData.cartCount,
+      totalPrice: app.globalData.totalPrice
     })
+    
+    wx.showToast({
+      title: '已添加到购物车',
+      icon: 'success'
+    })
+    
+    // 跳转到分类页面
+    setTimeout(() => {
+      wx.switchTab({
+        url: '/pages/category/category'
+      })
+    }, 1500)
   },
 
   // 添加商品到购物车
@@ -212,6 +256,18 @@ Page({
     // 保存到本地存储
     wx.setStorageSync('cartItems', cartItems)
     
+    // 同步到globalData
+    const app = getApp()
+    app.globalData.cartItems = cartItems
+    app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+    app.globalData.totalPrice = cartItems.reduce((total, item) => total + (item.price * item.count), 0)
+    
+    console.log('购物车数据已更新:', {
+      cartItems: cartItems,
+      cartCount: app.globalData.cartCount,
+      totalPrice: app.globalData.totalPrice
+    })
+    
     wx.showToast({
       title: '已添加到购物车',
       icon: 'success'
@@ -232,6 +288,26 @@ Page({
     })
   },
 
+  // 测试添加商品到购物车
+  testAddToCart() {
+    console.log('=== 测试添加商品到购物车 ===')
+    
+    // 模拟一个测试商品
+    const testProduct = {
+      id: 'test_001',
+      name: '测试商品',
+      image: '/imgs/test-product.png',
+      price: 25.00,
+      originalPrice: 30.00,
+      tags: ['测试', '推荐'],
+      subtitle: '测试商品副标题',
+      description: '这是一个测试商品'
+    }
+    
+    console.log('测试商品:', testProduct)
+    this.addProductToCartDirectly(testProduct)
+  },
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -243,7 +319,23 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow() {
-
+    // 调试信息：检查当前页面数据
+    console.log('=== 测试结果页面数据检查 ===')
+    console.log('result:', this.data.result)
+    console.log('backgroundImage:', this.data.backgroundImage)
+    console.log('rightImage:', this.data.rightImage)
+    console.log('recommendProducts:', this.data.recommendProducts)
+    
+    // 检查当前购物车数据
+    const cartItems = wx.getStorageSync('cartItems') || []
+    console.log('当前购物车数据:', cartItems)
+    
+    const app = getApp()
+    console.log('globalData购物车数据:', {
+      cartItems: app.globalData.cartItems,
+      cartCount: app.globalData.cartCount,
+      totalPrice: app.globalData.totalPrice
+    })
   },
 
   /**

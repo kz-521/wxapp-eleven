@@ -6,6 +6,7 @@
     "pages/test/index",
     "pages/test-result/index",
     "pages/order-submit/index",
+    "pages/order-detail/index",
     "pages/my-order/index",
     "pages/coupon-select/index"
   ],

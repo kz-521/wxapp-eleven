@@ -44,8 +44,17 @@ Page({
 
   // 加载购物车数据
   loadCartData() {
-    // 只使用页面级别的缓存，不读取本地存储
-    const cartItems = this.data.cartItems || []
+    // 从globalData和本地存储读取购物车数据
+    const app = getApp()
+    let cartItems = app.globalData.cartItems || []
+    
+    // 如果globalData中没有数据，尝试从本地存储读取
+    if (cartItems.length === 0) {
+      cartItems = wx.getStorageSync('cartItems') || []
+      // 同步到globalData
+      app.globalData.cartItems = cartItems
+    }
+    
     const cartCount = cartItems.reduce((total, item) => total + item.count, 0)
 
     // 价格计算：优先使用SKU价格，fallback到SPU价格
@@ -76,14 +85,15 @@ Page({
     }, 0)
 
     this.setData({
+      cartItems: cartItems,
       cartCount,
       totalPrice: totalPrice.toFixed(2)
     })
 
     console.log('购物车数据更新:', {
+      cartItems: cartItems,
       cartCount,
-      totalPrice: totalPrice.toFixed(2),
-      cartItems: cartItems.length
+      totalPrice: totalPrice.toFixed(2)
     })
   },
 
@@ -164,6 +174,16 @@ Page({
     this.setData({
       cartItems: cartItems
     })
+    
+    // 同步到globalData和本地存储
+    const app = getApp()
+    app.globalData.cartItems = cartItems
+    app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+    app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+    
+    // 保存到本地存储
+    wx.setStorageSync('cartItems', cartItems)
+    
     this.loadCartData()
 
     wx.showToast({
@@ -182,6 +202,16 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
     }
   },
@@ -196,6 +226,16 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
     } else if (cartItems[index] && cartItems[index].count === 1) {
       // 如果数量为1，则移除商品
@@ -203,6 +243,16 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
 
       wx.showToast({
@@ -236,6 +286,16 @@ Page({
           this.setData({
             cartItems: []
           })
+          
+          // 同步到globalData和本地存储
+          const app = getApp()
+          app.globalData.cartItems = []
+          app.globalData.cartCount = 0
+          app.globalData.totalPrice = 0
+          
+          // 清空本地存储
+          wx.removeStorageSync('cartItems')
+          
           this.loadCartData()
           this.closeCartDetail()
           wx.showToast({

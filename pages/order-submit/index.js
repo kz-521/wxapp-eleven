@@ -384,8 +384,8 @@ Page({
                             wx.removeStorageSync('payAmount')
                             
                             setTimeout(() => {
-                                wx.navigateBack({
-                                    delta: 1
+                                wx.redirectTo({
+                                    url: `/pages/order-detail/index?orderId=${orderId}`
                                 })
                             }, 2000)
                         }
@@ -680,10 +680,10 @@ Page({
                 app.globalData.cartCount = 0
                 app.globalData.totalPrice = 0
                 
-                // 跳转到支付页面或订单详情页
+                // 跳转到订单详情页
                 setTimeout(() => {
                     wx.redirectTo({
-                        url: `/pages/pay-success/pay-success?orderId=${res.result.orderId}`
+                        url: `/pages/order-detail/index?orderId=${res.result.orderId}`
                     })
                 }, 1500)
             } else {
