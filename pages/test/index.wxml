@@ -10,31 +10,82 @@
         </view>
       </view>
       <text lines="1" class="text_6">选择你的生日</text>
-      <view class="text-wrapper_3">
-        <text lines="1" class="text_7">完善生日可以更准确计算体质哦～</text>
+      <view class="text-wrapper_3" bindtap="onShowBirthdayPicker">
+        <text lines="1" class="text_7">{{ birthday ? birthday : '完善生日可以更准确计算体质哦～' }}</text>
       </view>
+      <van-popup show="{{showBirthdayPicker}}" position="bottom" bind:close="onCloseBirthdayPicker">
+        <van-picker
+          show-toolbar
+          value="{{birthdayPickerValue}}"
+          columns="{{birthdayColumns}}"
+          bind:confirm="onBirthdayConfirm"
+          bind:cancel="onCloseBirthdayPicker"
+        />
+      </van-popup>
       <text lines="1" class="text_8">第一部分：基础特征（单选）</text>
       <text lines="1" class="text_9">你的体形特征是？</text>
-      <view class="box_4">
-        <text lines="1" class="text_10">请选择</text>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_3"></image>
+      <view class="box_4" bindtap="onOptionTap" data-option="feature">
+        <view class="option-left"><text lines="1" class="text_10">{{featureValue || '请选择'}}</text></view>
+        <view class="option-right">
+          <van-icon name="arrow-down" size="32rpx" color="#999" style="margin-left: 12rpx;" />
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_3"></image>
+        </view>
       </view>
       <text lines="1" class="text_11">平时有什么日常状态？</text>
-      <view class="box_4">
-        <text lines="1" class="text_12">请选择</text>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_4"></image>
+      <view class="box_4" bindtap="onOptionTap" data-option="daily">
+        <view class="option-left"><text lines="1" class="text_12">{{dailyValue || '请选择'}}</text></view>
+        <view class="option-right">
+          <van-icon name="arrow-down" size="32rpx" color="#999" style="margin-left: 12rpx;" />
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_4"></image>
+        </view>
       </view>
       <text lines="1" class="text_8">第二部分：性格倾向（多选）</text>
       <text lines="1" class="text_9">遇到压力时你会怎么做？</text>
-      <view class="box_4">
-        <text lines="1" class="text_15">请选择</text>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_5"></image>
+      <view class="box_4" bindtap="onOptionTap" data-option="pressure">
+        <view class="option-left"><text lines="1" class="text_15">{{pressureValue || '请选择'}}</text></view>
+        <view class="option-right">
+          <van-icon name="arrow-down" size="32rpx" color="#999" style="margin-left: 12rpx;" />
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_5"></image>
+        </view>
       </view>
       <text lines="1" class="text_9" style="margin: 30rpx 0 16rpx 0;">社交场合你通常喜欢？</text>
-      <view class="box_4">
-        <text lines="1" class="text_17">请选择</text>
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_6"></image>
+      <view class="box_4" bindtap="onOptionTap" data-option="social">
+        <view class="option-left"><text lines="1" class="text_17">{{socialValue || '请选择'}}</text></view>
+        <view class="option-right">
+          <van-icon name="arrow-down" size="32rpx" color="#999" style="margin-left: 12rpx;" />
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng68dede910f9d7bf9aee79aa9e536db96f269b83a34a1e52eadd286d78ed0a2df" class="image_6"></image>
+        </view>
       </view>
+      <!-- 多选弹窗 -->
+      <van-popup show="{{showMultiPopup}}" position="bottom" custom-style="background:transparent;" bind:close="onCloseMultiPopup">
+        <view class="box_11">
+          <view class="block_1">
+            <text lines="1" class="text_18">{{multiPopupTitle}}</text>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2e905535361898a5bd005602a4626ca2806f09d301141c7845129f5e307af47e" class="label_4" bindtap="onCloseMultiPopup"></image>
+          </view>
+          <scroll-view scroll-y="true" class="scroll-area">
+            <view wx:for="{{multiOptions}}" wx:key="index" class="multi-option-item" catchtap="onMultiOptionTap" data-index="{{index}}">
+              <view class="multi-option-inner {{multiSelected[index] ? 'selected' : ''}}">
+                <text class="multi-option-text">{{item}}</text>
+                <image wx:if="{{multiSelected[index]}}" src="https://lanhu-oss-proxy.lanhuapp.com/SketchPnge5c75fa9e7e895d23a130ee82cb6fe8f521b6d242642a9359490e302c9929369" class="label_5"></image>
+              </view>
+            </view>
+          </scroll-view>
+          <view class="text-wrapper_8" bindtap="onMultiConfirm">
+            <text class="text_24">确定</text>
+          </view>
+          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_8"></image>
+        </view>
+      </van-popup>
     </view>
     <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_7"></image>
+  <van-popup show="{{showPopup}}" position="bottom" bind:close="onClosePopup">
+    <van-picker
+      show-toolbar
+      value="{{optionPickerValue}}"
+      columns="{{optionColumns}}"
+      bind:confirm="onOptionConfirm"
+      bind:cancel="onClosePopup"
+    />
+  </van-popup>
 </view>
