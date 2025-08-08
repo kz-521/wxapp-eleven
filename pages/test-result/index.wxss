@@ -801,3 +801,28 @@
   width: 78rpx;
   height: 118rpx;
 }
+
+/* 去喝一杯按钮样式 */
+.drink-btn-container {
+  display: flex;
+  justify-content: center;
+  padding: 40rpx 30rpx;
+  margin-top: 20rpx;
+}
+
+.drink-btn {
+  background: linear-gradient(135deg, #3a9ac6 0%, #2d7a9a 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  padding: 20rpx 60rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  box-shadow: 0 4rpx 12rpx rgba(58, 154, 198, 0.3);
+  transition: all 0.3s ease;
+}
+
+.drink-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 8rpx rgba(58, 154, 198, 0.4);
+}

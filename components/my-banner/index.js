@@ -7,7 +7,11 @@ Component({
      * 组件的属性列表
      */
     properties: {
-        couponCount:Number
+        couponCount: Number,
+        balance: {
+            type: Number,
+            value: 0
+        }
     },
 
     /**
@@ -15,13 +19,15 @@ Component({
      */
     data: {
         showLoginBtn: false,
-        couponCount:Number
+        couponCount: Number,
+        balance: 0
     },
 
     lifetimes: {
         async attached() {
             // wx.getUserInfo()
             console.log(this.properties.couponCount)
+            console.log(this.properties.balance)
             if (!await this.hasAuthUserInfo()) {
                 this.setData({
                     showLoginBtn: true
@@ -32,6 +38,8 @@ Component({
 
     observers:{
         'couponCount':function (couponCount) {
+        },
+        'balance':function (balance) {
         }
     },
 
@@ -57,13 +65,15 @@ Component({
 
         onGotoMyCoupon(event) {
             wx.navigateTo({
-                url:`/pages/my-coupon/my-coupon`
+                url:`/pages/coupon-select/index`
             })
         },
 
-        aboutUs(event) {
-            wx.navigateTo({
-                url:`/pages/about/about`
+        onGotoBalance(event) {
+            wx.showToast({
+                title: '余额功能开发中',
+                icon: 'none',
+                duration: 2000
             })
         }
     }

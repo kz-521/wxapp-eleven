@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/home/home",
-    "pages/cart/cart",
     "pages/my/my",
     "pages/category/category",
     "pages/test/index",
@@ -33,9 +32,6 @@
         "iconPath": "imgs/tabbar/category@dis.png",
         "selectedIconPath": "imgs/tabbar/category.png"
       },
-
-
-
       {
         "pagePath": "pages/my/my",
         "text": "我的",

@@ -114,6 +114,124 @@ Page({
     })
   },
 
+  // 添加到购物车
+  addToCart(event) {
+    const index = event.currentTarget.dataset.index
+    const product = this.data.recommendProducts[index]
+    
+    console.log('添加推荐商品到购物车:', product)
+    
+    // 获取商品详情，包括SKU信息
+    this.getProductDetailAndAddToCart(product.id)
+  },
+
+  // 获取商品详情并添加到购物车
+  getProductDetailAndAddToCart(spuId) {
+    wx.showLoading({ title: '加载中...' })
+    
+    // 获取商品详情
+    api.getSpuDetail(spuId).then(res => {
+      wx.hideLoading()
+      
+      if (res.code === 200 && res.result) {
+        const productDetail = res.result
+        
+        // 检查商品是否有SKU列表
+        if (!productDetail.skuList || productDetail.skuList.length === 0) {
+          wx.showToast({
+            title: '商品暂不可购买',
+            icon: 'none'
+          })
+          return
+        }
+        
+        // 如果商品只有一个SKU，直接添加到购物车
+        if (productDetail.skuList.length === 1) {
+          this.addProductToCart(productDetail, productDetail.skuList[0])
+        } else {
+          // 多个SKU的情况，跳转到商品详情页选择规格
+          wx.navigateTo({
+            url: `/pages/detail/detail?id=${spuId}&from=test-result`
+          })
+        }
+      } else {
+        wx.showToast({
+          title: '商品信息获取失败',
+          icon: 'none'
+        })
+      }
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('获取商品详情失败:', err)
+      wx.showToast({
+        title: '商品信息获取失败',
+        icon: 'none'
+      })
+    })
+  },
+
+  // 添加商品到购物车
+  addProductToCart(product, selectedSku) {
+    // 获取当前购物车数据
+    let cartItems = wx.getStorageSync('cartItems') || []
+    
+    // 查找是否已存在相同的SKU
+    const existingItemIndex = cartItems.findIndex(item => 
+      item.skuId === selectedSku.id || (item.id === product.id && item.name === product.name)
+    )
+    
+    if (existingItemIndex >= 0) {
+      // 已存在，增加数量
+      cartItems[existingItemIndex].count += 1
+    } else {
+      // 新增商品到购物车
+      const cartItem = {
+        id: product.id, // SPU ID
+        skuId: selectedSku.id, // SKU ID
+        name: product.name,
+        image: product.image,
+        count: 1,
+        price: selectedSku.discount_price || selectedSku.price,
+        originalPrice: selectedSku.price,
+        skuPrice: selectedSku.discount_price || selectedSku.price,
+        sku: {
+          id: selectedSku.id,
+          price: selectedSku.price,
+          discount_price: selectedSku.discount_price,
+          stock: selectedSku.stock,
+          title: selectedSku.title || product.name
+        },
+        tags: product.tags,
+        subtitle: product.subtitle,
+        categoryId: product.categoryId
+      }
+      
+      cartItems.unshift(cartItem)
+    }
+    
+    // 保存到本地存储
+    wx.setStorageSync('cartItems', cartItems)
+    
+    wx.showToast({
+      title: '已添加到购物车',
+      icon: 'success'
+    })
+    
+    // 跳转到分类页面
+    setTimeout(() => {
+      wx.switchTab({
+        url: '/pages/category/category'
+      })
+    }, 1500)
+  },
+
+  // 跳转到分类页面
+  goToCategory() {
+    wx.switchTab({
+      url: '/pages/category/category'
+    })
+  },
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */

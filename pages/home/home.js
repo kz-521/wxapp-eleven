@@ -185,8 +185,8 @@ Page({
 
     // 跳转到购物车页面
     goToCart() {
-        wx.navigateTo({
-            url: '/pages/cart/cart'
+        wx.switchTab({
+            url: '/pages/category/category'
         })
     },
 

@@ -35,12 +35,17 @@
             <text lines="1" class="text_14-0" />
             <text lines="1" class="text_15-0">起</text>
           </view>
-          <image src="/imgs/plus-circle-fill.png" class="label_4-0 add-btn"></image>
+          <image src="/imgs/plus-circle-fill.png" class="label_4-0 add-btn" bindtap="addToCart" data-index="{{index}}"></image>
         </view>
           </view>
         </view>
         
       </view>
     </view>
+  </view>
+  
+  <!-- 去喝一杯按钮 -->
+  <view class="drink-btn-container">
+    <button class="drink-btn" bindtap="goToCategory">去喝一杯</button>
   </view>
 </view>

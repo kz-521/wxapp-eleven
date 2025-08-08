@@ -30,6 +30,11 @@ Page({
         this.checkCachedCoupon()
         // 获取门店距离
         this.getStoreDistance()
+        
+        // 测试优惠券逻辑
+        setTimeout(() => {
+            this.testCouponLogic()
+        }, 1000)
     },
 
     onShow() {
@@ -125,6 +130,75 @@ Page({
         wx.navigateTo({
             url: '/pages/coupon-select/index'
         })
+    },
+
+    /**
+     * 测试优惠券逻辑
+     */
+    testCouponLogic() {
+        console.log('=== 测试优惠券逻辑 ===')
+        console.log('当前订单总金额:', this.data.totalAmount)
+        
+        // 测试满减优惠券
+        const testCoupon1 = {
+            id: 1,
+            name: '测试满减券',
+            amount: 10,
+            full_money: 50,
+            type: 1
+        }
+        
+        console.log('测试满减券:', testCoupon1)
+        const result1 = this.calculateCouponDiscount(testCoupon1)
+        console.log('满减券结果:', result1)
+        
+        // 测试折扣优惠券
+        const testCoupon2 = {
+            id: 2,
+            name: '测试折扣券',
+            rate: 0.85,
+            type: 2
+        }
+        
+        console.log('测试折扣券:', testCoupon2)
+        const result2 = this.calculateCouponDiscount(testCoupon2)
+        console.log('折扣券结果:', result2)
+        
+        // 测试另一个折扣券
+        const testCoupon3 = {
+            id: 3,
+            name: '测试9折券',
+            rate: 0.9,
+            type: 2
+        }
+        
+        console.log('测试9折券:', testCoupon3)
+        const result3 = this.calculateCouponDiscount(testCoupon3)
+        console.log('9折券结果:', result3)
+        
+        // 测试3折券（模拟您遇到的问题）
+        const testCoupon4 = {
+            id: 4,
+            name: '测试3折券',
+            rate: 3, // 错误的数据：应该是0.3
+            type: 2
+        }
+        
+        console.log('测试3折券（错误数据）:', testCoupon4)
+        const result4 = this.calculateCouponDiscount(testCoupon4)
+        console.log('3折券结果（错误数据）:', result4)
+        
+        // 测试正确的3折券
+        const testCoupon5 = {
+            id: 5,
+            name: '测试3折券',
+            rate: 0.3, // 正确的数据
+            type: 2
+        }
+        
+        console.log('测试3折券（正确数据）:', testCoupon5)
+        const result5 = this.calculateCouponDiscount(testCoupon5)
+        console.log('3折券结果（正确数据）:', result5)
     },
 
     /**
@@ -368,32 +442,44 @@ Page({
         const app = getApp()
         const selectedCoupon = app.globalData.selectedCoupon
         
+        console.log('=== 优惠券检查开始 ===')
+        console.log('当前订单总金额:', this.data.totalAmount)
+        console.log('globalData中的优惠券:', selectedCoupon)
+        
         if (selectedCoupon) {
             console.log('检测到选中的优惠券:', selectedCoupon)
             
             // 计算优惠后的价格
-            const originalAmount = parseFloat(this.data.totalAmount)
-            const couponAmount = parseFloat(selectedCoupon.amount)
-            let payAmount = Math.max(0, originalAmount - couponAmount)
+            const result = this.calculateCouponDiscount(selectedCoupon)
+            console.log('优惠券计算结果:', result)
             
-            // 如果金额为0，变成0.01
-            if (payAmount === 0) {
-                payAmount = 0.01
+            if (result.success) {
+                this.setData({
+                    selectedCoupon: selectedCoupon,
+                    couponAmount: result.couponAmount.toFixed(2),
+                    payAmount: result.payAmount.toFixed(2)
+                })
+                
+                console.log('优惠券应用成功，设置数据:', {
+                    couponAmount: result.couponAmount.toFixed(2),
+                    payAmount: result.payAmount.toFixed(2)
+                })
+                
+                // 缓存优惠券数据到本地存储，避免页面刷新后丢失
+                wx.setStorageSync('selectedCoupon', selectedCoupon)
+                wx.setStorageSync('couponAmount', result.couponAmount.toFixed(2))
+                wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
+                
+                // 清空globalData中的优惠券，避免重复使用
+                app.globalData.selectedCoupon = null
+            } else {
+                // 优惠券不满足条件，清空选择
+                wx.showToast({
+                    title: result.message,
+                    icon: 'none'
+                })
+                this.clearSelectedCoupon()
             }
-            
-            this.setData({
-                selectedCoupon: selectedCoupon,
-                couponAmount: couponAmount.toFixed(2),
-                payAmount: payAmount.toFixed(2)
-            })
-            
-            // 缓存优惠券数据到本地存储，避免页面刷新后丢失
-            wx.setStorageSync('selectedCoupon', selectedCoupon)
-            wx.setStorageSync('couponAmount', couponAmount.toFixed(2))
-            wx.setStorageSync('payAmount', payAmount.toFixed(2))
-            
-            // 清空globalData中的优惠券，避免重复使用
-            app.globalData.selectedCoupon = null
         } else {
             // 如果没有从globalData获取到优惠券，尝试从本地存储获取
             const cachedCoupon = wx.getStorageSync('selectedCoupon')
@@ -402,20 +488,124 @@ Page({
             
             if (cachedCoupon) {
                 console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
-                let payAmount = parseFloat(cachedPayAmount) || parseFloat(this.data.totalAmount)
                 
-                // 如果金额为0，变成0.01
-                if (payAmount === 0) {
-                    payAmount = 0.01
+                // 重新验证优惠券是否仍然有效
+                const result = this.calculateCouponDiscount(cachedCoupon)
+                
+                if (result.success) {
+                    this.setData({
+                        selectedCoupon: cachedCoupon,
+                        couponAmount: result.couponAmount.toFixed(2),
+                        payAmount: result.payAmount.toFixed(2)
+                    })
+                    
+                    // 更新缓存
+                    wx.setStorageSync('couponAmount', result.couponAmount.toFixed(2))
+                    wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
+                } else {
+                    // 优惠券不再有效，清空缓存
+                    this.clearSelectedCoupon()
                 }
-                
-                this.setData({
-                    selectedCoupon: cachedCoupon,
-                    couponAmount: cachedCouponAmount || '0.00',
-                    payAmount: payAmount.toFixed(2)
-                })
             }
         }
+    },
+
+    /**
+     * 计算优惠券折扣
+     */
+    calculateCouponDiscount(coupon) {
+        const originalAmount = parseFloat(this.data.totalAmount)
+        
+        console.log('=== 优惠券计算开始 ===')
+        console.log('优惠券信息:', coupon)
+        console.log('订单原价:', originalAmount)
+        
+        // 检查优惠券类型
+        if (coupon.type === 1) {
+            // 满减优惠券
+            const fullMoney = parseFloat(coupon.full_money) || 0
+            const discountAmount = parseFloat(coupon.amount) || 0
+            
+            // 检查是否满足满减条件
+            if (originalAmount < fullMoney) {
+                return {
+                    success: false,
+                    message: `满${fullMoney}元可用，当前订单${originalAmount}元`
+                }
+            }
+            
+            // 计算优惠后价格
+            let payAmount = Math.max(0.01, originalAmount - discountAmount)
+            
+            return {
+                success: true,
+                couponAmount: discountAmount,
+                payAmount: payAmount
+            }
+        } else if (coupon.type === 2) {
+            // 折扣优惠券
+            const discountRate = parseFloat(coupon.rate) || 0
+            
+            console.log('折扣券计算详情:', {
+                discountRate: discountRate,
+                originalAmount: originalAmount,
+                discountRateValid: discountRate > 0 && discountRate < 1
+            })
+            
+            if (discountRate <= 0 || discountRate >= 1) {
+                console.log('折扣券数据异常，折扣率:', discountRate)
+                return {
+                    success: false,
+                    message: '折扣券数据异常'
+                }
+            }
+            
+            // 计算折扣金额
+            const discountAmount = originalAmount * (1 - discountRate)
+            let payAmount = Math.max(0.01, originalAmount - discountAmount)
+            
+            console.log('折扣券计算结果:', {
+                discountAmount: discountAmount,
+                payAmount: payAmount,
+                discountPercentage: (1 - discountRate) * 100 + '%'
+            })
+            
+            return {
+                success: true,
+                couponAmount: discountAmount,
+                payAmount: payAmount
+            }
+        } else {
+            // 默认满减逻辑（兼容旧数据）
+            const couponAmount = parseFloat(coupon.amount) || 0
+            let payAmount = Math.max(0.01, originalAmount - couponAmount)
+            
+            return {
+                success: true,
+                couponAmount: couponAmount,
+                payAmount: payAmount
+            }
+        }
+    },
+
+    /**
+     * 清空选中的优惠券
+     */
+    clearSelectedCoupon() {
+        this.setData({
+            selectedCoupon: null,
+            couponAmount: '0.00',
+            payAmount: this.data.totalAmount
+        })
+        
+        // 清空缓存
+        wx.removeStorageSync('selectedCoupon')
+        wx.removeStorageSync('couponAmount')
+        wx.removeStorageSync('payAmount')
+        
+        // 清空globalData
+        const app = getApp()
+        app.globalData.selectedCoupon = null
     },
 
     /**
@@ -423,23 +613,27 @@ Page({
      */
     checkCachedCoupon() {
         const cachedCoupon = wx.getStorageSync('selectedCoupon')
-        const cachedCouponAmount = wx.getStorageSync('couponAmount')
-        const cachedPayAmount = wx.getStorageSync('payAmount')
 
         if (cachedCoupon) {
             console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
-            let payAmount = parseFloat(cachedPayAmount) || parseFloat(this.data.totalAmount)
             
-            // 如果金额为0，变成0.01
-            if (payAmount === 0) {
-                payAmount = 0.01
+            // 重新验证优惠券是否仍然有效
+            const result = this.calculateCouponDiscount(cachedCoupon)
+            
+            if (result.success) {
+                this.setData({
+                    selectedCoupon: cachedCoupon,
+                    couponAmount: result.couponAmount.toFixed(2),
+                    payAmount: result.payAmount.toFixed(2)
+                })
+                
+                // 更新缓存
+                wx.setStorageSync('couponAmount', result.couponAmount.toFixed(2))
+                wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
+            } else {
+                // 优惠券不再有效，清空缓存
+                this.clearSelectedCoupon()
             }
-            
-            this.setData({
-                selectedCoupon: cachedCoupon,
-                couponAmount: cachedCouponAmount || '0.00',
-                payAmount: payAmount.toFixed(2)
-            })
         }
     },
 

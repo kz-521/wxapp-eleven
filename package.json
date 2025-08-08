@@ -11,6 +11,7 @@
   },
   "license": "https://class.imooc.com/sale/javafullstack",
   "dependencies": {
-    "@vant/weapp": "^1.11.7"
+    "@vant/weapp": "^1.11.7",
+    "lin-ui": "^0.9.13"
   }
 }

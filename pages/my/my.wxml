@@ -1,6 +1,6 @@
 
 <view class="container">
-    <s-my-banner coupon-count="{{couponCount}}"></s-my-banner>
+    <s-my-banner coupon-count="{{couponCount}}" balance="{{balance}}"></s-my-banner>
 
     <view class="main-container">
         <s-my-order-panel></s-my-order-panel>

@@ -269,7 +269,11 @@ Page({
 
     // 跳转到提交订单页面，使用navigateTo保留返回按钮
     wx.navigateTo({
-      url: '/pages/order-submit/index'
+      url: '/pages/order-submit/index',
+      success: function() {
+        // 隐藏底部tabbar
+        wx.hideTabBar()
+      }
     })
   },
 

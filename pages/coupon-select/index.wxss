@@ -167,7 +167,7 @@
   height: 92rpx;
   overflow-wrap: break-word;
   color: rgba(131, 208, 106);
-  font-size: 72rpx;
+  font-size: 54rpx;
   font-family: DINPro-Bold;
   font-weight: 700;
   text-align: left;

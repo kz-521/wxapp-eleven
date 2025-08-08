@@ -107,10 +107,9 @@ Page({
     getStatusByActiveKey(activeKey) {
         const statusMap = {
             0: null,    // 全部
-            1: 1,       // 待付款
-            2: 2,       // 待取茶
-            3: 3,       // 已完成
-            4: 4        // 已取消
+            1: 2,       // 待取茶
+            2: 3,       // 已完成
+            3: 4        // 已取消
         }
         return statusMap[activeKey]
     },

@@ -9,7 +9,8 @@ Page({
      * 页面的初始数据
      */
     data: {
-        couponCount: 0
+        couponCount: 0,
+        balance: 0
     },
 
     /**
@@ -18,13 +19,14 @@ Page({
     onLoad: async function (options) {
         const coupons = await Coupon.getMyCoupons(CouponStatus.AVAILABLE)
         this.setData({
-            couponCount: coupons.length
+            couponCount: coupons.length,
+            balance: 128.50 // 模拟余额数据
         })
     },
 
     onGotoMyCoupon(event) {
         wx.navigateTo({
-            url: "/pages/my-coupon/my-coupon"
+            url: "/pages/coupon-select/index"
         })
     },
 

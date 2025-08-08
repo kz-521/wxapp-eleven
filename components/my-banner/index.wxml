@@ -14,14 +14,14 @@
         </l-button>
         <view class="row-bottom">
             <view class="bottom-container">
-                <view bind:tap="onGotoMyCoupon" class="left">
-                    <text>{{couponCount}}</text>
-                    <text>优惠券</text>
+                <view bind:tap="onGotoBalance" class="left">
+                    <text>{{balance}}</text>
+                    <text>余额</text>
                 </view>
                 <view class="v-line"></view>
-                <view bind:tap="aboutUs" class="right">
-                    <l-icon name="about" size="32" l-class="sleeve"></l-icon>
-                    <text>关于我们</text>
+                <view bind:tap="onGotoMyCoupon" class="right">
+                    <text>{{couponCount}}</text>
+                    <text>优惠券</text>
                 </view>
             </view>
         </view>
