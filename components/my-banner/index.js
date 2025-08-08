@@ -74,8 +74,40 @@ Component({
          * 点击头像事件
          */
         onAvatarTap() {
-            console.log('点击头像，检查用户信息授权状态')
-            this.checkAndGetUserInfo()
+            console.log('点击头像，开始用户信息授权流程')
+            
+            // 检查是否已经有完整的用户信息
+            const userInfo = wx.getStorageSync('userInfo')
+            if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
+                console.log('用户信息已完整，显示用户信息')
+                wx.showToast({
+                    title: '用户信息已授权',
+                    icon: 'success',
+                    duration: 1500
+                })
+                return
+            }
+
+            console.log('用户信息不完整，开始授权流程')
+            
+            // 显示授权提示
+            wx.showModal({
+                title: '授权提示',
+                content: '需要获取您的头像和昵称信息，是否授权？',
+                success: (res) => {
+                    if (res.confirm) {
+                        // 用户确认授权，开始获取用户信息
+                        this.getUserProfile()
+                    } else {
+                        console.log('用户取消授权')
+                        wx.showToast({
+                            title: '您取消了授权',
+                            icon: 'none',
+                            duration: 1500
+                        })
+                    }
+                }
+            })
         },
 
         /**
@@ -183,11 +215,18 @@ Component({
          */
         async handleUserInfoSuccess(userInfo) {
             try {
+                console.log('处理用户信息成功:', userInfo)
+                
                 // 保存用户信息到本地存储
                 wx.setStorageSync('userInfo', userInfo)
                 
                 // 更新组件状态
                 this.setData({
+                    showLoginBtn: false,
+                    userInfo: userInfo
+                })
+
+                console.log('组件状态已更新:', {
                     showLoginBtn: false,
                     userInfo: userInfo
                 })

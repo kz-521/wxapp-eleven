@@ -101,7 +101,9 @@
   line-height: 30rpx;
   margin: 50rpx 0 20rpx 0;
 }
-
+.van-popup--bottom.van-popup--safe{
+  padding-bottom: 0 !important;
+}
 .box_4 {
   box-sizing: border-box;
   background-color: rgba(249,248,250,1.000000);
@@ -227,7 +229,7 @@
 .question-popup {
   background: #FFFFFF;
   border-radius: 30rpx 30rpx 0rpx 0rpx;
-  padding: 40rpx;
+  padding: 40rpx 40rpx 0rpx 40rpx;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -271,7 +273,7 @@
 .options-scroll {
   flex: 1;
   max-height: 60vh;
-  margin-bottom: 120rpx;
+  margin-bottom: 0rpx;
 }
 
 .single-option-item {
@@ -349,7 +351,7 @@
 /* 弹窗中的确定按钮样式 */
 .question-popup .submit-btn {
   position: absolute;
-  bottom: 40rpx;
+  bottom: 0rpx;
   left: 50%;
   transform: translateX(-50%);
   width: 528rpx;

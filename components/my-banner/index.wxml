@@ -8,8 +8,8 @@
         
         <!-- 用户昵称显示 -->
         <view class="user-info-container">
-            <!-- <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text> -->
-            <!-- <text class="user-nickname" wx:else>点击头像登录</text> -->
+            <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text>
+            <text class="user-nickname" wx:else>点击头像登录</text>
         </view>
         <l-button wx:if="{{showLoginBtn}}" l-class="auth-btn"
                   bg-color="#DCEBE6"
