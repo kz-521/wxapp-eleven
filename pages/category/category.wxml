@@ -30,7 +30,7 @@
             <scroll-view class="product-list" scroll-y="{{true}}" show-scrollbar="{{true}}">
                 <!-- 有数据时显示商品列表 -->
                 <view wx:if="{{products.length > 0}}">
-                    <view class="product-item" wx:for="{{products}}" wx:key="index" bindtap="onProductClick" data-index="{{index}}">
+                    <view class="product-item" wx:for="{{products}}" wx:key="index">
                         <view class="product-content">
                             <image src="{{item.image}}" class="product-image"></image>
                             <view class="product-info">
@@ -46,7 +46,7 @@
                                         <text class="price-value">{{item.price}}</text>
                                         <text class="price-unit" wx:if="{{item.originalPrice && item.originalPrice != item.price}}">起</text>
                                     </view>
-                                    <image src="/imgs/plus-circle-fill.png" class="add-btn" bindtap="addToCart" data-index="{{index}}"></image>
+                                    <image src="/imgs/plus-circle-fill.png" class="add-btn" catchtap="addToCart" data-index="{{index}}"></image>
                                 </view>
                             </view>
                         </view>
@@ -106,7 +106,7 @@
                         <!-- 商品信息 -->
                         <view class="product-details">
                             <text class="product-name-text">{{item.name}}</text>
-                            <text class="product-attributes">大、热、不额外加糖、脱脂牛奶</text>
+                            <text class="product-attributes">{{item.specs || '默认规格'}}</text>
 
                             <!-- 价格和数量控制行 -->
                             <view class="price-quantity-row">
@@ -125,11 +125,71 @@
                     </view>
 
                     <!-- 分隔线 -->
-                    <view class="divider-line" wx:for="{{cartItems}}" wx:key="index" wx:if="{{index < cartItems.length - 1}}"></view>
+                    <view class="divider-line" wx:if="{{index < cartItems.length - 1}}"></view>
                 </view>
             </view>
         </view>
     </view>
 
+    <!-- 商品详情弹出层 -->
+    <view class="product-detail-overlay" wx:if="{{showProductDetail}}" bindtap="closeProductDetail">
+        <view class="product-detail-content" catchtap="stopPropagation">
+            <!-- 商品信息头部 -->
+            <view class="product-detail-header">
+                <view class="product-info">
+                    <image src="{{currentProduct.img}}" class="product-detail-image"></image>
+                    <view class="product-detail-info">
+                        <text class="product-detail-name">{{currentProduct.title}}</text>
+                        <text class="product-detail-subtitle">{{currentProduct.subtitle}}</text>
+                    </view>
+                </view>
+                <view class="product-detail-actions">
+                    <view class="action-btn share-btn">
+                      <view class="close-btn" bindtap="closeProductDetail">×</view>
+                    </view>
+                </view>
+            </view>
 
+            <!-- 规格选择区域 -->
+            <view class="product-options" wx:if="{{currentProduct.order_options && currentProduct.order_options.length > 0}}">
+                <text class="options-title">口味选择</text>
+                
+                <!-- 动态渲染规格选项 -->
+                <view wx:for="{{currentProduct.order_options}}" wx:key="id" class="option-group">
+                    <view class="option-group-header">
+                        <text class="option-group-name">{{item.name}}</text>
+                        <!-- <text class="option-required" wx:if="{{item.type === 1}}">(*必选)</text> -->
+                    </view>
+                    <view class="option-values">
+                        <view wx:for="{{item.values}}" wx:key="id" wx:for-item="option" 
+                              class="option-value {{selectedOptions[item.id] === option.id ? 'selected' : ''}}"
+                              bindtap="selectOption" 
+                              data-index="{{item.id}}" 
+                              data-option="{{option.id}}">
+                            <text class="option-text">{{option.full_text}}</text>
+                            <view class="recommend-tag" wx:if="{{option.recommend}}">推荐</view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
+            <!-- 底部价格和操作栏 -->
+            <view class="product-detail-footer">
+                <view class="price-section">
+                    <text class="current-price">¥{{currentProduct.price}}</text>
+                    <text class="original-price" wx:if="{{currentProduct.originalPrice && currentProduct.originalPrice !== currentProduct.price}}">¥{{currentProduct.originalPrice}}</text>
+                </view>
+                <view class="quantity-section">
+                    <view class="quantity-control">
+                        <view class="quantity-btn minus" bindtap="decreaseProductQuantity">-</view>
+                        <text class="quantity-text">{{currentQuantity}}</text>
+                        <view class="quantity-btn plus" bindtap="increaseProductQuantity">+</view>
+                    </view>
+                </view>
+                <view class="add-to-cart-btn" bindtap="confirmSelection">
+                    <text class="add-to-cart-text">加入购物车</text>
+                </view>
+            </view>
+        </view>
+    </view>
 </view>

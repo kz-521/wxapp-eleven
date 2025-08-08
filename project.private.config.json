@@ -10,8 +10,8 @@
           "name": "pages/order-detail/index",
           "pathName": "pages/order-detail/index",
           "query": "orderId=53",
-          "scene": null,
-          "launchMode": "default"
+          "launchMode": "default",
+          "scene": null
         },
         {
           "name": "pages/cart/cart",

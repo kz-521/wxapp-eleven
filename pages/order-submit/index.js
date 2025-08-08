@@ -263,82 +263,8 @@ Page({
             return
         }
 
-        wx.showLoading({
-            title: '提交中...'
-        })
-
-        // 构建sku_info_list参数 - 确保使用正确的SKU ID和数量
-        const sku_info_list = this.data.orderProducts.map(item => {
-            console.log('处理商品项:', item)
-            
-            // 优先使用SKU ID，这是订单接口需要的
-            let skuId = null
-            if (item.skuId) {
-                skuId = item.skuId
-            } else if (item.sku && item.sku.id) {
-                skuId = item.sku.id
-            } else {
-                // fallback到商品ID（可能不准确，应该有SKU ID）
-                skuId = item.id
-                console.warn('商品缺少SKU ID，使用商品ID:', item)
-            }
-            
-            return {
-                id: skuId, // 这里应该是SKU ID，不是SPU ID
-                count: parseInt(item.count) || 1
-            }
-        })
-        
-        console.log('构建的sku_info_list:', sku_info_list)
-        
-        // 构建完整的订单数据
-        const orderData = {
-            sku_info_list: sku_info_list,
-            remark: this.data.remark || '', // 备注
-            dining_type: this.data.diningType, // 用餐类型：dine-in(堂食) 或 take-out(外带)
-            total_amount: parseFloat(this.data.totalAmount), // 商品总金额
-            coupon_amount: parseFloat(this.data.couponAmount) || 0, // 优惠券优惠金额
-            pay_amount: parseFloat(this.data.payAmount), // 实际支付金额
-            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null // 优惠券ID
-        }
-
-        // 如果有地址信息，添加到订单数据中
-        if (this.data.address) {
-            orderData.address = {
-                name: this.data.address.name,
-                phone: this.data.address.phone,
-                detail: this.data.address.detail,
-                province: this.data.address.province,
-                city: this.data.address.city,
-                district: this.data.address.district
-            }
-        }
-
-        console.log('完整的订单数据:', orderData)
-
-        // 调用订单提交接口
-        api.submitOrder(orderData).then(res => {
-            wx.hideLoading()
-            console.log('订单提交响应:', res)
-            
-            if (res.code === 0 && res.result && res.result.order_id) {
-                console.log('订单提交成功，订单ID:', res.result.order_id)
-                // 使用返回的order_id调用支付接口
-                this.callPayment(res.result.order_id)
-            } else {
-                wx.showToast({
-                    title: res.msg || res.message || '订单提交失败',
-                    icon: 'none'
-                })
-            }
-        }).catch(err => {
-            wx.hideLoading()
-            console.error('订单提交失败:', err)
-            wx.showToast({
-                title: '订单提交失败',
-                icon: 'none'
-            })
-        })
+        // 直接调用submitOrder方法
+        this.submitOrder()
     },
 
     /**
@@ -641,9 +567,19 @@ Page({
      * 提交订单
      */
     submitOrder() {
-        if (!this.data.address) {
+        // 检查购物车数据
+        if (!this.data.orderProducts || this.data.orderProducts.length === 0) {
             wx.showToast({
-                title: '请选择收货地址',
+                title: '购物车为空',
+                icon: 'none'
+            })
+            return
+        }
+
+        // 验证用餐类型
+        if (!this.data.diningType) {
+            wx.showToast({
+                title: '请选择用餐类型',
                 icon: 'none'
             })
             return
@@ -653,26 +589,62 @@ Page({
             title: '提交中...'
         })
 
-        // 构建订单数据
-        const orderData = {
-            address: this.data.address,
-            products: this.data.orderProducts,
-            coupon: this.data.selectedCoupon,
-            remark: this.data.remark,
-            totalAmount: this.data.totalAmount,
-            couponAmount: this.data.couponAmount,
-            payAmount: this.data.payAmount,
-            diningType: this.data.diningType
+        // 格式化当前时间作为下单时间
+        const now = new Date()
+        const createTime = now.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/\//g, '/')
+
+        console.log('生成的下单时间:', createTime)
+
+        // 构建API期望的订单数据格式
+        const apiOrderData = {
+            sku_info_list: this.data.orderProducts.map(item => ({
+                id: item.id,
+                count: parseInt(item.count) || 1
+            })),
+            remark: this.data.remark || '',
+            dining_type: this.data.diningType,
+            total_amount: parseFloat(this.data.totalAmount),
+            coupon_amount: parseFloat(this.data.couponAmount) || 0,
+            pay_amount: parseFloat(this.data.payAmount),
+            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null
         }
 
+        console.log('发送给API的订单数据:', apiOrderData)
+
         // 调用提交订单API
-        api.submitOrder(orderData).then(res => {
+        api.submitOrder(apiOrderData).then(res => {
             wx.hideLoading()
+            console.log('API响应:', res)
+            
             if (res.code === 0) {
                 wx.showToast({
                     title: '订单提交成功',
                     icon: 'success'
                 })
+                
+                // 构建传递给订单详情页的数据
+                const orderDetailData = {
+                    products: this.data.orderProducts,
+                    coupon: this.data.selectedCoupon,
+                    remark: this.data.remark,
+                    totalAmount: this.data.totalAmount,
+                    couponAmount: this.data.couponAmount,
+                    payAmount: this.data.payAmount,
+                    diningType: this.data.diningType,
+                    createTime: createTime,
+                    storeLocation: this.data.storeLocation,
+                    pickupNumber: Math.floor(Math.random() * 9000) + 1000,
+                    estimatedTime: '6',
+                    storePhone: '1342137123'
+                }
                 
                 // 清空购物车
                 const app = getApp()
@@ -680,10 +652,14 @@ Page({
                 app.globalData.cartCount = 0
                 app.globalData.totalPrice = 0
                 
-                // 跳转到订单详情页
+                // 跳转到订单详情页，携带完整的订单数据
                 setTimeout(() => {
-                    wx.redirectTo({
-                        url: `/pages/order-detail/index?orderId=${res.result.orderId}`
+                    wx.navigateTo({
+                        url: '/pages/order-detail/index',
+                        success: (res) => {
+                            // 通过eventChannel向被打开页面传送数据
+                            res.eventChannel.emit('orderData', orderDetailData)
+                        }
                     })
                 }, 1500)
             } else {
@@ -692,6 +668,13 @@ Page({
                     icon: 'none'
                 })
             }
+        }).catch(err => {
+            wx.hideLoading()
+            console.error('提交订单失败:', err)
+            wx.showToast({
+                title: '提交失败',
+                icon: 'none'
+            })
         })
     },
 

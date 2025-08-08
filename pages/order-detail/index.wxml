@@ -1,6 +1,4 @@
 <view class="page">
-  <view class="section_1">
-  </view>
   <view class="block_2">
     <view class="text-group_9">
       <text lines="1" class="text_3">取茶号</text>
@@ -8,17 +6,17 @@
     </view>
     <view class="box_3">
       <view class="image-text_8">
-        <image src="{{getStatusImage('pending')}}" class="label_4"></image>
+        <image src="/imgs/ordered.png" class="label_4"></image>
         <text lines="1" class="text-group_2">已下单</text>
       </view>
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng27e8da5932ba99e4b31a385256fce3120aae8a7affbf5a2bb4a280918cbed0a2" class="image_3"></image>
+      <view class="image_3"></view>
       <view class="image-text_9">
-        <image src="{{getStatusImage('preparing')}}" class="label_5"></image>
+        <image src="/imgs/making.png" class="label_5"></image>
         <text lines="1" class="text-group_3">制作中</text>
       </view>
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng27e8da5932ba99e4b31a385256fce3120aae8a7affbf5a2bb4a280918cbed0a2" class="image_4"></image>
+      <view class="image_4"></view>
       <view class="image-text_10">
-        <image src="{{getStatusImage('ready')}}" class="image_5"></image>
+        <image src="/imgs/ready.png" class="image_5"></image>
         <text lines="1" class="text-group_4">可取茶</text>
       </view>
     </view>
@@ -32,12 +30,21 @@
         <text lines="1" class="text_6">分钟</text>
       </view>
     </view>
+    <view class="group_3">
+      <view class="group_4"></view>
+    </view>
+    <view class="text-wrapper_2">
+      <!-- <text lines="1" class="text_7">前方还有3杯/</text>
+      <text lines="1" class="text_8">共6杯商品制作</text> -->
+    </view>
+    <!-- <text lines="1" class="text_9">预估时间仅供参考，制作完成后将第一时间为您推送取茶通知</text> -->
   </view>
   <view class="block_3">
+    <image src="/imgs/order-bg.png" class="order-bg"></image>
     <view class="image-text_12">
       <view class="text-group_10">
-        <text lines="1" class="text_10">{{storeLocation.name}}</text>
-        <text lines="1" decode="true" class="paragraph_1">地址：{{storeLocation.address}}<br/>营业时间：每日09:00&nbsp;-&nbsp;23:00</text>
+        <text lines="1" class="text_10">清汀.新养生空间</text>
+        <text lines="1" decode="true" class="paragraph_1">地址：余杭区瓶窑镇南山村横山60号1幢1楼106室<br/>营业时间：每日09:00&nbsp;-&nbsp;23:00</text>
       </view>
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngb9174ef99e580e7c89a970c893ea9b1cc778af3badeac408c97cf75c59534b07" class="image_6"></image>
     </view>
@@ -45,12 +52,12 @@
       <text lines="1" class="text_11">下单电话</text>
       <text lines="1" class="text_12">{{storePhone}}</text>
       <text lines="1" class="text_13">下单时间</text>
-      <text lines="1" decode="true" class="text_14">{{createTime}}</text>
+      <text lines="1" decode="true" class="text_14">{{createTime || '2025/08/04 13:05'}}</text>
     </view>
   </view>
   <view class="block_4">
     <text lines="1" class="text_15">商品明细</text>
-    <view wx:for="{{orderProducts}}" wx:key="id" class="group_11">
+    <view class="group_11" wx:for="{{orderProducts}}" wx:key="id">
       <view class="image-text_13">
         <view class="image-wrapper_1">
           <image src="{{item.image}}" class="image_7"></image>
@@ -58,25 +65,26 @@
         </view>
         <view class="text-group_11">
           <text lines="1" class="text_16">{{item.name}}</text>
-          <text lines="1" class="text_17">{{item.specs || '标准规格'}}</text>
+          <text lines="1" class="text_17">{{item.specs || item.description || '默认规格'}} 数量：{{item.count}}杯</text>
         </view>
       </view>
       <text lines="1" class="text_18">¥{{item.price}}</text>
     </view>
+    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng318f227ba08a853e0a7cfda8226a4fa4c27b399e77cf0825d035e5edf159d2f3" class="image_9" wx:if="{{index < orderProducts.length - 1}}"></image>
     <view class="group_13">
       <text lines="1" class="text_22">总价</text>
       <view class="text-wrapper_4">
         <text lines="1" class="text_23">¥</text>
         <text lines="1" class="text_24">{{totalAmount}}</text>
       </view>
-      <view wx:if="{{couponAmount > 0}}" class="text-wrapper_5">
+      <view class="text-wrapper_5" wx:if="{{couponAmount > 0}}">
         <text lines="1" class="text_25">¥</text>
         <text lines="1" class="text_26">{{payAmount}}</text>
       </view>
     </view>
   </view>
-  <view wx:if="{{remark}}" class="text-wrapper_6">
+  <view class="text-wrapper_6">
     <text lines="1" class="text_27">备注</text>
-    <text lines="1" class="text_28">{{remark}}</text>
+    <text lines="1" class="text_28">{{remark || '无备注'}}</text>
   </view>
 </view>

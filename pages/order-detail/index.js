@@ -31,22 +31,39 @@ Page({
 
     onLoad(options) {
         console.log('订单详情页面加载')
+        console.log('页面参数:', options)
+        
+        // 通过eventChannel接收从订单提交页面传递的订单数据
+        try {
+            const eventChannel = this.getOpenerEventChannel()
+            if (eventChannel && typeof eventChannel.on === 'function') {
+                console.log('找到eventChannel，等待接收订单数据')
+                eventChannel.on('orderData', (orderData) => {
+                    console.log('接收到订单数据:', orderData)
+                    console.log('订单商品数量:', orderData.products ? orderData.products.length : 0)
+                    console.log('订单总金额:', orderData.totalAmount)
+                    console.log('创建时间:', orderData.createTime)
+                    this.setOrderDetailData(orderData)
+                })
+            } else {
+                console.log('没有找到eventChannel或eventChannel.on不是函数')
+            }
+        } catch (error) {
+            console.error('eventChannel错误:', error)
+        }
         
         // 获取订单ID
         if (options.orderId) {
+            console.log('通过orderId获取订单详情:', options.orderId)
             this.setData({
                 orderId: options.orderId
             })
             // 获取订单详情
             this.getOrderDetail(options.orderId)
         } else {
-            wx.showToast({
-                title: '订单ID不存在',
-                icon: 'none'
-            })
-            setTimeout(() => {
-                wx.navigateBack()
-            }, 1500)
+            // 如果没有orderId，使用模拟数据
+            console.log('使用模拟订单数据')
+            this.setMockOrderData()
         }
         
         // 获取门店距离
@@ -98,33 +115,64 @@ Page({
     setOrderDetailData(orderInfo) {
         console.log('设置订单详情数据:', orderInfo)
         
-        // 处理订单商品数据
-        const orderProducts = orderInfo.products || orderInfo.sku_list || []
+        // 处理订单商品数据 - 支持两种数据格式
+        let orderProducts = []
+        if (orderInfo.products && Array.isArray(orderInfo.products)) {
+            // 从订单提交页面传递的数据格式
+            orderProducts = orderInfo.products
+            console.log('处理从订单提交页面传递的商品数据:', orderProducts)
+        } else if (orderInfo.sku_list && Array.isArray(orderInfo.sku_list)) {
+            // 从API返回的数据格式
+            orderProducts = orderInfo.sku_list
+            console.log('处理从API返回的商品数据:', orderProducts)
+        } else {
+            orderProducts = []
+            console.log('没有找到商品数据')
+        }
         
         // 计算总金额
         const totalAmount = orderProducts.reduce((total, item) => {
             const itemPrice = parseFloat(item.price) || parseFloat(item.sku_price) || 0
             const count = parseInt(item.count) || 1
-            return total + (itemPrice * count)
+            const itemTotal = itemPrice * count
+            console.log('商品价格计算:', {
+                name: item.name,
+                price: itemPrice,
+                count: count,
+                total: itemTotal
+            })
+            return total + itemTotal
         }, 0)
 
+        console.log('计算的总金额:', totalAmount)
+
         // 设置页面数据
-        this.setData({
+        const pageData = {
             orderInfo: orderInfo,
             orderProducts: orderProducts,
-            totalAmount: totalAmount.toFixed(2),
-            payAmount: parseFloat(orderInfo.pay_amount || totalAmount).toFixed(2),
-            couponAmount: parseFloat(orderInfo.coupon_amount || 0).toFixed(2),
+            totalAmount: parseFloat(orderInfo.totalAmount || totalAmount).toFixed(2),
+            payAmount: parseFloat(orderInfo.payAmount || totalAmount).toFixed(2),
+            couponAmount: parseFloat(orderInfo.couponAmount || 0).toFixed(2),
             remark: orderInfo.remark || '',
-            diningType: orderInfo.dining_type || 'dine-in',
+            diningType: orderInfo.diningType || 'dine-in',
             orderStatus: orderInfo.status || 'pending',
-            orderStatusText: this.getOrderStatusText(orderInfo.status),
-            createTime: orderInfo.create_time || '',
-            payTime: orderInfo.pay_time || '',
-            completeTime: orderInfo.complete_time || '',
-            pickupNumber: orderInfo.pickup_number || '8195',
-            estimatedTime: orderInfo.estimated_time || '6',
-            storePhone: orderInfo.store_phone || '1342137123'
+            orderStatusText: this.getOrderStatusText(orderInfo.status || 'pending'),
+            createTime: orderInfo.createTime || orderInfo.create_time || '',
+            payTime: orderInfo.payTime || orderInfo.pay_time || '',
+            completeTime: orderInfo.completeTime || orderInfo.complete_time || '',
+            pickupNumber: orderInfo.pickupNumber || orderInfo.pickup_number || '8195',
+            estimatedTime: orderInfo.estimatedTime || orderInfo.estimated_time || '6',
+            storePhone: orderInfo.storePhone || orderInfo.store_phone || '1342137123'
+        }
+
+        console.log('设置的页面数据:', pageData)
+
+        this.setData(pageData, () => {
+            console.log('数据设置完成，当前页面数据:')
+            console.log('orderProducts:', this.data.orderProducts)
+            console.log('createTime:', this.data.createTime)
+            console.log('remark:', this.data.remark)
+            console.log('totalAmount:', this.data.totalAmount)
         })
 
         // 如果有优惠券信息，设置优惠券数据
@@ -142,10 +190,26 @@ Page({
         console.log('使用模拟订单数据')
         
         const mockOrderInfo = {
-            order_id: this.data.orderId,
+            order_id: this.data.orderId || 'TEST001',
             status: 'preparing',
-            create_time: '2024-01-15 14:30:00',
-            pay_time: '2024-01-15 14:31:00',
+            create_time: new Date().toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\//g, '/'),
+            pay_time: new Date().toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\//g, '/'),
             complete_time: '',
             dining_type: 'dine-in',
             remark: '少糖，谢谢',
@@ -183,6 +247,7 @@ Page({
             }
         }
 
+        console.log('模拟订单数据:', mockOrderInfo)
         this.setOrderDetailData(mockOrderInfo)
     },
 

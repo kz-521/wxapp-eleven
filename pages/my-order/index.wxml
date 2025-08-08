@@ -10,49 +10,54 @@
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
     </view>
   </view>
-  <view class="group_2" bindtap="goToOrderDetail" data-order-id="test_order_001">
-    <view class="section_1">
-     <view style="display: flex;">
-      <view class="text-wrapper_2">
-        <text lines="1" class="text_7">堂食</text>
+  
+  <!-- 订单列表 -->
+  <view wx:if="{{orders.length > 0}}">
+    <view class="group_2" wx:for="{{orders}}" wx:key="id" bindtap="goToOrderDetail" data-order-id="{{item.id}}">
+      <view class="section_1">
+        <view style="display: flex;">
+          <view class="text-wrapper_2">
+            <text lines="1" class="text_7">堂食</text>
+          </view>
+          <text lines="1" class="text_8">清汀.新养生空间</text>
+        </view>
+        <text lines="1" class="text_9">{{item.statusText}}</text>
       </view>
-      <text lines="1" class="text_8">这里是店铺的名称</text>
-     </view>
-      <text lines="1" class="text_9">待取茶</text>
-    </view>
-    <view class="section_2">
-      <view class="image-text_1">
-        <view class="image-wrapper_2">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_5"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
+      
+      <!-- 商品列表 -->
+      <view class="section_2" wx:for="{{item.products}}" wx:key="id" wx:for-item="product">
+        <view class="image-text_1">
+          <view class="image-wrapper_2">
+            <image src="{{product.image}}" class="image_5"></image>
+            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
+          </view>
+          <view class="text-group_1">
+            <text lines="1" class="text_10">{{product.name}}</text>
+            <text lines="1" class="text_11">{{product.specs}}</text>
+          </view>
         </view>
-        <view class="text-group_1">
-          <text lines="1" class="text_10">清照竹影茶</text>
-          <text lines="1" class="text_11">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
-        </view>
+        <text lines="1" decode="true" class="text_12">x&nbsp;{{product.count}}</text>
       </view>
-      <text lines="1" decode="true" class="text_12">x&nbsp;1</text>
-    </view>
-    <view class="section_3">
-      <view class="image-text_2">
-        <view class="image-wrapper_3">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_8"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_9"></image>
+      
+      <view class="section_4">
+        <text lines="1" decode="true" class="text_16">{{item.createTime}}</text>
+        <view class="text-wrapper_3">
+          <text lines="1" decode="true" class="text_17">共{{item.totalCount}}件商品&nbsp;合计：</text>
+          <text lines="1" class="text_18">¥{{item.totalPrice}}</text>
         </view>
-        <view class="text-group_2">
-          <text lines="1" class="text_13">清照竹影茶</text>
-          <text lines="1" class="text_14">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
-        </view>
-      </view>
-      <text lines="1" decode="true" class="text_15">x&nbsp;1</text>
-    </view>
-    <view class="section_4">
-      <text lines="1" decode="true" class="text_16">2025/08/04&nbsp;13:05</text>
-      <view class="text-wrapper_3">
-        <text lines="1" decode="true" class="text_17">共1件商品&nbsp;合计：</text>
-        <text lines="1" class="text_18">¥40</text>
       </view>
     </view>
+    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_10" wx:if="{{index < orders.length - 1}}"></image>
   </view>
-  <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_10"></image>
+  
+  <!-- 空状态 -->
+  <view wx:else class="empty-state">
+    <view class="empty-icon">📦</view>
+    <view class="empty-text">暂无订单</view>
+  </view>
+  
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <view class="loading-text">加载中...</view>
+  </view>
 </view>

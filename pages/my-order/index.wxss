@@ -815,3 +815,38 @@ border-radius: 4rpx;
   white-space: nowrap;
   line-height: 33rpx;
 }
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  margin-top: 200rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Medium;
+}
+
+/* 加载状态样式 */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Medium;
+}

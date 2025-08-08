@@ -39,14 +39,4 @@
       </view>
     </view>
   </view>
-  
-  <!-- 去喝一杯按钮 -->
-  <view class="drink-btn-container">
-    <button class="drink-btn" bindtap="goToCategory">去喝一杯</button>
-  </view>
-  
-  <!-- 测试按钮 -->
-  <view style="margin: 20rpx; text-align: center;">
-    <button style="background: #007aff; color: white; font-size: 28rpx; padding: 20rpx;" bindtap="testAddToCart">测试添加商品到购物车</button>
-  </view>
 </view>

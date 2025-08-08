@@ -181,7 +181,7 @@
   display: flex;
   flex-direction: column;
   padding: 40rpx 30rpx 0 30rpx;
-  margin: 40rpx auto;
+  margin: 0rpx auto;
 }
 .text_8 {
   overflow-wrap: break-word;
