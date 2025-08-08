@@ -19,11 +19,14 @@ Page({
           address: '浙江省杭州市余杭区瓶窑镇南山村横山60号1幢1楼106室'
         },
         distance: '',
-        orderStatus: 'pending', // 订单状态：pending(待支付), paid(已支付), completed(已完成), cancelled(已取消)
+        orderStatus: 'pending', // 订单状态：pending(待支付), paid(已支付), preparing(制作中), ready(待取茶), completed(已完成), cancelled(已取消)
         orderStatusText: '待支付',
         createTime: '',
         payTime: '',
-        completeTime: ''
+        completeTime: '',
+        pickupNumber: '8195', // 取茶号
+        estimatedTime: '6', // 预计时间（分钟）
+        storePhone: '1342137123' // 店铺电话
     },
 
     onLoad(options) {
@@ -118,7 +121,10 @@ Page({
             orderStatusText: this.getOrderStatusText(orderInfo.status),
             createTime: orderInfo.create_time || '',
             payTime: orderInfo.pay_time || '',
-            completeTime: orderInfo.complete_time || ''
+            completeTime: orderInfo.complete_time || '',
+            pickupNumber: orderInfo.pickup_number || '8195',
+            estimatedTime: orderInfo.estimated_time || '6',
+            storePhone: orderInfo.store_phone || '1342137123'
         })
 
         // 如果有优惠券信息，设置优惠券数据
@@ -137,15 +143,18 @@ Page({
         
         const mockOrderInfo = {
             order_id: this.data.orderId,
-            status: 'pending',
+            status: 'preparing',
             create_time: '2024-01-15 14:30:00',
-            pay_time: '',
+            pay_time: '2024-01-15 14:31:00',
             complete_time: '',
             dining_type: 'dine-in',
             remark: '少糖，谢谢',
             total_amount: 68.00,
             coupon_amount: 10.00,
             pay_amount: 58.00,
+            pickup_number: '8195',
+            estimated_time: '6',
+            store_phone: '1342137123',
             products: [
                 {
                     id: '1',
@@ -153,7 +162,8 @@ Page({
                     price: 28.00,
                     count: 2,
                     image: '/imgs/home/drink-item.png',
-                    tags: ['养生', '推荐']
+                    tags: ['养生', '推荐'],
+                    specs: '大、热、不额外加糖、脱脂牛奶'
                 },
                 {
                     id: '2',
@@ -161,7 +171,8 @@ Page({
                     price: 32.00,
                     count: 1,
                     image: '/imgs/home/drink-item.png',
-                    tags: ['清香', '热销']
+                    tags: ['清香', '热销'],
+                    specs: '中、温、微糖、全脂牛奶'
                 }
             ],
             coupon: {
@@ -188,6 +199,35 @@ Page({
             'cancelled': '已取消'
         }
         return statusMap[status] || '未知状态'
+    },
+
+    /**
+     * 获取状态对应的图片
+     */
+    getStatusImage(status) {
+        const imageMap = {
+            'pending': '/imgs/order/ordered.png',
+            'paid': '/imgs/order/ordered.png',
+            'preparing': '/imgs/order/making.png',
+            'ready': '/imgs/order/ready.png',
+            'completed': '/imgs/order/ready.png'
+        }
+        return imageMap[status] || '/imgs/order/ordered.png'
+    },
+
+    /**
+     * 获取状态对应的样式类
+     */
+    getStatusClass(status) {
+        const classMap = {
+            'pending': 'status-active',
+            'paid': 'status-active',
+            'preparing': 'status-active',
+            'ready': 'status-active',
+            'completed': 'status-active',
+            'cancelled': 'status-inactive'
+        }
+        return classMap[status] || 'status-inactive'
     },
 
     /**

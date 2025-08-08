@@ -4,21 +4,21 @@
   <view class="block_2">
     <view class="text-group_9">
       <text lines="1" class="text_3">取茶号</text>
-      <text lines="1" class="text_4">8195</text>
+      <text lines="1" class="text_4">{{pickupNumber}}</text>
     </view>
     <view class="box_3">
       <view class="image-text_8">
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng02b93e74ba04c88e2d26c3494af0a93c882d762352c1869c86c53150b31f1c43" class="label_4"></image>
+        <image src="{{getStatusImage('pending')}}" class="label_4"></image>
         <text lines="1" class="text-group_2">已下单</text>
       </view>
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng27e8da5932ba99e4b31a385256fce3120aae8a7affbf5a2bb4a280918cbed0a2" class="image_3"></image>
       <view class="image-text_9">
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngbaf03e7e28ad893bf82f6d58864b0af4c928ec5dbdcd2508adc4a657b58ce1c5" class="label_5"></image>
+        <image src="{{getStatusImage('preparing')}}" class="label_5"></image>
         <text lines="1" class="text-group_3">制作中</text>
       </view>
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng27e8da5932ba99e4b31a385256fce3120aae8a7affbf5a2bb4a280918cbed0a2" class="image_4"></image>
       <view class="image-text_10">
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngfa574dc4958c77960327fe25611ec45f21bc420cf85fde3f5cf686f30e7ee988" class="image_5"></image>
+        <image src="{{getStatusImage('ready')}}" class="image_5"></image>
         <text lines="1" class="text-group_4">可取茶</text>
       </view>
     </view>
@@ -28,90 +28,55 @@
         <text lines="1" class="text-group_5">预计时间</text>
       </view>
       <view class="text-wrapper_1">
-        <text lines="1" class="text_5">6</text>
+        <text lines="1" class="text_5">{{estimatedTime}}</text>
         <text lines="1" class="text_6">分钟</text>
       </view>
     </view>
-    <view class="group_3">
-      <view class="group_4"></view>
-    </view>
-    <view class="text-wrapper_2">
-      <text lines="1" class="text_7">前方还有3杯/</text>
-      <text lines="1" class="text_8">共6杯商品制作</text>
-    </view>
-    <text lines="1" class="text_9">预估时间仅供参考，制作完成后将第一时间为您推送取茶通知</text>
   </view>
   <view class="block_3">
     <view class="image-text_12">
       <view class="text-group_10">
-        <text lines="1" class="text_10">这里是店铺的名称</text>
-        <text lines="1" decode="true" class="paragraph_1">地址：湖南省长沙市天心区饺子街道太平老街12号<br/>营业时间：每日09:00&nbsp;-&nbsp;23:00</text>
+        <text lines="1" class="text_10">{{storeLocation.name}}</text>
+        <text lines="1" decode="true" class="paragraph_1">地址：{{storeLocation.address}}<br/>营业时间：每日09:00&nbsp;-&nbsp;23:00</text>
       </view>
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngb9174ef99e580e7c89a970c893ea9b1cc778af3badeac408c97cf75c59534b07" class="image_6"></image>
     </view>
     <view class="text-wrapper_9">
       <text lines="1" class="text_11">下单电话</text>
-      <text lines="1" class="text_12">1342137123</text>
+      <text lines="1" class="text_12">{{storePhone}}</text>
       <text lines="1" class="text_13">下单时间</text>
-      <text lines="1" decode="true" class="text_14">2025/08/04&nbsp;13:05</text>
+      <text lines="1" decode="true" class="text_14">{{createTime}}</text>
     </view>
   </view>
   <view class="block_4">
     <text lines="1" class="text_15">商品明细</text>
-    <view class="group_11">
+    <view wx:for="{{orderProducts}}" wx:key="id" class="group_11">
       <view class="image-text_13">
         <view class="image-wrapper_1">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_7"></image>
+          <image src="{{item.image}}" class="image_7"></image>
           <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_8"></image>
         </view>
         <view class="text-group_11">
-          <text lines="1" class="text_16">清照竹影茶</text>
-          <text lines="1" class="text_17">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
+          <text lines="1" class="text_16">{{item.name}}</text>
+          <text lines="1" class="text_17">{{item.specs || '标准规格'}}</text>
         </view>
       </view>
-      <text lines="1" class="text_18">¥20</text>
+      <text lines="1" class="text_18">¥{{item.price}}</text>
     </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng318f227ba08a853e0a7cfda8226a4fa4c27b399e77cf0825d035e5edf159d2f3" class="image_9"></image>
-    <view class="group_12">
-      <view class="image-text_14">
-        <view class="image-wrapper_2">
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng2a2d9ff2268d70f7609ca0529a748669abe1eb92320141b8eb9af54fab566d5e" class="image_10"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_11"></image>
-        </view>
-        <view class="text-group_12">
-          <text lines="1" class="text_19">清照竹影茶</text>
-          <text lines="1" class="text_20">大、热、不额外加糖、脱脂牛奶、大、热、不额外加糖、脱脂牛奶</text>
-        </view>
-      </view>
-      <text lines="1" class="text_21">¥20</text>
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPngacf8924448c4ce8f2415448371f32a072dd475293efad3f87092bff5766d6d36" class="thumbnail_1"></image>
-    </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng318f227ba08a853e0a7cfda8226a4fa4c27b399e77cf0825d035e5edf159d2f3" class="image_12"></image>
     <view class="group_13">
       <text lines="1" class="text_22">总价</text>
       <view class="text-wrapper_4">
         <text lines="1" class="text_23">¥</text>
-        <text lines="1" class="text_24">20</text>
+        <text lines="1" class="text_24">{{totalAmount}}</text>
       </view>
-      <view class="text-wrapper_5">
+      <view wx:if="{{couponAmount > 0}}" class="text-wrapper_5">
         <text lines="1" class="text_25">¥</text>
-        <text lines="1" class="text_26">15</text>
+        <text lines="1" class="text_26">{{payAmount}}</text>
       </view>
     </view>
   </view>
-  <view class="text-wrapper_6">
+  <view wx:if="{{remark}}" class="text-wrapper_6">
     <text lines="1" class="text_27">备注</text>
-    <text lines="1" class="text_28">这里是备注这里是备注这里是备注这里是备注这里是备注这里是备注这里是备注</text>
-  </view>
-  <view class="block_5">
-    <view class="box_5">
-      <view class="text-wrapper_7">
-        <text lines="1" class="text_29">申请开票</text>
-      </view>
-      <view class="text-wrapper_8">
-        <text lines="1" class="text_30">取消订单</text>
-      </view>
-    </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_13"></image>
+    <text lines="1" class="text_28">{{remark}}</text>
   </view>
 </view>
