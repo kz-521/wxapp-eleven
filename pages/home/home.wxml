@@ -43,14 +43,14 @@
       <image src="/imgs/home/activity-icon.png" class="action-icon"></image>
       <view class="flexda">
         <text class="action-subtitle">RECENT ACTIVITIES</text>
-        <image src="/imgs/home/to-drink-text.png" class="action-title-img"></image>
+        <image src="/imgs/active.png" class="action-title-img"></image>
       </view>
     </view>
   </view>
 
   <!-- 推荐茶饮区域 -->
   <view class="recommend-card">
-    <view class="recommend-header">
+    <view class="recommend-header" bindtap="goToCart">
       <text class="section-title">今日推荐茶饮</text>
       <text class="section-desc">来一杯自然的味道/适合木行体质的味道</text>
       <image src="/imgs/right-icon.png" class="arrow-icon"></image>

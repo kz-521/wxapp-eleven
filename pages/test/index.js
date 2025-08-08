@@ -1,5 +1,9 @@
 // pages/test/index.js
+const { api } = require('../../utils/api.js')
+const { Token } = require('../../models/token.js')
+
 Page({
+  data: {},
 
   /**
    * 页面的初始数据
@@ -23,13 +27,41 @@ Page({
     multiSelected: [],
     pressureMultiValue: [],
     socialMultiValue: [],
+    gender: '',
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad(options) {
+  async onLoad(options) {
+    // 每次启动页面都获取新的token
+    await this.refreshToken()
+  },
 
+  /**
+   * 刷新token
+   */
+  async refreshToken() {
+    try {
+      console.log('体质测评页面 - 开始获取新token')
+      const tokenInstance = new Token()
+      await tokenInstance.getTokenFromServer()
+      console.log('体质测评页面 - token获取成功')
+      
+      // 显示成功提示
+      wx.showToast({
+        title: 'Token已更新',
+        icon: 'success',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('体质测评页面 - token获取失败:', error)
+      wx.showToast({
+        title: 'Token获取失败',
+        icon: 'none',
+        duration: 2000
+      })
+    }
   },
   toSuccess() {
   //   wx.navigateTo({
@@ -111,6 +143,17 @@ Page({
   },
   onMultiConfirm() {
     const selectedArr = this.data.multiOptions.filter((item, idx) => this.data.multiSelected[idx]);
+    
+    // 验证是否至少选择了一项
+    if (selectedArr.length === 0) {
+      wx.showToast({
+        title: '请至少选择一个选项',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+    
     let update = { showMultiPopup: false };
     if (this.data.multiOptionType === 'pressure') {
       update.pressureMultiValue = selectedArr;
@@ -119,7 +162,15 @@ Page({
       update.socialMultiValue = selectedArr;
       update.socialValue = selectedArr.join('，');
     }
+    
     this.setData(update);
+    
+    // 显示选择成功提示
+    wx.showToast({
+      title: '选择成功',
+      icon: 'success',
+      duration: 1500
+    });
   },
   onCloseMultiPopup() {
     this.setData({ showMultiPopup: false });
@@ -142,52 +193,53 @@ Page({
   onClosePopup() {
     this.setData({ showPopup: false });
   },
+  onGenderSelect(e) {
+    const gender = e.currentTarget.dataset.gender;
+    this.setData({ gender });
+  },
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady() {
 
+  onLoad(options) {},
+
+  toSuccess() {
+    // wx.navigateTo({
+    //   url: `/pages/test-result/index`
+    // })
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+  submitTest() {
+    // 模拟答案
+    const answers = [
+      { question_id: 1, answer: 'A' },
+      { question_id: 2, answer: 'C' },
+      { question_id: 3, answer: 'E' },
+      { question_id: 4, answer: 'B' },
+      { question_id: 5, answer: 'D' },
+      { question_id: 6, answer: 'A' },
+      { question_id: 7, answer: 'F' },
+      { question_id: 8, answer: 'G' }
+    ]
+    wx.showLoading({ title: '提交中...' })
+    api.submitConstitutionTest({ answers }).then(res => {
+      wx.hideLoading()
+      if (res.code === 0) {
+        wx.navigateTo({
+          url: '/pages/test-result/index',
+          success: function (navRes) {
+            // 通过eventChannel传递数据
+            if (navRes.eventChannel) {
+              navRes.eventChannel.emit('testResult', res.result)
+            }
+          }
+        })
+      } else {
+        wx.showToast({ title: res.msg || '提交失败', icon: 'none' })
+      }
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '提交失败', icon: 'none' })
+    })
   }
 })

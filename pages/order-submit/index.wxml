@@ -5,29 +5,33 @@
     <view class="store-info">
       <view class="pickup-tag">到店取</view>
       <view class="store-details">
-        <text class="store-name">这里是店铺的名称</text>
+        <text class="store-name">{{storeLocation.name}}</text>
       </view>
-
+      <image src="/imgs/orderBg.png" class="order-bg"></image>
     </view>
     <view class="store-address" style="height: 30rpx;">
-      地址
-      </view>
+      {{storeLocation.address}} {{distance}}
+    </view>
     <!-- 中部分：堂食和外带选项 -->
     <view class="dining-options">
       <view class="option-item {{diningType === 'dine-in' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="dine-in">
         <view class="option-text">堂食</view>
         <view class="option-tip">店内即喝</view>
+        <view class="triangle" wx:if="{{diningType === 'dine-in'}}"></view>
+        <image src="/imgs/yes.png" class="yes" mode="" wx:if="{{diningType === 'dine-in'}}"/>
       </view>
       <view class="option-item {{diningType === 'takeaway' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="takeaway">
         <view class="option-text">外带</view>
         <view class="option-tip">纸袋打包</view>
+        <view class="triangle" wx:if="{{diningType === 'takeaway'}}"></view>
+        <image src="/imgs/yes.png" class="yes" mode="" wx:if="{{diningType === 'takeaway'}}"/>
       </view>
     </view>
   </view>
   <view class="group_7">
     <view class="block_4">
       <view class="image-text_6">
-        <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng82bfc13238b25fe5c6aef2c1cd6a93c4eacf63ef7ae5050cbab106a3e4bf4e61" class="label_4"></image>
+        <image src="/imgs/time.png" class="label_4"></image>
         <text lines="1" class="text-group_3">预计时间</text>
       </view>
       <view class="text-wrapper_3">
@@ -39,8 +43,8 @@
       <view class="section_3"></view>
     </view>
     <view class="text-wrapper_4">
-      <text lines="1" class="text_13">前方还有3杯/</text>
-      <text lines="1" class="text_14">共6杯商品制作</text>
+      <!-- <text lines="1" class="text_13">前方还有3杯/</text>
+      <text lines="1" class="text_14">共6杯商品制作</text> -->
     </view>
   </view>
   <view class="group_8">

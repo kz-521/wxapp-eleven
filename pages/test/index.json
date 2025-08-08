@@ -1,4 +1,5 @@
 {
+  "navigationBarTitleText": "体质测评",
   "usingComponents": {
     "van-popup": "@vant/weapp/popup/index",
     "van-picker": "@vant/weapp/picker/index",

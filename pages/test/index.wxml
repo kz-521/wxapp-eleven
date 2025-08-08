@@ -2,10 +2,12 @@
     <view class="group_2" bind:tap="toSuccess">
       <text lines="1" class="text_3">你是男生还是女生？</text>
       <view class="box_3">
-        <view class="text-wrapper_1">
+        <view class="text-wrapper_1 {{gender === 'male' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="male">
+          <image src="/imgs/boy.png" class="gender-img"></image>
           <text lines="1" class="text_4">我是男生</text>
         </view>
-        <view class="text-wrapper_2">
+        <view class="text-wrapper_2 {{gender === 'female' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="female">
+          <image src="/imgs/woman.png" class="gender-img"></image>
           <text lines="1" class="text_5">我是女生</text>
         </view>
       </view>
@@ -67,18 +69,14 @@
             <view wx:for="{{multiOptions}}" wx:key="index" class="multi-option-item" catchtap="onMultiOptionTap" data-index="{{index}}">
               <view class="multi-option-inner {{multiSelected[index] ? 'selected' : ''}}">
                 <text class="multi-option-text">{{item}}</text>
-                <image wx:if="{{multiSelected[index]}}" src="https://lanhu-oss-proxy.lanhuapp.com/SketchPnge5c75fa9e7e895d23a130ee82cb6fe8f521b6d242642a9359490e302c9929369" class="label_5"></image>
+                <!-- <image wx:if="{{multiSelected[index]}}" src="https://lanhu-oss-proxy.lanhuapp.com/SketchPnge5c75fa9e7e895d23a130ee82cb6fe8f521b6d242642a9359490e302c9929369" class="label_5"></image> -->
               </view>
             </view>
           </scroll-view>
-          <view class="text-wrapper_8" bindtap="onMultiConfirm">
-            <text class="text_24">确定</text>
-          </view>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_8"></image>
+          <button class="submit-btn" bindtap="onMultiConfirm">确定</button>
         </view>
       </van-popup>
     </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_7"></image>
   <van-popup show="{{showPopup}}" position="bottom" bind:close="onClosePopup">
     <van-picker
       show-toolbar
@@ -88,4 +86,5 @@
       bind:cancel="onClosePopup"
     />
   </van-popup>
+    <button class="submit-btn" bindtap="submitTest">提交</button>
 </view>

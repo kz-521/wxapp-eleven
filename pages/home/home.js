@@ -85,24 +85,8 @@ Page({
             wx.showToast({ title: '您已登录', icon: 'none' })
             return
         }
-
-        // 获取微信登录凭证
-        wx.login({
-            success: (res) => {
-                if (res.code) {
-                    console.log('微信登录成功，code:', res.code)
-                    // 先获取token
-                    this.getTokenAndUserInfo(res.code)
-                } else {
-                    console.error('微信登录失败:', res.errMsg)
-                    wx.showToast({ title: '登录失败', icon: 'none' })
-                }
-            },
-            fail: (err) => {
-                console.error('微信登录失败:', err)
-                wx.showToast({ title: '登录失败', icon: 'none' })
-            }
-        })
+        // 直接调用微信授权
+        this.getUserProfile()
     },
 
     /**
@@ -215,7 +199,7 @@ Page({
     // 跳转到活动页面
     goToActivity() {
         wx.showToast({
-            title: '活动功能开发中',
+            title: '暂无活动',
             icon: 'none'
         })
     },
