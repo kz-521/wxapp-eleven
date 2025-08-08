@@ -2,6 +2,8 @@
   "pages": [
     "pages/home/home",
     "pages/cart/cart",
+    "pages/my/my",
+    "pages/category/category",
     "pages/test/index",
     "pages/test-result/index",
     "pages/order-submit/index",
@@ -13,6 +15,35 @@
     "backgroundColor": "#FFFFFF",
     "navigationBarBackgroundColor": "#FFFFFF"
   },
+  "tabBar": {
+    "color": "#666666",
+    "selectedColor": "#2EAA5B",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "imgs/tabbar/home@dis.png",
+        "selectedIconPath": "imgs/tabbar/home.png"
+      },
+      {
+        "pagePath": "pages/category/category",
+        "text": "点单",
+        "iconPath": "imgs/tabbar/category@dis.png",
+        "selectedIconPath": "imgs/tabbar/category.png"
+      },
+
+
+
+      {
+        "pagePath": "pages/my/my",
+        "text": "我的",
+        "iconPath": "imgs/tabbar/my@dis.png",
+        "selectedIconPath": "imgs/tabbar/my.png"
+      }
+    ]
+  },
   "permission": {
     "scope.userLocation": {
       "desc": "您的位置信息将用于计算到门店的距离"
@@ -20,6 +51,11 @@
   },
   "sitemapLocation": "sitemap.json",
   "usingComponents": {
-      "s-empty": "/components/empty/index"
+      "s-empty": "/components/empty/index",
+      "l-badge": "/miniprogram_npm/lin-ui/badge/index",
+      "l-avatar": "/miniprogram_npm/lin-ui/avatar/index",
+      "l-icon": "/miniprogram_npm/lin-ui/icon/index",
+      "l-button": "/miniprogram_npm/lin-ui/button/index",
+      "l-list": "/miniprogram_npm/lin-ui/list/index"
   }
 }

@@ -176,6 +176,14 @@ const api = {
       method: 'POST',
       data: userInfo
     })
+  },
+
+  // 获取用户优惠券列表
+  getUserCoupons: () => {
+    return request({
+      url: '/qingting/v1/self/coupons',
+      method: 'GET'
+    })
   }
 }
 

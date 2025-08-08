@@ -1,45 +1,52 @@
 // pages/coupon-select/index.js
+import { Coupon } from '../../models/coupon.js'
+
 Page({
     data: {
-        activeTab: 'available', // 当前激活的标签
-        availableCoupons: [
-            {
-                id: 1,
-                name: '新人专享券',
-                amount: '30',
-                condition: '满100可用',
-                validDate: '2025.12.30 - 2026.12.30'
-            },
-            {
-                id: 2,
-                name: '满减优惠券',
-                amount: '20',
-                condition: '满80可用',
-                validDate: '2025.12.30 - 2026.12.30'
-            }
-        ],
-        usedCoupons: [
-            {
-                id: 3,
-                name: '周末特惠券',
-                amount: '15',
-                condition: '满60可用',
-                validDate: '2025.12.30 - 2026.12.30'
-            }
-        ],
-        expiredCoupons: [
-            {
-                id: 4,
-                name: '限时优惠券',
-                amount: '25',
-                condition: '满120可用',
-                validDate: '2025.11.30 - 2025.12.30'
-            }
-        ]
+        activeTab: 'available',
+        availableCoupons: [],
+        usedCoupons: [],
+        expiredCoupons: [],
+        loading: false
     },
 
     onLoad(options) {
         console.log('优惠券页面加载')
+        this.loadCoupons()
+    },
+
+    /**
+     * 加载优惠券数据
+     */
+    async loadCoupons() {
+        this.setData({ loading: true })
+        
+        try {
+            const response = await Coupon.getUserCoupons()
+            console.log('获取到优惠券数据:', response)
+            
+            if (response && response.code === 0) {
+                const processedData = Coupon.processCouponsData(response)
+                this.setData({
+                    availableCoupons: processedData.availableCoupons,
+                    usedCoupons: processedData.usedCoupons,
+                    expiredCoupons: processedData.expiredCoupons
+                })
+            } else {
+                wx.showToast({
+                    title: response?.msg || '获取优惠券失败',
+                    icon: 'error'
+                })
+            }
+        } catch (error) {
+            console.error('获取优惠券异常:', error)
+            wx.showToast({
+                title: '获取优惠券失败',
+                icon: 'error'
+            })
+        } finally {
+            this.setData({ loading: false })
+        }
     },
 
     /**

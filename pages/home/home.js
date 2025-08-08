@@ -1,5 +1,6 @@
 // pages/home/home.js
 const { api } = require('../../utils/api.js')
+import { Spu } from '../../models/spu.js'
 
 Page({
     data: {
@@ -17,12 +18,12 @@ Page({
     },
 
   async onLoad() {
-        console.log('Home页面加载')
-        // 检查登录状态
+       
         this.checkLoginStatus()
         
         // 获取今日推荐数据
         await this.getRecommendData()
+        
         // 获取banner数据
         await this.getBannerData()
         
@@ -242,7 +243,7 @@ Page({
     /**
      * 获取今日推荐数据
      */
-    getRecommendData() {
+    async getRecommendData() {
         try {
             console.log('开始获取今日推荐数据')
             
@@ -250,33 +251,23 @@ Page({
             const token = wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token')
             console.log('首页 - Token检查:', token ? '存在' : '不存在')
             
-            api.getRecommendSpu(3).then(res => {
-                console.log('今日推荐API响应:', res)
-                if (res.code === 200 && res.result && res.result.list) {
-                    console.log('获取今日推荐成功:', res.result.list)
-                    // 处理数据格式，适配页面显示
-                    const drinks = res.result.list.map(item => ({
-                        id: item.id,
-                        name: item.title,
-                        price: item.discount_price || item.price,
-                        image: item.img
-                    }))
-                    
-                    this.setData({
-                        drinks: drinks
-                    })
-                } else {
-                    console.log('今日推荐数据格式不正确:', res)
-                    // 如果API失败，使用默认数据
-                    this.setDefaultDrinks()
-                }
-            }).catch(err => {
-                console.error('获取今日推荐失败:', err)
+            const response = await Spu.getRecommendSpu(3)
+            console.log('今日推荐API响应:', response)
+            
+            const formattedDrinks = Spu.formatRecommendData(response)
+            if (formattedDrinks) {
+                console.log('获取今日推荐成功:', formattedDrinks)
+                this.setData({
+                    drinks: formattedDrinks
+                })
+            } else {
+                console.log('今日推荐数据格式不正确:', response)
                 // 如果API失败，使用默认数据
                 this.setDefaultDrinks()
-            })
+            }
         } catch (error) {
-            console.error('getRecommendData方法执行错误:', error)
+            console.error('获取今日推荐失败:', error)
+            // 如果API失败，使用默认数据
             this.setDefaultDrinks()
         }
     },
@@ -285,27 +276,7 @@ Page({
      * 设置默认饮品数据（API失败时的备用数据）
      */
     setDefaultDrinks() {
-        const defaultDrinks = [
-            {
-                id: 1,
-                name: '清照竹影茶',
-                price: '32',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                id: 2,
-                name: '苦瓜单丛',
-                price: '36',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                id: 3,
-                name: '兰花银针',
-                price: '34',
-                image: '/imgs/home/drink-item.png'
-            }
-        ]
-        
+        const defaultDrinks = Spu.getDefaultRecommendData()
         this.setData({
             drinks: defaultDrinks
         })

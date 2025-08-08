@@ -1,2 +1,135 @@
-<!--pages/category/category.wxml-->
-<text>pages/category/category.wxml</text>
+<view class="order-page">
+    <!-- 问候区域 -->
+    <view class="greeting-section">
+        <view class="greeting-content">
+            <image src="/imgs/cartlogo.png" class="leaf-icon"></image>
+            <view class="greeting-text">
+                <text class="greeting-title">Hello! 下午好</text>
+                <text class="greeting-subtitle">暖阳午后，一杯清茶，熨帖所有心绪。</text>
+            </view>
+        </view>
+        <view class="slipper-icons">
+            <image src="/imgs/编组 3@2x.png" class="slipper-icon"></image>
+        </view>
+    </view>
+
+    <!-- 主要内容区域 -->
+    <view class="main-content">
+        <!-- 左侧分类栏 -->
+        <view class="category-sidebar">
+            <view class="category-item {{currentCategory == index ? 'active' : ''}}" 
+                  wx:for="{{categories}}" wx:key="id" wx:for-index="index"
+                  bindtap="switchCategory" data-index="{{index}}">
+                <text class="category-text">{{item.displayName || item.name}}</text>
+            </view>
+        </view>
+
+        <!-- 右侧商品列表 -->
+        <view class="product-section">
+            <text class="section-title">{{sectionTitle}}</text>
+            <scroll-view class="product-list" scroll-y="{{true}}" show-scrollbar="{{true}}">
+                <!-- 有数据时显示商品列表 -->
+                <view wx:if="{{products.length > 0}}">
+                    <view class="product-item" wx:for="{{products}}" wx:key="index" bindtap="onProductClick" data-index="{{index}}">
+                        <view class="product-content">
+                            <image src="{{item.image}}" class="product-image"></image>
+                            <view class="product-info">
+                                <view>
+                                    <text class="product-name">{{item.name}}</text>
+                                    <view class="product-tags">
+                                        <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+                                    </view>
+                                </view>
+                                <view class="product-price-section">
+                                    <view class="product-price">
+                                        <text class="price-symbol">¥</text>
+                                        <text class="price-value">{{item.price}}</text>
+                                        <text class="price-unit" wx:if="{{item.originalPrice && item.originalPrice != item.price}}">起</text>
+                                    </view>
+                                    <image src="/imgs/plus-circle-fill.png" class="add-btn" bindtap="addToCart" data-index="{{index}}"></image>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 无数据时显示空状态 -->
+                <view wx:else class="empty-product-state">
+                    <image src="/imgs/logo.png" class="empty-logo"></image>
+                    <text class="empty-text">暂无产品</text>
+                </view>
+            </scroll-view>
+        </view>
+    </view>
+
+    <!-- 底部购物车栏 -->
+    <view class="cart-bar">
+        <view class="cart-info">
+            <view class="cart-icon-wrapper" bindtap="showCartDetail">
+                <image src="/imgs/home/shopping-cart-icon.png" class="cart-img"></image>
+                <view class="cart-badge" wx:if="{{cartCount > 0}}">
+                    <text class="cart-count">{{cartCount}}</text>
+                </view>
+            </view>
+            <view class="cart-price">
+                <text class="price-symbol2">¥</text>
+                <text class="price-value">{{totalPrice}}</text>
+            </view>
+        </view>
+        <view class="checkout-btn" bindtap="goToCheckout">
+            <text class="checkout-text">去结算</text>
+        </view>
+    </view>
+
+    <!-- 购物车详情弹出层 -->
+    <view class="cart-detail-overlay" wx:if="{{showCartDetail}}" bindtap="closeCartDetail">
+        <view class="cart-detail-content" catchtap="stopPropagation">
+            <!-- 头部 -->
+            <view class="cart-detail-header">
+                <text class="text_10">已选购{{cartCount}}件</text>
+                <view class="cart-detail-close" bindtap="closeCartDetail">×</view>
+            </view>
+            <view class="image_6"></view>
+
+            <!-- 购物车商品列表 -->
+            <view class="cart-detail-body">
+                <view wx:if="{{cartItems.length === 0}}" class="empty-cart">
+                    <text class="empty-cart-text">购物车为空</text>
+                </view>
+                <view wx:else class="cart-items">
+                    <view class="cart-item-row" wx:for="{{cartItems}}" wx:key="name">
+                        <!-- 商品图片 -->
+                        <view class="product-image-container">
+                            <image src="{{item.image}}" class="product-thumbnail"></image>
+                        </view>
+
+                        <!-- 商品信息 -->
+                        <view class="product-details">
+                            <text class="product-name-text">{{item.name}}</text>
+                            <text class="product-attributes">大、热、不额外加糖、脱脂牛奶</text>
+
+                            <!-- 价格和数量控制行 -->
+                            <view class="price-quantity-row">
+                                <text class="product-price-text">¥{{item.price}}</text>
+                                <view class="quantity-controls">
+                                    <view class="quantity-btn" bindtap="decreaseQuantity" data-index="{{index}}">
+                                        <text>-</text>
+                                    </view>
+                                    <text class="quantity-text">{{item.count}}</text>
+                                    <view class="quantity-btn" bindtap="increaseQuantity" data-index="{{index}}">
+                                        <text>+</text>
+                                    </view>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+
+                    <!-- 分隔线 -->
+                    <view class="divider-line" wx:for="{{cartItems}}" wx:key="index" wx:if="{{index < cartItems.length - 1}}"></view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+
+</view>

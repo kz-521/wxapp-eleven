@@ -110,6 +110,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `Order` - 订单处理
   - `User` - 用户信息管理
   - `Spu` - 商品数据处理
+  - `Coupon` - 优惠券管理，包含用户优惠券获取、数据格式化、状态分类等功能
 
 ### HTTP请求模式
 有两套API调用方式：
@@ -122,6 +123,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - 通用HTTP请求封装
    - 自动token刷新
    - 异常处理
+
+**注意**: 对于优惠券相关功能，推荐使用 `models/coupon.js` 中的 `Coupon` 类，它基于 `utils/http.js` 实现，提供了完整的优惠券业务逻辑。
 
 ### 组件开发
 - 组件放置在`/components/`目录
@@ -165,15 +168,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    - 优惠券选择
    - 订单提交和支付
 
+4. **优惠券选择** (`pages/coupon-select/index.js`):
+   - 使用 `models/coupon.js` 的 `Coupon.getUserCoupons()` 获取优惠券列表
+   - 通过 `Coupon.processCouponsData()` 按状态分类（未使用、已使用、已过期）
+   - 使用 `Coupon.formatCouponData()` 格式化数据适配UI显示
+
 ### 关键业务逻辑
 - **微信登录**: code -> token -> 用户信息获取
 - **商品推荐**: 基于体质测评的个性化推荐
 - **购物车管理**: 本地状态 + 全局状态双重管理
 - **订单支付**: 订单创建 -> 预支付 -> 微信支付
+- **优惠券管理**: 获取用户优惠券 -> 状态分类 -> 数据格式化 -> UI展示
 
 ## 开发注意事项
 1. **Token管理**: 优先使用wechat_token，fallback到access_token
-2. **API调用**: 新项目推荐使用`utils/api.js`中的方法
+2. **API调用**: 新项目推荐使用`utils/api.js`中的方法，优惠券相关使用`models/coupon.js`
 3. **错误处理**: API失败时提供降级方案（如默认数据）
 4. **状态同步**: 购物车状态需要在页面间同步
 5. **图片资源**: 使用相对路径，图片放在`/imgs/`目录下

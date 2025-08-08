@@ -1,6 +1,6 @@
 //app.js
-import {Cart} from "./models/cart";
-import {Token} from "./models/token";
+
+import { Token } from "./models/token";
 
 App({
     globalData: {
@@ -9,25 +9,33 @@ App({
         totalPrice: 0, // 购物车总价格
         selectedCoupon: null // 选中的优惠券
     },
-
     async onLaunch() {
-        // 应用启动时获取token
-        await this.ensureToken()
-    },
 
-    async ensureToken() {
-        // 检查本地是否已有token
-        const existingToken = wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token')
-        
-        if (existingToken) {
-            console.log('应用启动 - 发现本地已有token，跳过获取')
-            return existingToken
+        await (new Token()).verify();
+
+        if (wx.canIUse('getUpdateManager')) {
+            const updateManager = wx.getUpdateManager()
+            updateManager.onCheckForUpdate(function (res) {
+                if (res.hasUpdate) {
+                    try {} catch (e) {
+                        console.log(e)
+                    }
+                    updateManager.onUpdateReady(function () {
+                        updateManager.applyUpdate();
+                    })
+                    updateManager.onUpdateFailed(function () {
+                        wx.showModal({
+                            title: '已经有新版本了哟~',
+                            content: '新版本已经上线啦~，请您重新打开当前小程序哟~',
+                        })
+                    })
+                }
+            })
+        } else {
+            wx.showModal({
+                title: '提示',
+                content: '当前微信版本过低，无法完好兼容，请升级到最新微信版本后重试。'
+            })
         }
-
-        // 本地没有token时才获取新token
-        console.log('应用启动 - 本地无token，开始获取新token')
-        const tokenInstance = new Token()
-        await tokenInstance.verify() // 这会自动获取并存储token
-        console.log('应用启动 - token获取完成')
     }
 })
