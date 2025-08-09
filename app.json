@@ -33,9 +33,6 @@
         "iconPath": "imgs/tabbar/category@dis.png",
         "selectedIconPath": "imgs/tabbar/category.png"
       },
-
-
-
       {
         "pagePath": "pages/my/my",
         "text": "我的",
