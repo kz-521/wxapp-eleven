@@ -32,10 +32,33 @@
 .avatar-container{
     position: relative;
     top:-18rpx;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.avatar-container:active {
+    transform: scale(0.95);
+    opacity: 0.8;
 }
 
 .avatar{
     border-radius: 4rpx;
+}
+
+.user-info-container {
+    position: absolute;
+    top: 120rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 100%;
+}
+
+.user-nickname {
+    font-size: 28rpx;
+    color: #333333;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .auth-btn{
@@ -96,5 +119,15 @@
     display:flex;
     align-items:center;
     justify-content: space-between;
+}
+
+.right text:first-child{
+    font-size:36rpx;
+    line-height: 36rpx;
+    color: #157658;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
 }
 

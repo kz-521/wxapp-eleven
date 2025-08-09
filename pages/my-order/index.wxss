@@ -10,7 +10,7 @@
 .group_1 {
   display: flex;
   flex-direction: column;
-  padding: 29rpx 6rpx 31rpx 0;
+  padding: 0rpx 6rpx 31rpx 0;
 }
 .box_1 {
   flex-direction: row;
@@ -85,6 +85,12 @@
   white-space: nowrap;
   line-height: 40rpx;
 }
+
+.text_3.active {
+  color: rgba(0,0,0,1);
+  font-weight: 600;
+}
+
 .text_4 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.65);
@@ -95,6 +101,12 @@
   white-space: nowrap;
   line-height: 40rpx;
 }
+
+.text_4.active {
+  color: rgba(0,0,0,1);
+  font-weight: 600;
+}
+
 .text_5 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.65);
@@ -105,6 +117,12 @@
   white-space: nowrap;
   line-height: 40rpx;
 }
+
+.text_5.active {
+  color: rgba(0,0,0,1);
+  font-weight: 600;
+}
+
 .text_6 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.65);
@@ -114,6 +132,11 @@
   text-align: center;
   white-space: nowrap;
   line-height: 40rpx;
+}
+
+.text_6.active {
+  color: rgba(0,0,0,1);
+  font-weight: 600;
 }
 .image-wrapper_1 {
   display: flex;
@@ -133,7 +156,8 @@
   padding: 30rpx;
   width: 690rpx;
 background: #FFFFFF;
-background-color: aqua;
+margin: 20rpx auto;
+/* background-color: aqua; */
 border-radius: 4rpx;
 }
 .section_1 {
@@ -791,4 +815,39 @@ border-radius: 4rpx;
   text-align: left;
   white-space: nowrap;
   line-height: 33rpx;
+}
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  margin-top: 200rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Medium;
+}
+
+/* 加载状态样式 */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40rpx 0;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Medium;
 }

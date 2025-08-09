@@ -2,11 +2,7 @@
   <view class="box_2" wx:if="{{result}}">
     <text lines="1" class="text_3">您的体质是</text>
     <view class="box_3" style="background-image: url('{{backgroundImage}}');">
-    <image src="/imgs/test1right.png" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
-    <!-- <image src="/imgs/test1right.png" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
-    <image src="/imgs/test1right.png" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
-    <image src="/imgs/test1right.png" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
-    <image src="/imgs/test1right.png" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/> -->
+    <image src="{{rightImage}}" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
       <view class="text-group_1">
         <text lines="1" class="text_4">{{result.primary_constitution.type}}</text>
         <text lines="1" class="text_5">核心特征：{{result.primary_constitution.features}}</text>
@@ -35,7 +31,7 @@
             <text lines="1" class="text_14-0" />
             <text lines="1" class="text_15-0">起</text>
           </view>
-          <image src="/imgs/plus-circle-fill.png" class="label_4-0 add-btn"></image>
+          <image src="/imgs/plus-circle-fill.png" class="label_4-0 add-btn" bindtap="addToCart" data-index="{{index}}"></image>
         </view>
           </view>
         </view>

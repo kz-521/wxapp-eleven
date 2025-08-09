@@ -28,10 +28,8 @@ class Coupon {
      * 获取用户优惠券列表（新API）
      */
     static async getUserCoupons() {
-        return await Http.request({
-            url: 'qingting/v1/self/coupons',
-            method: 'GET'
-        })
+        const { api } = require('../utils/api.js')
+        return await api.getUserCoupons()
     }
 
     /**

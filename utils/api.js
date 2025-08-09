@@ -184,6 +184,42 @@ const api = {
       url: '/qingting/v1/self/coupons',
       method: 'GET'
     })
+  },
+
+  // 获取订单列表
+  getOrderList: (status = '', page = 1, per_page = 10) => {
+    let url = `/qingting/v1/order/list?page=${page}&per_page=${per_page}`
+    if (status !== '') {
+      url += `&status=${status}`
+    }
+    return request({
+      url: url,
+      method: 'GET'
+    })
+  },
+
+  // 获取订单详情
+  getOrderDetail: (orderId) => {
+    return request({
+      url: `/qingting/v1/order/detail/${orderId}`,
+      method: 'GET'
+    })
+  },
+
+  // 取消订单
+  cancelOrder: (orderId) => {
+    return request({
+      url: `/qingting/v1/order/cancel/${orderId}`,
+      method: 'POST'
+    })
+  },
+
+  // 确认取茶
+  confirmPickup: (orderId) => {
+    return request({
+      url: `/qingting/v1/order/pickup/${orderId}`,
+      method: 'POST'
+    })
   }
 }
 

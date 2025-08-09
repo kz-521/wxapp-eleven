@@ -20,7 +20,13 @@ Page({
     cartCount: 0,
     totalPrice: 0,
     categories: [], // 分类列表
-    sectionTitle: '本草滋养茶·9种体质' // 右侧标题
+    sectionTitle: '本草滋养茶·9种体质', // 右侧标题
+    
+    // 商品详情弹出层相关数据
+    showProductDetail: false, // 是否显示商品详情弹出层
+    currentProduct: null, // 当前选中的商品详情
+    selectedOptions: {}, // 用户选择的规格选项
+    currentQuantity: 1, // 当前选择的数量
   },
 
   async onLoad(options) {
@@ -44,8 +50,17 @@ Page({
 
   // 加载购物车数据
   loadCartData() {
-    // 只使用页面级别的缓存，不读取本地存储
-    const cartItems = this.data.cartItems || []
+    // 从globalData和本地存储读取购物车数据
+    const app = getApp()
+    let cartItems = app.globalData.cartItems || []
+    
+    // 如果globalData中没有数据，尝试从本地存储读取
+    if (cartItems.length === 0) {
+      cartItems = wx.getStorageSync('cartItems') || []
+      // 同步到globalData
+      app.globalData.cartItems = cartItems
+    }
+    
     const cartCount = cartItems.reduce((total, item) => total + item.count, 0)
 
     // 价格计算：优先使用SKU价格，fallback到SPU价格
@@ -76,14 +91,15 @@ Page({
     }, 0)
 
     this.setData({
+      cartItems: cartItems,
       cartCount,
       totalPrice: totalPrice.toFixed(2)
     })
 
     console.log('购物车数据更新:', {
+      cartItems: cartItems,
       cartCount,
-      totalPrice: totalPrice.toFixed(2),
-      cartItems: cartItems.length
+      totalPrice: totalPrice.toFixed(2)
     })
   },
 
@@ -91,85 +107,14 @@ Page({
   addToCart(event) {
     const index = event.currentTarget.dataset.index
     const product = this.data.products[index]
-
-    console.log('添加商品到购物车:', product)
-
-    // 检查商品是否有SKU列表
-    if (!product.skuList || product.skuList.length === 0) {
-      wx.showToast({
-        title: '商品暂不可购买',
-        icon: 'none'
-      })
+    
+    if (!product) {
+      console.error('商品数据不存在')
       return
     }
-
-    // 如果商品只有一个SKU，直接使用
-    let selectedSku = null
-    if (product.skuList.length === 1) {
-      selectedSku = product.skuList[0]
-    } else {
-      // 多个SKU的情况，应该跳转到商品详情页选择规格
-      // 这里暂时使用第一个可用的SKU
-      selectedSku = product.skuList.find(sku => sku.stock > 0) || product.skuList[0]
-    }
-
-    if (!selectedSku) {
-      wx.showToast({
-        title: '商品缺少规格信息',
-        icon: 'none'
-      })
-      return
-    }
-
-    let cartItems = this.data.cartItems || []
-
-    // 查找是否已存在相同的SKU
-    const existingItemIndex = cartItems.findIndex(item =>
-        item.skuId === selectedSku.id || (item.id === product.id && item.name === product.name)
-    )
-
-    if (existingItemIndex >= 0) {
-      // 已存在，增加数量
-      cartItems[existingItemIndex].count += 1
-    } else {
-      // 新增商品到购物车
-      const cartItem = {
-        id: product.id, // SPU ID
-        skuId: selectedSku.id, // SKU ID，订单提交时使用
-        name: product.name,
-        image: product.image,
-        count: 1,
-        // 价格使用SKU价格
-        price: selectedSku.discount_price || selectedSku.price, // 显示价格
-        originalPrice: selectedSku.price, // 原价
-        skuPrice: selectedSku.discount_price || selectedSku.price, // SKU价格
-        // 存储完整的SKU信息
-        sku: {
-          id: selectedSku.id,
-          price: selectedSku.price,
-          discount_price: selectedSku.discount_price,
-          stock: selectedSku.stock,
-          title: selectedSku.title || product.name
-        },
-        // 其他商品信息
-        tags: product.tags,
-        subtitle: product.subtitle,
-        categoryId: product.categoryId
-      }
-
-      console.log('新建购物车项:', cartItem)
-      cartItems.unshift(cartItem)
-    }
-
-    this.setData({
-      cartItems: cartItems
-    })
-    this.loadCartData()
-
-    wx.showToast({
-      title: '已添加到购物车',
-      icon: 'success'
-    })
+    
+    // 获取商品详情并显示弹出层
+    this.getProductDetailAndShow(product.id)
   },
 
   // 增加商品数量
@@ -182,7 +127,45 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
+    }
+  },
+
+  /**
+   * 增加商品详情数量
+   */
+  increaseProductQuantity() {
+    const currentQuantity = this.data.currentQuantity
+    this.setData({
+      currentQuantity: currentQuantity + 1
+    }, () => {
+      // 重新计算价格
+      this.calculateProductPrice()
+    })
+  },
+
+  /**
+   * 减少商品详情数量
+   */
+  decreaseProductQuantity() {
+    const currentQuantity = this.data.currentQuantity
+    if (currentQuantity > 1) {
+      this.setData({
+        currentQuantity: currentQuantity - 1
+      }, () => {
+        // 重新计算价格
+        this.calculateProductPrice()
+      })
     }
   },
 
@@ -196,6 +179,16 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
     } else if (cartItems[index] && cartItems[index].count === 1) {
       // 如果数量为1，则移除商品
@@ -203,6 +196,16 @@ Page({
       this.setData({
         cartItems: cartItems
       })
+      
+      // 同步到globalData和本地存储
+      const app = getApp()
+      app.globalData.cartItems = cartItems
+      app.globalData.cartCount = cartItems.reduce((total, item) => total + item.count, 0)
+      app.globalData.totalPrice = cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.count), 0)
+      
+      // 保存到本地存储
+      wx.setStorageSync('cartItems', cartItems)
+      
       this.loadCartData()
 
       wx.showToast({
@@ -214,13 +217,25 @@ Page({
 
   // 显示购物车详情
   showCartDetail() {
+    console.log('显示购物车详情')
+    console.log('当前购物车数据:', this.data.cartItems)
+    console.log('购物车数量:', this.data.cartCount)
+    console.log('当前showCartDetail状态:', this.data.showCartDetail)
+    console.log('当前showProductDetail状态:', this.data.showProductDetail)
+    
+    // 确保先关闭商品详情弹出层
     this.setData({
+      showProductDetail: false,
       showCartDetail: true
+    }, () => {
+      console.log('购物车弹出层已显示')
+      console.log('showCartDetail新状态:', this.data.showCartDetail)
     })
   },
 
   // 关闭购物车详情
   closeCartDetail() {
+    console.log('关闭购物车详情')
     this.setData({
       showCartDetail: false
     })
@@ -236,6 +251,16 @@ Page({
           this.setData({
             cartItems: []
           })
+          
+          // 同步到globalData和本地存储
+          const app = getApp()
+          app.globalData.cartItems = []
+          app.globalData.cartCount = 0
+          app.globalData.totalPrice = 0
+          
+          // 清空本地存储
+          wx.removeStorageSync('cartItems')
+          
           this.loadCartData()
           this.closeCartDetail()
           wx.showToast({
@@ -269,7 +294,11 @@ Page({
 
     // 跳转到提交订单页面，使用navigateTo保留返回按钮
     wx.navigateTo({
-      url: '/pages/order-submit/index'
+      url: '/pages/order-submit/index',
+      success: function() {
+        // 隐藏底部tabbar
+        wx.hideTabBar()
+      }
     })
   },
 
@@ -287,6 +316,49 @@ Page({
 
   // 确认结算
   confirmCheckout() {
+    // 获取当前购物车数据
+    const cartItems = this.data.cartItems
+    const totalPrice = this.data.totalPrice
+    
+    // 格式化当前时间
+    const now = new Date()
+    const createTime = now.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+    
+    // 创建订单数据
+    const orderData = {
+      products: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        image: item.image,
+        price: parseFloat(item.price),
+        count: item.count,
+        tags: item.tags || [],
+        specs: item.specs || item.description || '大、热、不额外加糖、脱脂牛奶',
+        originalPrice: parseFloat(item.originalPrice) || parseFloat(item.price),
+        sku: item.sku || null
+      })),
+      totalAmount: totalPrice,
+      payAmount: totalPrice,
+      couponAmount: 0,
+      remark: '',
+      diningType: 'dine-in',
+      createTime: createTime,
+      payTime: createTime, // 支付时间与创建时间相同
+      storePhone: '1342137123',
+      pickupNumber: Math.floor(Math.random() * 9000) + 1000, // 生成随机取茶号
+      estimatedTime: '6',
+      status: 'paid', // 设置为已支付状态
+      orderStatusText: '已支付'
+    }
+
+    console.log('创建的订单数据:', orderData)
 
     wx.showToast({
       title: '结算成功',
@@ -298,6 +370,17 @@ Page({
       cartItems: []
     })
     this.loadCartData()
+
+    // 跳转到订单详情页面，携带订单数据
+    setTimeout(() => {
+      wx.navigateTo({
+        url: '/pages/order-detail/index',
+        success: (res) => {
+          // 通过eventChannel向被打开页面传送数据
+          res.eventChannel.emit('orderData', orderData)
+        }
+      })
+    }, 1500)
   },
 
   /**
@@ -389,7 +472,6 @@ Page({
           subtitle: item.subtitle,
           description: item.description,
           originalPrice: item.price,
-          skuList: item.skuList || item.sku_list || [],
           categoryId: item.category_id
         }))
 
@@ -495,34 +577,229 @@ Page({
   /**
    * 获取商品详情
    */
-  getSpuDetail(spuId) {
-    api.getSpuDetail(spuId).then(res => {
-      if (res.code === 200 && res.result) {
-        console.log('获取商品详情成功:', res.result)
-        return res.result
+  async getSpuDetail(spuId) {
+    try {
+      wx.showLoading({ title: '加载中...' })
+      const response = await api.getSpuDetail(spuId)
+      wx.hideLoading()
+      
+      if (response.code === 200 && response.result) {
+        console.log('商品详情:', response.result)
+        return response.result
+      } else {
+        console.error('获取商品详情失败:', response)
+        wx.showToast({
+          title: response.msg || '获取商品详情失败',
+          icon: 'none'
+        })
+        return null
       }
-    }).catch(err => {
-      console.error('获取商品详情失败:', err)
+    } catch (error) {
+      wx.hideLoading()
+      console.error('获取商品详情异常:', error)
+      wx.showToast({
+        title: '获取商品详情失败',
+        icon: 'none'
+      })
+      return null
+    }
+  },
+
+  /**
+   * 获取商品详情并显示弹出层
+   */
+  async getProductDetailAndShow(spuId) {
+    const detail = await this.getSpuDetail(spuId)
+    if (detail) {
+      // 设置默认选中的选项
+      const selectedOptions = {}
+      if (detail.order_options && detail.order_options.length > 0) {
+        detail.order_options.forEach(option => {
+          // 为每个选项组选择第一个选项作为默认值
+          if (option.values && option.values.length > 0) {
+            selectedOptions[option.id] = option.values[0].id
+          }
+        })
+      }
+      
+      // 计算初始价格（包含默认选项的额外费用）
+      let initialPrice = parseFloat(detail.discount_price || detail.price)
+      if (detail.order_options && detail.order_options.length > 0) {
+        detail.order_options.forEach(option => {
+          const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+          if (selectedValue && selectedValue.extra_price) {
+            initialPrice += parseFloat(selectedValue.extra_price)
+          }
+        })
+      }
+      
+      this.setData({
+        showProductDetail: true,
+        currentProduct: {
+          ...detail,
+          price: initialPrice.toFixed(2),
+          originalPrice: detail.price
+        },
+        selectedOptions: selectedOptions,
+        currentQuantity: 1
+      })
+    }
+  },
+
+  /**
+   * 关闭商品详情弹出层
+   */
+  closeProductDetail() {
+    this.setData({
+      showProductDetail: false,
+      currentProduct: null
     })
   },
 
   /**
-   * 点击商品项
+   * 选择规格选项
    */
-  onProductClick(event) {
-    const index = event.currentTarget.dataset.index
-    const product = this.data.products[index]
-    console.log('点击商品:', product)
+  selectOption(event) {
+    const { index, option } = event.currentTarget.dataset
+    const selectedOptions = { ...this.data.selectedOptions }
+    
+    selectedOptions[index] = option
+    this.setData({
+      selectedOptions: selectedOptions
+    })
+    
+    // 重新计算价格
+    this.calculateProductPrice()
+  },
 
-    // 获取商品详情
-    this.getSpuDetail(product.id).then(detail => {
-      if (detail) {
-        // 这里可以跳转到商品详情页或显示详情弹窗
-        wx.showToast({
-          title: '商品详情功能开发中',
-          icon: 'none'
-        })
+  /**
+   * 计算商品价格（包含选项额外费用）
+   */
+  calculateProductPrice() {
+    const product = this.data.currentProduct
+    const selectedOptions = this.data.selectedOptions
+    const currentQuantity = this.data.currentQuantity
+    
+    if (!product) return
+    
+    // 基础价格
+    let basePrice = parseFloat(product.discount_price || product.originalPrice)
+    
+    // 加上选项的额外费用
+    if (product.order_options && product.order_options.length > 0) {
+      product.order_options.forEach(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        if (selectedValue && selectedValue.extra_price) {
+          basePrice += parseFloat(selectedValue.extra_price)
+        }
+      })
+    }
+    
+    // 计算总价格（价格 × 数量）
+    const totalPrice = basePrice * currentQuantity
+    
+    this.setData({
+      'currentProduct.price': totalPrice.toFixed(2)
+    })
+  },
+
+  /**
+   * 确定选择并添加到购物车
+   */
+  confirmSelection() {
+    const product = this.data.currentProduct
+    const selectedOptions = this.data.selectedOptions
+    const currentQuantity = this.data.currentQuantity
+
+    if (!product) {
+      wx.showToast({
+        title: '商品信息错误',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 检查必选项是否已选择
+    const requiredOptions = product.order_options ? product.order_options.filter(option => option.type === 1) : []
+    const missingRequired = requiredOptions.filter(option => !selectedOptions[option.id])
+    
+    if (missingRequired.length > 0) {
+      wx.showToast({
+        title: `请选择${missingRequired[0].name}`,
+        icon: 'none'
+      })
+      return
+    }
+
+    // 构建规格描述
+    let specsDescription = ''
+    if (product.order_options && product.order_options.length > 0) {
+      const selectedSpecs = product.order_options.map(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        return selectedValue ? selectedValue.value : ''
+      }).filter(spec => spec)
+      specsDescription = selectedSpecs.join('、')
+    }
+
+    // 计算单价（不包含数量）
+    let unitPrice = parseFloat(product.discount_price || product.originalPrice)
+    if (product.order_options && product.order_options.length > 0) {
+      product.order_options.forEach(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        if (selectedValue && selectedValue.extra_price) {
+          unitPrice += parseFloat(selectedValue.extra_price)
+        }
+      })
+    }
+
+    // 添加到购物车
+    let cartItems = this.data.cartItems || []
+    
+    // 查找是否已存在相同的商品和规格
+    const existingItemIndex = cartItems.findIndex(item => 
+      item.id === product.id && item.specs === specsDescription
+    )
+
+    if (existingItemIndex >= 0) {
+      // 已存在，增加数量
+      cartItems[existingItemIndex].count += currentQuantity
+    } else {
+      // 新增商品到购物车
+      const cartItem = {
+        id: product.id,
+        name: product.title,
+        image: product.img,
+        count: currentQuantity,
+        price: unitPrice.toFixed(2), // 单价
+        originalPrice: product.originalPrice,
+        specs: specsDescription,
+        tags: product.tags ? product.tags.split(',') : [],
+        subtitle: product.subtitle,
+        description: product.description,
+        selectedOptions: selectedOptions
       }
+
+      cartItems.unshift(cartItem)
+    }
+
+    this.setData({
+      cartItems: cartItems,
+      showProductDetail: false,
+      currentProduct: null,
+      selectedOptions: {},
+      currentQuantity: 1
+    })
+    
+    // 同步到globalData和本地存储
+    const app = getApp()
+    app.globalData.cartItems = cartItems
+    wx.setStorageSync('cartItems', cartItems)
+    
+    this.loadCartData()
+
+    wx.showToast({
+      title: '已添加到购物车',
+      icon: 'success'
     })
   },
 
@@ -606,6 +883,160 @@ Page({
         title: '支付失败',
         icon: 'none'
       })
+    })
+  },
+
+  /**
+   * 测试商品详情弹出层
+   */
+  testProductDetail() {
+    // 模拟商品详情数据
+    const mockProduct = {
+      id: 1,
+      title: "佛手映月",
+      subtitle: "大乔木白茶，五行属金，对应肺，可止咳平喘，清热解毒",
+      price: "38",
+      discount_price: "32",
+      description: "清热解毒、止咳平喘，适合肺热咳嗽、咽喉不适人群",
+      img: "https://qn.jixiangjiaoyu.com/2025/8/6d6421a35c54686e3614123366bf0bb941754456860367.png",
+      category_id: 1,
+      tags: "白茶,肺,金",
+      recommend_for_constitution: "金",
+      is_package: 0,
+      status: 1,
+      sort: 0,
+      sales_count: 0,
+      stock_total: 0,
+      create_time: "2025-07-22 07:07:08",
+      update_time: "2025-08-06 15:09:36",
+      order_options: [
+        {
+          id: 1,
+          name: "冷热",
+          type: 1,
+          type_text: "单选",
+          values: [
+            {
+              id: 1,
+              value: "冰",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "冰"
+            },
+            {
+              id: 2,
+              value: "热",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "热"
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: "糖度",
+          type: 1,
+          type_text: "单选",
+          values: [
+            {
+              id: 3,
+              value: "无糖",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "无糖"
+            },
+            {
+              id: 4,
+              value: "三分糖",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "三分糖"
+            },
+            {
+              id: 5,
+              value: "五分糖",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "五分糖"
+            },
+            {
+              id: 6,
+              value: "七分糖",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "七分糖"
+            },
+            {
+              id: 7,
+              value: "全糖",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "全糖"
+            }
+          ]
+        },
+        {
+          id: 3,
+          name: "口味",
+          type: 1,
+          type_text: "单选",
+          values: [
+            {
+              id: 8,
+              value: "原味",
+              extra_price: 0,
+              formatted_price: "",
+              full_text: "原味"
+            },
+            {
+              id: 9,
+              value: "柠檬",
+              extra_price: 1,
+              formatted_price: "+￥1.00",
+              full_text: "柠檬 (+￥1.00)"
+            },
+            {
+              id: 10,
+              value: "蜂蜜",
+              extra_price: 2,
+              formatted_price: "+￥2.00",
+              full_text: "蜂蜜 (+￥2.00)"
+            }
+          ]
+        }
+      ],
+      has_order_options: true,
+      skuList: [
+        {
+          id: 1,
+          spu_id: 1,
+          price: "0.01",
+          stock: 976,
+          img: "/img/spu/foshou.jpg",
+          title: "佛手映月",
+          specs: null,
+          status: 1,
+          sales_count: 0,
+          create_time: "2025-07-22 07:07:08"
+        }
+      ]
+    }
+
+    // 设置默认选中的选项
+    const selectedOptions = {}
+    if (mockProduct.order_options && mockProduct.order_options.length > 0) {
+      mockProduct.order_options.forEach(option => {
+        if (option.values && option.values.length > 0) {
+          selectedOptions[option.id] = option.values[0].id
+        }
+      })
+    }
+    
+    this.setData({
+      showProductDetail: true,
+      currentProduct: mockProduct,
+      selectedOptions: selectedOptions,
+      currentQuantity: 1
     })
   }
 })
