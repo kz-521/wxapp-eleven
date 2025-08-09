@@ -206,12 +206,10 @@ Page({
       icon: 'success'
     })
     
-    // 跳转到分类页面
-    setTimeout(() => {
-      wx.switchTab({
-        url: '/pages/category/category'
-      })
-    }, 1500)
+    // 立即跳转到分类页面
+    wx.switchTab({
+      url: '/pages/category/category'
+    })
   },
 
   // 添加商品到购物车
@@ -273,12 +271,10 @@ Page({
       icon: 'success'
     })
     
-    // 跳转到分类页面
-    setTimeout(() => {
-      wx.switchTab({
-        url: '/pages/category/category'
-      })
-    }, 1500)
+    // 立即跳转到分类页面
+    wx.switchTab({
+      url: '/pages/category/category'
+    })
   },
 
   // 跳转到分类页面

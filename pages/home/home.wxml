@@ -1,7 +1,7 @@
 <view class="home-page  safe-bottom">
   <!-- 顶部logo区域 -->
-  <view style="margin:226rpx 0 40rpx 0;display:flex;justify-content:center;">
-    <image src="/imgs/logo.png" style="width: 387rpx;height: 338rpx;"></image>
+  <view class="logo-wrapper flexca">
+    <image src="/imgs/logo.png" class="logo-image"></image>
   </view>
 
   <!-- 登录区域 -->
@@ -15,15 +15,8 @@
       <image src="/imgs/right-icon.png" class="arrow-icon"></image>
     </view>
     
-    <!-- 已登录状态：只显示去测测体质 -->
-    <view class="test-card" bindtap="goToTest" wx:if="{{isLogin}}">
-      <image src="/imgs/形状@2x.png" class="test-icon"></image>
-      <text class="test-text">去测测体质</text>
-      <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>
-    </view>
-    
-    <!-- 未登录状态：显示去测测体质 -->
-    <view class="test-card" bindtap="goToTest" wx:if="{{!isLogin}}">
+    <!-- 去测测体质（登录与未登录均显示） -->
+    <view class="test-card" bindtap="goToTest">
       <image src="/imgs/形状@2x.png" class="test-icon"></image>
       <text class="test-text">去测测体质</text>
       <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>

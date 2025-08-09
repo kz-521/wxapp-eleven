@@ -7,9 +7,9 @@
     "miniprogram": {
       "list": [
         {
-          "name": "pages/order-detail/index",
-          "pathName": "pages/order-detail/index",
-          "query": "orderId=53",
+          "name": "pages/test-result/index",
+          "pathName": "pages/test-result/index",
+          "query": "",
           "launchMode": "default",
           "scene": null
         },

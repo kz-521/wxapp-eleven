@@ -136,18 +136,14 @@
         <view class="product-detail-content" catchtap="stopPropagation">
             <!-- 商品信息头部 -->
             <view class="product-detail-header">
-                <view class="product-info">
-                    <image src="{{currentProduct.img}}" class="product-detail-image"></image>
+                <view class="product-info2">
+                    <image src="{{currentProduct.img}}" class="product-image"></image>
                     <view class="product-detail-info">
                         <text class="product-detail-name">{{currentProduct.title}}</text>
                         <text class="product-detail-subtitle">{{currentProduct.subtitle}}</text>
                     </view>
                 </view>
-                <view class="product-detail-actions">
-                    <view class="action-btn share-btn">
-                      <view class="close-btn" bindtap="closeProductDetail">×</view>
-                    </view>
-                </view>
+                  <view class="product-detail-actions" bindtap="closeProductDetail">×</view>
             </view>
 
             <!-- 规格选择区域 -->

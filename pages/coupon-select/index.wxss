@@ -1,207 +1,113 @@
-.page {
-  background-color: rgba(249,248,250,1.000000);
-  position: relative;
+/* 页面容器 */
+.coupon-page {
+  background-color: rgba(249,248,250,1);
   width: 750rpx;
-  height: 1624rpx;
-  overflow: hidden;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
 }
-.box_1 {
-  flex-direction: row;
-  display: flex;
+.page-body {
+  position: relative;
 }
-.block_1 {
+.coupon-content {
   position: relative;
   margin-bottom: 67rpx;
   display: flex;
   flex-direction: column;
   padding: 29rpx 6rpx 211rpx 0;
 }
-.section_1 {
-  flex-direction: row;
-  display: flex;
-  margin: 0 22rpx 0 42rpx;
-}
-.text_1 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,1);
-  font-size: 30rpx;
-  letter-spacing: -1rpx;
-  font-family: Helvetica, "Microsoft YaHei", Arial, sans-serif;
-  font-weight: normal;
-  text-align: right;
-  white-space: nowrap;
-  line-height: 35rpx;
-}
-.label_1 {
-  width: 34rpx;
-  height: 21rpx;
-  margin: 6rpx 0 8rpx 438rpx;
-}
-.label_2 {
-  width: 31rpx;
-  height: 22rpx;
-  margin: 6rpx 0 7rpx 10rpx;
-}
-.label_3 {
-  width: 49rpx;
-  height: 23rpx;
-  margin: 6rpx 0 6rpx 10rpx;
-}
-.section_2 {
-  margin-top: 24rpx;
-  flex-direction: row;
-  display: flex;
-}
-.image_1 {
-  width: 80rpx;
-  height: 88rpx;
-}
-.text_2 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,1);
-  font-size: 34rpx;
-  font-family: PingFangSC-Regular;
-  font-weight: normal;
-  text-align: right;
-  white-space: nowrap;
-  line-height: 48rpx;
-  margin: 20rpx 0 0 228rpx;
-}
-.image_2 {
-  width: 87rpx;
-  height: 32rpx;
-  margin: 28rpx 0 28rpx 213rpx;
-}
-.text-wrapper_1 {
+
+/* 顶部tabs */
+.tabs {
   width: 572rpx;
-  flex-direction: row;
+  margin: 0rpx 83rpx 20rpx 89rpx;
+}
+.tab-item-wrap {
   display: flex;
-  justify-content: space-between;
-  margin: 0rpx 83rpx 0 89rpx;
+  flex-direction: column;
+  align-items: center;
 }
-.text_3 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 28rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 40rpx;
-  cursor: pointer;
-}
-
-.text_3.active {
-  color: rgba(0,0,0,0.85);
-  font-weight: 600;
-}
-
-.text_4 {
-  overflow-wrap: break-word;
+.tab-item {
   color: rgba(0,0,0,0.65);
   font-size: 28rpx;
   font-family: PingFang-SC-Medium;
-  font-weight: normal;
   text-align: center;
   white-space: nowrap;
   line-height: 40rpx;
-  cursor: pointer;
 }
-
-.text_4.active {
+.tab-item.active {
   color: rgba(0,0,0,0.85);
   font-weight: 600;
 }
-
-.text_5 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.65);
-  font-size: 28rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 40rpx;
-  cursor: pointer;
-}
-
-.text_5.active {
-  color: rgba(0,0,0,0.85);
-  font-weight: 600;
-}
-.image_3 {
+.tab-underline {
   width: 56rpx;
   height: 8rpx;
-  margin: 6rpx 586rpx 0 102rpx;
+  margin-top: 6rpx;
 }
-.section_3 {
+
+/* 卡片通用 */
+.coupon-card {
   box-sizing: border-box;
   width: 690rpx;
   height: 214rpx;
   background: #FFFFFF;
-  background-size: 100% 100%;
   padding-left: 32rpx;
-  flex-direction: row;
-  display: flex;
   justify-content: flex-end;
   margin: 10rpx auto;
 }
-.section_4 {
-  display: flex;
+.coupon-left {
   flex-direction: column;
   margin: 39rpx 0 46rpx 0;
 }
-.text-wrapper_2 {
+.coupon-left-amount-wrap {
   height: 92rpx;
-  overflow-wrap: break-word;
-  font-size: 0rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
   line-height: 93rpx;
 }
-.text_6 {
+.coupon-left-amount {
   height: 92rpx;
-  overflow-wrap: break-word;
   color: rgba(131, 208, 106);
   font-size: 54rpx;
   font-family: DINPro-Bold;
   font-weight: 700;
   text-align: left;
   white-space: nowrap;
+}
+.coupon-left-amount-group {
+  height: 92rpx;
   line-height: 93rpx;
 }
-.text_7 {
+.coupon-left-amount-large {
   height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(131, 208, 106);
+  color: rgba(0,0,0,0.85);
+  font-size: 72rpx;
+  font-family: DINPro-Bold;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+.coupon-left-unit {
+  height: 92rpx;
+  color: rgba(0,0,0,0.85);
   font-size: 26rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
   text-align: left;
-  line-height: 93rpx;
 }
-.text_8 {
-  overflow-wrap: break-word;
+.coupon-left-label {
   color: rgba(131, 208, 106);
   font-size: 26rpx;
   font-family: PingFang-SC-Medium;
-  font-weight: normal;
   text-align: center;
   white-space: nowrap;
   line-height: 37rpx;
   margin: 0 13rpx 0 14rpx;
 }
-.text-group_1 {
-  display: flex;
+.coupon-info {
   flex-direction: column;
   margin: 40rpx 0 39rpx 24rpx;
 }
-.text_9 {
-  overflow-wrap: break-word;
+.coupon-name {
   color: rgba(0,0,0,0.85);
   font-size: 32rpx;
   font-family: PingFangSC-Medium;
@@ -211,42 +117,37 @@
   line-height: 45rpx;
   margin-right: 31rpx;
 }
-.text_10 {
-  overflow-wrap: break-word;
+.coupon-condition {
   color: rgba(0,0,0,0.45);
   font-size: 24rpx;
   font-family: PingFang-SC-Medium;
-  font-weight: normal;
   text-align: left;
   white-space: nowrap;
   line-height: 33rpx;
   margin: 16rpx 119rpx 0 0;
 }
-.text_11 {
-  overflow-wrap: break-word;
+.coupon-valid {
   color: rgba(0,0,0,0.45);
   font-size: 24rpx;
   font-family: PingFang-SC-Medium;
-  font-weight: normal;
   text-align: center;
   white-space: nowrap;
   line-height: 33rpx;
   margin-top: 8rpx;
 }
-.section_5 {
+.coupon-action {
   margin-left: 43rpx;
   display: flex;
   flex-direction: column;
 }
-.block_2 {
+.action-button {
   background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/028f44bcc05542e3ace976ddd57abf8a_mergeImage.png);
   display: flex;
   flex-direction: column;
   position: relative;
   padding: 81rpx 41rpx 83rpx 50rpx;
 }
-.text_12 {
-  overflow-wrap: break-word;
+.action-text {
   color: rgba(255,255,255,1);
   font-size: 36rpx;
   font-family: PingFangSC-Semibold;
@@ -255,373 +156,28 @@
   white-space: nowrap;
   line-height: 50rpx;
 }
-.image_4 {
+.action-divider {
   position: absolute;
   left: -1rpx;
   top: 17rpx;
   width: 2rpx;
   height: 175rpx;
 }
-.section_6 {
-  width: 690rpx;
-  background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngbdc12fa25c9dfa4c6ed83dd5a4e18f739835224678e31af649f2260a4c55b82c) 100% no-repeat;
-  background-size: 100% 100%;
-  padding-left: 32rpx;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-end;
-  margin: 20rpx 24rpx 0 30rpx;
-}
-.group_1 {
-  display: flex;
-  flex-direction: column;
-  margin: 39rpx 0 46rpx 0;
-}
-.text-wrapper_3 {
-  width: 105rpx;
-  height: 92rpx;
-  overflow-wrap: break-word;
-  font-size: 0rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_13 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 72rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_14 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  line-height: 93rpx;
-}
-.text_15 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 37rpx;
-  margin: 0 13rpx 0 14rpx;
-}
-.text-group_2 {
-  display: flex;
-  flex-direction: column;
-  margin: 40rpx 0 39rpx 24rpx;
-}
-.text_16 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 32rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 45rpx;
-  margin-right: 31rpx;
-}
-.text_17 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin: 16rpx 119rpx 0 0;
-}
-.text_18 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin-top: 8rpx;
-}
-.group_2 {
+
+/* 状态卡片右侧 */
+.coupon-status {
   margin-left: 43rpx;
   display: flex;
   flex-direction: column;
 }
-.box_2 {
-  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/2176ada780d94c38bd96996e648b53c4_mergeImage.png);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 81rpx 41rpx 83rpx 50rpx;
-}
-.text_19 {
-  overflow-wrap: break-word;
-  color: rgba(255,255,255,1);
-  font-size: 36rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 50rpx;
-}
-.image_5 {
-  position: absolute;
-  left: -1rpx;
-  top: 17rpx;
-  width: 2rpx;
-  height: 175rpx;
-}
-.section_7 {
-  width: 690rpx;
-  background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngbdc12fa25c9dfa4c6ed83dd5a4e18f739835224678e31af649f2260a4c55b82c) 100% no-repeat;
-  background-size: 100% 100%;
-  padding-left: 32rpx;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-end;
-  margin: 20rpx 24rpx 0 30rpx;
-}
-.block_3 {
-  display: flex;
-  flex-direction: column;
-  margin: 39rpx 0 46rpx 0;
-}
-.text-wrapper_4 {
-  width: 105rpx;
-  height: 92rpx;
-  overflow-wrap: break-word;
-  font-size: 0rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_20 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 72rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_21 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  line-height: 93rpx;
-}
-.text_22 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 37rpx;
-  margin: 0 13rpx 0 14rpx;
-}
-.text-group_3 {
-  display: flex;
-  flex-direction: column;
-  margin: 40rpx 0 39rpx 24rpx;
-}
-.text_23 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 32rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 45rpx;
-  margin-right: 31rpx;
-}
-.text_24 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin: 16rpx 119rpx 0 0;
-}
-.text_25 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin-top: 8rpx;
-}
-.block_4 {
-  margin-left: 43rpx;
-  display: flex;
-  flex-direction: column;
-}
-.block_5 {
-  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/607553c880df4f01a99861be3029ddb0_mergeImage.png);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 81rpx 41rpx 83rpx 50rpx;
-}
-.text_26 {
-  overflow-wrap: break-word;
-  color: rgba(255,255,255,1);
-  font-size: 36rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 50rpx;
-}
-.image_6 {
-  position: absolute;
-  left: -1rpx;
-  top: 17rpx;
-  width: 2rpx;
-  height: 175rpx;
-}
-.section_8 {
-  width: 690rpx;
-  background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngbdc12fa25c9dfa4c6ed83dd5a4e18f739835224678e31af649f2260a4c55b82c) 100% no-repeat;
-  background-size: 100% 100%;
-  padding-left: 32rpx;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-end;
-  margin: 20rpx 24rpx 0 30rpx;
-}
-.box_3 {
-  display: flex;
-  flex-direction: column;
-  margin: 39rpx 0 46rpx 0;
-}
-.text-wrapper_5 {
-  /* width: 105rpx; */
-  height: 92rpx;
-  overflow-wrap: break-word;
-  font-size: 0rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_27 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 72rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_28 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  line-height: 93rpx;
-}
-.text_29 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 37rpx;
-  margin: 0 13rpx 0 14rpx;
-}
-.text-group_4 {
-  display: flex;
-  flex-direction: column;
-  margin: 40rpx 0 39rpx 24rpx;
-}
-.text_30 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 32rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 45rpx;
-  margin-right: 31rpx;
-}
-.text_31 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin: 16rpx 119rpx 0 0;
-}
-.text_32 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin-top: 8rpx;
-}
-.box_4 {
-  margin-left: 43rpx;
-  display: flex;
-  flex-direction: column;
-}
-.group_3 {
+.status-badge {
   background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/ad4d0746744a49508d66455ecf229ebe_mergeImage.png);
   display: flex;
   flex-direction: column;
   position: relative;
   padding: 81rpx 41rpx 83rpx 50rpx;
 }
-.text_33 {
-  overflow-wrap: break-word;
+.status-text {
   color: rgba(255,255,255,1);
   font-size: 36rpx;
   font-family: PingFangSC-Semibold;
@@ -630,147 +186,16 @@
   white-space: nowrap;
   line-height: 50rpx;
 }
-.image_7 {
+.status-divider {
   position: absolute;
   left: -1rpx;
   top: 17rpx;
   width: 2rpx;
   height: 175rpx;
 }
-.thumbnail_1 {
-  width: 9rpx;
-  height: 17rpx;
-  margin: 114rpx 44rpx 0 691rpx;
-}
-.section_9 {
-  position: absolute;
-  left: 30rpx;
-  top: 1235rpx;
-  width: 690rpx;
-  height: 214rpx;
-  background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPngbdc12fa25c9dfa4c6ed83dd5a4e18f739835224678e31af649f2260a4c55b82c) 100% no-repeat;
-  background-size: 100% 100%;
-  padding-left: 32rpx;
-  flex-direction: row;
-  display: flex;
-  justify-content: flex-end;
-}
-.box_5 {
-  display: flex;
-  flex-direction: column;
-  margin: 39rpx 0 46rpx 0;
-}
-.text-wrapper_6 {
-  /* width: 105rpx; */
-  height: 92rpx;
-  overflow-wrap: break-word;
-  font-size: 0rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_34 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 72rpx;
-  font-family: DINPro-Bold;
-  font-weight: 700;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 93rpx;
-}
-.text_35 {
-  height: 92rpx;
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  line-height: 93rpx;
-}
-.text_36 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 26rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 37rpx;
-  margin: 0 13rpx 0 14rpx;
-}
-.text-group_5 {
-  display: flex;
-  flex-direction: column;
-  margin: 40rpx 0 39rpx 24rpx;
-}
-.text_37 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.85);
-  font-size: 32rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 45rpx;
-  margin-right: 31rpx;
-}
-.text_38 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: left;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin: 16rpx 119rpx 0 0;
-}
-.text_39 {
-  overflow-wrap: break-word;
-  color: rgba(0,0,0,0.45);
-  font-size: 24rpx;
-  font-family: PingFang-SC-Medium;
-  font-weight: normal;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 33rpx;
-  margin-top: 8rpx;
-}
-.box_6 {
-  margin-left: 43rpx;
-  display: flex;
-  flex-direction: column;
-}
-.group_4 {
-  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/b56086c6e7c4494097dac5a719a93e03_mergeImage.png);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 81rpx 41rpx 83rpx 50rpx;
-}
-.text_40 {
-  overflow-wrap: break-word;
-  color: rgba(255,255,255,1);
-  font-size: 36rpx;
-  font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  line-height: 50rpx;
-}
-.image_8 {
-  position: absolute;
-  left: -1rpx;
-  top: 17rpx;
-  width: 2rpx;
-  height: 175rpx;
-}
-.image_9 {
+
+/* 底部装饰 */
+.bottom-decoration {
   width: 750rpx;
   height: 68rpx;
   margin: 1556rpx 0 0 -750rpx;

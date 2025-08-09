@@ -5,7 +5,6 @@ const { Token } = require('../../models/token.js')
 Page({
   data: {
     gender: '',
-    
     // 体质问题相关数据
     questions: [], // 所有问题
     answers: {}, // 用户答案
@@ -79,16 +78,34 @@ Page({
     if (!question) return
     
     const isMultiSelect = question.question_type === 2
-    const currentSelected = isMultiSelect ? 
-      this.data.answers[question.id] || [] : 
-      []
-    
-    // 为多选问题预先计算每个选项的选中状态
-    let optionsWithStatus = question.options
+    const options = Array.isArray(question.options) ? question.options : []
+
+    // 读取已选答案
+    const savedValue = this.data.answers[question.id]
+
+    let currentSelected = []
     if (isMultiSelect) {
-      optionsWithStatus = question.options.map(option => ({
+      // 将已保存的答案（可能是字符串label数组或对象数组）统一转换为选项对象数组
+      const savedArray = Array.isArray(savedValue) ? savedValue : []
+      currentSelected = savedArray
+        .map(item => {
+          if (typeof item === 'string') {
+            return options.find(o => o.label === item)
+          }
+          if (item && typeof item === 'object' && 'label' in item) {
+            return options.find(o => o.label === item.label) || item
+          }
+          return null
+        })
+        .filter(Boolean)
+    }
+
+    // 为多选问题预先计算每个选项的选中状态
+    let optionsWithStatus = options
+    if (isMultiSelect) {
+      optionsWithStatus = options.map(option => ({
         ...option,
-        isSelected: currentSelected.some(selected => selected.label === option.label)
+        isSelected: currentSelected.some(sel => sel && sel.label === option.label)
       }))
     }
     
@@ -115,6 +132,7 @@ Page({
   onSingleOptionSelect(e) {
     const { index } = e.currentTarget.dataset
     const option = this.data.currentOptions[index]
+    if (!option) return
     const questionId = this.data.currentQuestion.id
     
     // 更新答案和显示文本
@@ -143,10 +161,14 @@ Page({
   onMultiOptionSelect(e) {
     const { index } = e.currentTarget.dataset
     const option = this.data.currentOptions[index]
+    if (!option) return
     const currentSelected = [...this.data.currentSelected]
     
-    // 切换选择状态
-    const optionIndex = currentSelected.findIndex(item => item.label === option.label)
+    // 切换选择状态（兼容字符串或对象）
+    const optionIndex = currentSelected.findIndex(item => {
+      if (!item) return false
+      return typeof item === 'string' ? item === option.label : item.label === option.label
+    })
     if (optionIndex > -1) {
       currentSelected.splice(optionIndex, 1)
     } else {
@@ -156,7 +178,10 @@ Page({
     // 更新选项的选中状态
     const currentOptions = this.data.currentOptions.map(opt => ({
       ...opt,
-      isSelected: currentSelected.some(selected => selected.label === opt.label)
+      isSelected: currentSelected.some(selected => {
+        if (!selected) return false
+        return typeof selected === 'string' ? selected === opt.label : selected.label === opt.label
+      })
     }))
     
     this.setData({

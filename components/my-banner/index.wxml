@@ -1,26 +1,35 @@
 <view class="container">
     <view class="inner-container">
-        <!-- 用户头像显示 -->
-        <l-avatar wx:if="{{userInfo && userInfo.avatarUrl}}" 
-                  size="140" class="avatar-container"
-                  l-class="avatar" shape="square"
-                  src="{{userInfo.avatarUrl}}"
-                  bind:tap="onAvatarTap">
-        </l-avatar>
-        
-        <!-- 默认头像 -->
-        <l-avatar wx:else
-                  size="140" class="avatar-container"
-                  l-class="avatar" shape="square"
-                  src="/imgs/logo.png"
-                  bind:tap="onAvatarTap">
-        </l-avatar>
-        
-        <!-- 用户昵称显示 -->
-        <view class="user-info-container">
-            <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text>
-            <text class="user-nickname" wx:else>点击头像登录</text>
+        <!-- 头像和昵称区域 -->
+        <view class="user-section">
+            <view class="avatar-wrapper">
+                <!-- 用户头像显示 -->
+                <l-avatar wx:if="{{userInfo && userInfo.avatarUrl}}" 
+                          size="140" class="avatar-container"
+                          l-class="avatar" shape="square"
+                          src="{{userInfo.avatarUrl}}"
+                          bind:tap="onAvatarTap">
+                </l-avatar>
+                
+                <!-- 默认头像 -->
+                <l-avatar wx:else
+                          size="140" class="avatar-container"
+                          l-class="avatar" shape="square"
+                          src="/imgs/logo.png"
+                          bind:tap="onAvatarTap">
+                </l-avatar>
+
+                <!-- 透明覆盖按钮：点击头像选择头像 -->
+                <button class="avatar-overlay-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar"></button>
+            </view>
+            
+            <!-- 用户昵称显示 -->
+            <view class="user-info-container">
+                <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text>
+                <text class="user-nickname" wx:else>点击头像登录</text>
+            </view>
         </view>
+        
         <l-button wx:if="{{showLoginBtn}}" l-class="auth-btn"
                   bg-color="#DCEBE6"
                   open-type="getUserInfo"

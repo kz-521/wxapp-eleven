@@ -241,7 +241,6 @@ page {
 /* 当前门店区域 */
 .store-card {
   width: 650rpx;
-  height: 321rpx;
   background: #F9F8FA;
   border-radius: 4rpx;
   padding: 27rpx 30rpx 30rpx 30rpx;
@@ -307,4 +306,15 @@ page {
 
 .wx-swiper-dot-active {
   background: #000000;
+}
+
+/* 顶部logo区域 */
+.logo-wrapper {
+  margin: 226rpx 0 40rpx 0;
+  display: flex;
+  justify-content: center;
+}
+.logo-image {
+  width: 387rpx;
+  height: 338rpx;
 }

@@ -51,32 +51,6 @@ class Spu {
         }
         return null
     }
-
-    /**
-     * 获取默认推荐数据（API失败时的备用数据）
-     */
-    static getDefaultRecommendData() {
-        return [
-            {
-                id: 1,
-                name: '清照竹影茶',
-                price: '32',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                id: 2,
-                name: '苦瓜单丛',
-                price: '36',
-                image: '/imgs/home/drink-item.png'
-            },
-            {
-                id: 3,
-                name: '兰花银针',
-                price: '34',
-                image: '/imgs/home/drink-item.png'
-            }
-        ]
-    }
 }
 
 export {

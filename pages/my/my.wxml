@@ -1,8 +1,8 @@
 
-<view class="container">
-    <s-my-banner coupon-count="{{couponCount}}" balance="{{balance}}" bind:userInfoUpdated="onUserInfoUpdated"></s-my-banner>
+<view class="my-page w">
+    <s-my-banner id="my-banner" coupon-count="{{couponCount}}" balance="{{balance}}" bind:userInfoUpdated="onUserInfoUpdated"></s-my-banner>
 
-    <view class="main-container">
+    <view class="my-content">
         <s-my-order-panel></s-my-order-panel>
 
         <view class="list">

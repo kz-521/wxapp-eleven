@@ -26,14 +26,39 @@
     color: #157658 !important;
 }
 
+/* 头像和昵称区域 */
+.user-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10rpx 0;
+    gap: 30rpx;
+}
+.avatar-wrapper {
+    position: relative;
+    width: 140rpx;
+    height: 140rpx;
+}
+.avatar-overlay-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 140rpx;
+    height: 140rpx;
+    background: transparent;
+    border: none;
+    padding: 0;
+    opacity: 0;
+}
+
 .row-top{
 }
 
 .avatar-container{
     position: relative;
-    top:-18rpx;
     cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .avatar-container:active {
@@ -46,16 +71,13 @@
 }
 
 .user-info-container {
-    position: absolute;
-    top: 120rpx;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .user-nickname {
-    font-size: 28rpx;
+    font-size: 32rpx;
     color: #333333;
     font-weight: 500;
     line-height: 1.2;
@@ -76,6 +98,11 @@
     display:flex;
     flex-direction:row;
     justify-content: center;
+    position: absolute;
+    bottom: 20rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
 }
 
 .bottom-container{

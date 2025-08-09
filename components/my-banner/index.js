@@ -26,16 +26,16 @@ Component({
 
     lifetimes: {
         async attached() {
-            console.log('my-banner组件初始化')
-            console.log('优惠券数量:', this.properties.couponCount)
-            console.log('余额:', this.properties.balance)
+            // console.log('my-banner组件初始化')
+            // console.log('优惠券数量:', this.properties.couponCount)
+            // console.log('余额:', this.properties.balance)
             
             // 检查用户信息状态
             const userInfo = wx.getStorageSync('userInfo')
             const hasAuth = await this.hasAuthUserInfo()
             
-            console.log('用户信息:', userInfo)
-            console.log('授权状态:', hasAuth)
+            // console.log('用户信息:', userInfo)
+            // console.log('授权状态:', hasAuth)
             
             // 设置用户信息到组件数据
             this.setData({
@@ -48,23 +48,23 @@ Component({
                     showLoginBtn: false,
                     userInfo: userInfo
                 })
-                console.log('用户信息完整，隐藏登录按钮')
+                // console.log('用户信息完整，隐藏登录按钮')
             } else {
                 this.setData({
                     showLoginBtn: true,
                     userInfo: null
                 })
-                console.log('用户信息不完整，显示登录按钮')
+                // console.log('用户信息不完整，显示登录按钮')
             }
         }
     },
 
     observers:{
         'couponCount':function (couponCount) {
-            console.log('my-banner组件接收到优惠券数量更新:', couponCount)
+            // console.log('my-banner组件接收到优惠券数量更新:', couponCount)
         },
         'balance':function (balance) {
-            console.log('my-banner组件接收到余额更新:', balance)
+            // console.log('my-banner组件接收到余额更新:', balance)
         }
     },
 
@@ -76,15 +76,15 @@ Component({
          * 点击头像事件
          */
         onAvatarTap() {
-            console.log('点击头像，开始用户信息授权流程')
+            // console.log('点击头像，开始用户信息授权流程')
             
             // 检查是否已经有完整的用户信息
             const userInfo = wx.getStorageSync('userInfo')
-            console.log('当前存储的用户信息:', userInfo)
-            console.log('当前组件状态:', this.data)
+            // console.log('当前存储的用户信息:', userInfo)
+            // console.log('当前组件状态:', this.data)
             
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
-                console.log('用户信息已完整，显示用户信息')
+                // console.log('用户信息已完整，显示用户信息')
                 wx.showToast({
                     title: '用户信息已授权',
                     icon: 'success',
@@ -93,7 +93,7 @@ Component({
                 return
             }
 
-            console.log('用户信息不完整，开始授权流程')
+            // console.log('用户信息不完整，开始授权流程')
             
             // 显示授权提示
             wx.showModal({
@@ -104,7 +104,7 @@ Component({
                         // 用户确认授权，开始获取用户信息
                         this.getUserProfile()
                     } else {
-                        console.log('用户取消授权')
+                        // console.log('用户取消授权')
                         wx.showToast({
                             title: '您取消了授权',
                             icon: 'none',
@@ -121,11 +121,11 @@ Component({
         async checkAndGetUserInfo() {
             const userInfo = wx.getStorageSync('userInfo')
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
-                console.log('用户信息已完整，无需重新授权')
+                // console.log('用户信息已完整，无需重新授权')
                 return
             }
 
-            console.log('用户信息不完整，开始授权流程')
+            // console.log('用户信息不完整，开始授权流程')
             // 先尝试一次性获取用户信息
             this.getUserProfile()
         },
@@ -134,19 +134,19 @@ Component({
          * 一次性获取用户信息
          */
         getUserProfile() {
-            console.log('尝试一次性获取用户信息')
+            // console.log('尝试一次性获取用户信息')
             wx.getUserProfile({
                 desc: '用于完善用户资料',
                 success: (res) => {
-                    console.log('一次性获取用户信息成功:', res.userInfo)
+                    // console.log('一次性获取用户信息成功:', res.userInfo)
                     this.handleUserInfoSuccess(res.userInfo)
                 },
                 fail: (err) => {
-                    console.error('一次性获取用户信息失败:', err)
+                    // console.error('一次性获取用户信息失败:', err)
                     if (err.errMsg.includes('cancel')) {
                         wx.showToast({ title: '用户取消授权', icon: 'none' })
                     } else {
-                        console.log('尝试分别授权获取用户信息')
+                        // console.log('尝试分别授权获取用户信息')
                         // 如果一次性获取失败，尝试分别授权
                         this.getUserInfoSeparately()
                     }
@@ -158,28 +158,15 @@ Component({
          * 分别授权获取用户信息
          */
         getUserInfoSeparately() {
-            console.log('开始分别授权获取用户信息')
+            // console.log('开始分别授权获取用户信息')
             
-            // 先获取头像
-            wx.chooseAvatar({
-                success: (res) => {
-                    console.log('获取头像成功:', res.avatarUrl)
-                    const userInfo = wx.getStorageSync('userInfo') || {}
-                    userInfo.avatarUrl = res.avatarUrl
-                    wx.setStorageSync('userInfo', userInfo)
-                    
-                    // 获取头像成功后，再获取昵称
-                    this.getNickName()
-                },
-                fail: (err) => {
-                    console.error('获取头像失败:', err)
-                    if (err.errMsg.includes('cancel')) {
-                        wx.showToast({ title: '用户取消头像授权', icon: 'none' })
-                    } else {
-                        wx.showToast({ title: '获取头像失败', icon: 'none' })
-                    }
-                }
-            })
+            // 由于wx.chooseAvatar不兼容，直接获取昵称并使用默认头像
+            const userInfo = wx.getStorageSync('userInfo') || {}
+            userInfo.avatarUrl = '/imgs/logo.png' // 使用默认头像
+            wx.setStorageSync('userInfo', userInfo)
+            
+            // 直接获取昵称
+            this.getNickName()
         },
 
         /**
@@ -193,7 +180,7 @@ Component({
                 placeholderText: '请输入昵称',
                 success: (res) => {
                     if (res.confirm && res.content) {
-                        console.log('用户输入昵称:', res.content)
+                        // console.log('用户输入昵称:', res.content)
                         const userInfo = wx.getStorageSync('userInfo') || {}
                         userInfo.nickName = res.content
                         wx.setStorageSync('userInfo', userInfo)
@@ -211,7 +198,7 @@ Component({
          * 完成用户信息获取
          */
         completeUserInfo(userInfo) {
-            console.log('完成用户信息获取:', userInfo)
+            // console.log('完成用户信息获取:', userInfo)
             this.handleUserInfoSuccess(userInfo)
         },
 
@@ -220,18 +207,13 @@ Component({
          */
         async handleUserInfoSuccess(userInfo) {
             try {
-                console.log('处理用户信息成功:', userInfo)
+                // console.log('处理用户信息成功:', userInfo)
                 
                 // 保存用户信息到本地存储
                 wx.setStorageSync('userInfo', userInfo)
                 
                 // 更新组件状态
                 this.setData({
-                    showLoginBtn: false,
-                    userInfo: userInfo
-                })
-
-                console.log('组件状态已更新:', {
                     showLoginBtn: false,
                     userInfo: userInfo
                 })
@@ -244,14 +226,14 @@ Component({
                 // 调用User模型更新用户信息
                 const success = await User.updateUserInfo(userInfo)
                 if (success) {
-                    console.log('用户信息更新到服务器成功')
+                    // console.log('用户信息更新到服务器成功')
                 }
                 
                 // 通知父组件用户信息已更新
                 this.triggerEvent('userInfoUpdated', { userInfo })
                 
             } catch (error) {
-                console.error('处理用户信息失败:', error)
+                // console.error('处理用户信息失败:', error)
                 wx.showToast({ 
                     title: '获取用户信息失败', 
                     icon: 'none' 
@@ -263,27 +245,27 @@ Component({
          * 刷新用户信息状态
          */
         refreshUserInfo() {
-            console.log('刷新用户信息状态')
+            // console.log('刷新用户信息状态')
             const userInfo = wx.getStorageSync('userInfo')
-            console.log('从本地存储获取的用户信息:', userInfo)
+            // console.log('从本地存储获取的用户信息:', userInfo)
             
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
                 this.setData({
                     showLoginBtn: false,
                     userInfo: userInfo
                 })
-                console.log('用户信息完整，隐藏登录按钮，更新用户信息')
+                // console.log('用户信息完整，隐藏登录按钮，更新用户信息')
             } else {
                 this.setData({
                     showLoginBtn: true,
                     userInfo: null
                 })
-                console.log('用户信息不完整，显示登录按钮，清空用户信息')
+                // console.log('用户信息不完整，显示登录按钮，清空用户信息')
             }
         },
 
         async onAuthUserInfo(event) {
-            console.log(event.detail)
+            // console.log(event.detail)
             if (event.detail.userInfo) {
                 this.handleUserInfoSuccess(event.detail.userInfo)
             }
@@ -307,6 +289,29 @@ Component({
                 icon: 'none',
                 duration: 2000
             })
+        },
+
+        /**
+         * 选择头像回调（微信开放能力）
+         */
+        onChooseAvatar(e) {
+            try {
+                const avatarUrl = e.detail && e.detail.avatarUrl
+                if (!avatarUrl) {
+                    wx.showToast({ title: '未选择头像', icon: 'none' })
+                    return
+                }
+                const userInfo = wx.getStorageSync('userInfo') || {}
+                userInfo.avatarUrl = avatarUrl
+                wx.setStorageSync('userInfo', userInfo)
+                this.setData({ userInfo, showLoginBtn: !(userInfo && userInfo.nickName) })
+                wx.showToast({ title: '头像已更新', icon: 'success' })
+                // 通知父组件已更新
+                this.triggerEvent('userInfoUpdated', { userInfo })
+            } catch (err) {
+                // console.error('选择头像失败:', err)
+                wx.showToast({ title: '选择头像失败', icon: 'none' })
+            }
         }
     }
 })

@@ -1,5 +1,5 @@
 .page {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   position: relative;
   width: 750rpx;
   height: 1624rpx;
@@ -227,7 +227,7 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_2 {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;
@@ -302,7 +302,7 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_3 {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;
@@ -426,7 +426,7 @@ border-radius: 4rpx;
   height: 17rpx;
 }
 .box_3 {
-  background-color: rgba(255,255,255,1.000000);
+  background-color: rgba(255,255,255,1);
   border-radius: 4rpx;
   position: absolute;
   left: 30rpx;
@@ -501,7 +501,7 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_4 {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;
@@ -559,7 +559,7 @@ border-radius: 4rpx;
   margin-top: 2rpx;
 }
 .group_4 {
-  background-color: rgba(255,255,255,1.000000);
+  background-color: rgba(255,255,255,1);
   border-radius: 4rpx;
   position: absolute;
   left: 30rpx;
@@ -634,7 +634,7 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_5 {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;
@@ -710,7 +710,7 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_6 {
-  background-color: rgba(249,248,250,1.000000);
+  background-color: rgba(249,248,250,1);
   border-radius: 4rpx;
   display: flex;
   flex-direction: column;

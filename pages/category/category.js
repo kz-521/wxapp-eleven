@@ -423,7 +423,7 @@ Page({
     const defaultCategories = Category.getDefaultCategoryData()
     this.setData({
       categories: defaultCategories,
-      sectionTitle: defaultCategories[0]?.name || '本草滋养茶·9种体质'
+      sectionTitle: (defaultCategories && defaultCategories[0] && defaultCategories[0].name) ? defaultCategories[0].name : '本草滋养茶·9种体质'
     })
   },
 
@@ -443,7 +443,7 @@ Page({
     }
 
     // 根据分类加载商品数据
-    const categoryId = categories[index]?.id || (Number(index) + 1) // 使用真实分类ID
+    const categoryId = (categories && categories[index] && categories[index].id) ? categories[index].id : (Number(index) + 1) // 使用真实分类ID
     this.loadProductsByCategory(categoryId)
   },
 
@@ -623,7 +623,9 @@ Page({
       }
       
       // 计算初始价格（包含默认选项的额外费用）
-      let initialPrice = parseFloat(detail.discount_price || detail.price)
+      // let initialPrice = parseFloat(detail.discount_price || detail.price)
+
+      let initialPrice = parseFloat(detail.skuList[0].price || detail.price)
       if (detail.order_options && detail.order_options.length > 0) {
         detail.order_options.forEach(option => {
           const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
@@ -683,7 +685,9 @@ Page({
     if (!product) return
     
     // 基础价格
-    let basePrice = parseFloat(product.discount_price || product.originalPrice)
+    // let basePrice = parseFloat(product.discount_price || product.originalPrice)
+
+    let basePrice = parseFloat(product.skuList[0].price || product.originalPrice)
     
     // 加上选项的额外费用
     if (product.order_options && product.order_options.length > 0) {
@@ -742,7 +746,9 @@ Page({
     }
 
     // 计算单价（不包含数量）
-    let unitPrice = parseFloat(product.discount_price || product.originalPrice)
+    // let unitPrice = parseFloat(product.discount_price || product.originalPrice)
+    let unitPrice = parseFloat(product.skuList[0].price || product.originalPrice)
+   
     if (product.order_options && product.order_options.length > 0) {
       product.order_options.forEach(option => {
         const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])

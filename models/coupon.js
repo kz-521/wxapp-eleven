@@ -33,6 +33,24 @@ class Coupon {
     }
 
     /**
+     * iOS安全的日期解析
+     */
+    static parseDateSafe(dateString) {
+        if (!dateString || typeof dateString !== 'string') return null
+        // 去掉毫秒和时区，替换为 iOS 可识别格式
+        let s = dateString.replace(/T/g, ' ').split('.')[0]
+        // 形如 2025-12-31 23:59:59 或 2025-12-31
+        s = s.replace(/-/g, '/')
+        try {
+            const d = new Date(s)
+            if (isNaN(d.getTime())) return null
+            return d
+        } catch (e) {
+            return null
+        }
+    }
+
+    /**
      * 处理优惠券数据，按状态分类
      */
     static processCouponsData(response) {
@@ -41,7 +59,7 @@ class Coupon {
         const expiredCoupons = []
 
         // 检查响应数据结构
-        const coupons = response?.result?.data || []
+        const coupons = (response && response.result && response.result.data) ? response.result.data : []
         
         coupons.forEach(item => {
             const couponData = Coupon.formatCouponData(item)
@@ -50,12 +68,15 @@ class Coupon {
             if (item.status === 1) {
                 // 未使用 - 还需要检查是否过期
                 const now = new Date()
-                const endTime = new Date(item.coupon.end_time)
+                const endTime = Coupon.parseDateSafe(item.coupon && item.coupon.end_time)
                 
-                if (now <= endTime) {
+                if (endTime && now <= endTime) {
                     availableCoupons.push(couponData)
-                } else {
+                } else if (endTime && now > endTime) {
                     expiredCoupons.push(couponData)
+                } else {
+                    // 无法解析时间，默认当作可用
+                    availableCoupons.push(couponData)
                 }
             } else {
                 // 已使用或其他状态
@@ -93,13 +114,17 @@ class Coupon {
             condition = '全场通用'
         }
 
+        // iOS安全显示日期（仅显示日期部分）
+        const start = (coupon.start_time || '').split(' ')[0] || ''
+        const end = (coupon.end_time || '').split(' ')[0] || ''
+
         return {
             id: item.id,
             coupon_id: coupon.id,
             name: coupon.title,
             amount: amount,
             condition: condition,
-            validDate: `${coupon.start_time.split(' ')[0]} - ${coupon.end_time.split(' ')[0]}`,
+            validDate: `${start} - ${end}`,
             status: item.status,
             type: coupon.type,
             rate: coupon.rate,

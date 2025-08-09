@@ -41,13 +41,12 @@ const request = (options) => {
       data: options.data || {},
       header: headers,
       success: (res) => {
-        console.log('API响应 - URL:', options.url, 'Status:', res.statusCode, 'Data:', res.data)
         if (res.statusCode === 200) {
           resolve(res.data)
         } else {
           reject({
             code: res.statusCode,
-            message: res.data?.message || '请求失败'
+            message: (res.data && res.data.message) ? res.data.message : '请求失败'
           })
         }
       },

@@ -11,9 +11,6 @@ Component({
      * 组件的初始数据
      */
     data: {
-        unpaidCount: 0,
-        paidCount: 0,
-        deliveredCount: 0
     },
 
     lifetimes: {
@@ -23,14 +20,6 @@ Component({
 
     pageLifetimes: {
         async show() {
-            const unpaidCount = await Order.getUnpaidCount()
-            const paidCount = await Order.getPaidCount()
-            const deliveredCount = await Order.getDeliveredCount()
-            this.setData({
-                unpaidCount,
-                paidCount,
-                deliveredCount
-            })
         }
     },
 

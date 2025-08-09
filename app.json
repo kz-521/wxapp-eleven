@@ -47,6 +47,9 @@
     }
   },
   "sitemapLocation": "sitemap.json",
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "usingComponents": {
       "s-empty": "/components/empty/index",
       "l-badge": "/miniprogram_npm/lin-ui/badge/index",

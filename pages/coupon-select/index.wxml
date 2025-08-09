@@ -1,79 +1,85 @@
-<view class="page">
-  <view class="box_1">
-    <view class="block_1">
+<view class="coupon-page w">
+  <view class="page-body w">
+    <view class="coupon-content">
       <!-- 头部标签 -->
-      <view class="text-wrapper_1">
-        <text lines="1" class="text_3 {{activeTab === 'available' ? 'active' : ''}}" bindtap="switchTab" data-tab="available">未使用</text>
-        <text lines="1" class="text_4 {{activeTab === 'used' ? 'active' : ''}}" bindtap="switchTab" data-tab="used">已使用</text>
-        <text lines="1" class="text_5 {{activeTab === 'expired' ? 'active' : ''}}" bindtap="switchTab" data-tab="expired">已过期</text>
+      <view class="tabs flexb">
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="available">
+          <text class="tab-item {{activeTab === 'available' ? 'active' : ''}}">未使用</text>
+          <image wx:if="{{activeTab === 'available'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="used">
+          <text class="tab-item {{activeTab === 'used' ? 'active' : ''}}">已使用</text>
+          <image wx:if="{{activeTab === 'used'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="expired">
+          <text class="tab-item {{activeTab === 'expired' ? 'active' : ''}}">已过期</text>
+          <image wx:if="{{activeTab === 'expired'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
       </view>
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
       
       <!-- 可用优惠券 -->
-      <view class="section_3" wx:if="{{activeTab === 'available'}}" wx:for="{{availableCoupons}}" wx:key="id">
-        <view class="section_4">
-                     <view class="text-wrapper_2">
-             <text lines="1" class="text_6">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
-           </view>
-          <text lines="1" class="text_8">优惠劵</text>
+      <view class="coupon-card flex" wx:if="{{activeTab === 'available'}}" wx:for="{{availableCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-wrap">
+            <text lines="1" class="coupon-left-amount">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+          </view>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
         </view>
-        <view class="text-group_1">
-          <text lines="1" class="text_9">{{item.name}}</text>
-          <text lines="1" class="text_10">{{item.condition}}</text>
-          <text lines="1" decode="true" class="text_11">{{item.validDate}}</text>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
         </view>
-        <view class="section_5">
-          <view class="block_2" bindtap="useCoupon" data-coupon="{{item}}">
-            <text lines="1" class="text_12">去使用</text>
-            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_4"></image>
+        <view class="coupon-action">
+          <view class="action-button" bindtap="useCoupon" data-coupon="{{item}}">
+            <text lines="1" class="action-text">去使用</text>
+            <image src="/imgs/item-bottom.png" class="action-divider"></image>
           </view>
         </view>
       </view>
       
       <!-- 已使用优惠券 -->
-      <view class="section_3" wx:if="{{activeTab === 'used'}}" wx:for="{{usedCoupons}}" wx:key="id">
-        <view class="box_3">
-          <view class="text-wrapper_5">
-            <text lines="1" class="text_6">{{item.amount}}</text>
-            <text lines="1" class="text_7">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+      <view class="coupon-card flex" wx:if="{{activeTab === 'used'}}" wx:for="{{usedCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-group">
+            <text lines="1" class="coupon-left-amount-large">{{item.amount}}</text>
+            <text lines="1" class="coupon-left-unit">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
           </view>
-          <text lines="1" class="text_8">优惠劵</text>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
         </view>
-        <view class="text-group_4">
-          <text lines="1" class="text_30">{{item.name}}</text>
-          <text lines="1" class="text_31">{{item.condition}}</text>
-          <text lines="1" decode="true" class="text_32">{{item.validDate}}</text>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
         </view>
-        <view class="box_4">
-          <view class="group_3">
-            <text lines="1" class="text_33">已使用</text>
-            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_7"></image>
+        <view class="coupon-status">
+          <view class="status-badge">
+            <text lines="1" class="status-text">已使用</text>
           </view>
         </view>
       </view>
       
       <!-- 已过期优惠券 -->
-      <view class="section_3" wx:if="{{activeTab === 'expired'}}" wx:for="{{expiredCoupons}}" wx:key="id">
-        <view class="box_5">
-          <view class="text-wrapper_6">
-            <text lines="1" class="text_6">{{item.amount}}</text>
-            <text lines="1" class="text_7">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+      <view class="coupon-card flex" wx:if="{{activeTab === 'expired'}}" wx:for="{{expiredCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-group">
+            <text lines="1" class="coupon-left-amount-large">{{item.amount}}</text>
+            <text lines="1" class="coupon-left-unit">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
           </view>
-          <text lines="1" class="text_8">优惠劵</text>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
         </view>
-        <view class="text-group_5">
-          <text lines="1" class="text_37">{{item.name}}</text>
-          <text lines="1" class="text_38">{{item.condition}}</text>
-          <text lines="1" decode="true" class="text_39">{{item.validDate}}</text>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
         </view>
-        <view class="box_6">
-          <view class="group_4">
-            <text lines="1" class="text_40">已过期</text>
-            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng8eda5532b9d025fc31dcd35218968131335fe4953b07fc5e8399e2e70f0c98de" class="image_8"></image>
+        <view class="coupon-status">
+          <view class="status-badge">
+            <text lines="1" class="status-text">已过期</text>
+            <image src="/imgs/item-bottom.png" class="action-divider"></image>
           </view>
         </view>
       </view>
     </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_9"></image>
   </view>
 </view>

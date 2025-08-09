@@ -117,28 +117,6 @@ class Order {
         return orderPage.total
     }
 
-    static async getUnpaidCount() {
-        const orderPage = await Http.request({
-            url: `order/status/unpaid`,
-            data:{
-                start:0,
-                count:1
-            }
-        })
-        return orderPage.total
-    }
-
-    static async getDeliveredCount() {
-        const orderPage = await Http.request({
-            url: `order/by/status/${OrderStatus.DELIVERED}`,
-            data: {
-                start:0,
-                count:1
-            }
-        })
-        return orderPage.total
-    }
-
     static getPagingCanceled() {
         return new Paging({
             url:`order/status/canceled`
@@ -158,13 +136,6 @@ class Order {
         // return Http.request({
         // })
     }
-
-    static getPagingUnpaid() {
-        return new Paging({
-            url:`order/by/status/2`
-        })
-    }
-
     /**
      * 获取订单列表（新API）
      * @param {number} page 页码，默认1
