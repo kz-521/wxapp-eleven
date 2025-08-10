@@ -26,19 +26,9 @@ Component({
 
     lifetimes: {
         async attached() {
-            // console.log('my-banner组件初始化')
-            // console.log('优惠券数量:', this.properties.couponCount)
-            // console.log('余额:', this.properties.balance)
-            
-            // 清除可能存在的模拟手机号数据
-            this.clearMockPhoneNumber()
-            
             // 检查用户信息状态
             const userInfo = wx.getStorageSync('userInfo')
             const hasAuth = await this.hasAuthUserInfo()
-            
-            // console.log('用户信息:', userInfo)
-            // console.log('授权状态:', hasAuth)
             
             // 设置用户信息到组件数据
             this.setData({
@@ -51,13 +41,11 @@ Component({
                     showLoginBtn: false,
                     userInfo: userInfo
                 })
-                // console.log('用户信息完整，隐藏登录按钮')
             } else {
                 this.setData({
                     showLoginBtn: true,
                     userInfo: null
                 })
-                // console.log('用户信息不完整，显示登录按钮')
             }
         }
     },
@@ -76,155 +64,13 @@ Component({
      */
     methods: {
         /**
-         * 清除模拟手机号数据
-         */
-        clearMockPhoneNumber() {
-            const userInfo = wx.getStorageSync('userInfo')
-            if (userInfo) {
-                // 如果存在模拟手机号，清除它
-                if (userInfo.phoneNumber === '138****8888' || userInfo.purePhoneNumber === '13888888888') {
-                    delete userInfo.phoneNumber
-                    delete userInfo.purePhoneNumber
-                    delete userInfo.countryCode
-                    wx.setStorageSync('userInfo', userInfo)
-                    this.setData({
-                        userInfo: userInfo
-                    })
-                    console.log('已清除模拟手机号数据')
-                }
-            }
-        },
-
-        /**
-         * 获取手机号
-         */
-        async onGetPhoneNumber(event) {
-            console.log('获取手机号事件:', event)
-            
-            if (event.detail.errMsg === 'getPhoneNumber:ok') {
-                try {
-                    wx.showLoading({
-                        title: '获取手机号中...'
-                    })
-                    
-                    // 获取code
-                    const { code } = event.detail
-                    console.log('手机号授权code:', code)
-                    
-                    // 调用后端接口解密手机号
-                    const phoneResult = await this.decryptPhoneNumber(code)
-                    
-                    console.log('解密后的手机号结果:', phoneResult)
-                    
-                    if (phoneResult && (phoneResult.phoneNumber || phoneResult.purePhoneNumber)) {
-                        // 优先使用phoneNumber，如果没有则使用purePhoneNumber
-                        const displayPhone = phoneResult.phoneNumber || phoneResult.purePhoneNumber
-                        
-                        // 更新用户信息
-                        const userInfo = wx.getStorageSync('userInfo') || {}
-                        userInfo.phoneNumber = displayPhone
-                        userInfo.purePhoneNumber = phoneResult.purePhoneNumber || displayPhone
-                        userInfo.countryCode = phoneResult.countryCode || '86'
-                        
-                        // 保存到本地存储
-                        wx.setStorageSync('userInfo', userInfo)
-                        
-                        // 更新组件数据
-                        this.setData({
-                            userInfo: userInfo
-                        })
-                        
-                        // 触发父组件更新事件
-                        this.triggerEvent('userInfoUpdated', {
-                            userInfo: userInfo
-                        })
-                        
-                        wx.hideLoading()
-                        wx.showToast({
-                            title: '手机号绑定成功',
-                            icon: 'success'
-                        })
-                        
-                        console.log('手机号绑定成功:', displayPhone)
-                    } else {
-                        throw new Error('获取手机号失败：返回数据格式不正确')
-                    }
-                } catch (error) {
-                    wx.hideLoading()
-                    console.error('获取手机号失败:', error)
-                    
-                    // 根据错误类型显示不同的提示
-                    let errorMessage = '获取手机号失败'
-                    if (error.message.includes('网络')) {
-                        errorMessage = '网络连接失败，请检查网络后重试'
-                    } else if (error.message.includes('解密')) {
-                        errorMessage = '手机号解密失败，请重试'
-                    } else if (error.message.includes('后端')) {
-                        errorMessage = '服务器暂时不可用，请稍后重试'
-                    }
-                    
-                    wx.showToast({
-                        title: errorMessage,
-                        icon: 'none',
-                        duration: 3000
-                    })
-                }
-            } else {
-                console.log('用户拒绝授权手机号:', event.detail.errMsg)
-                wx.showToast({
-                    title: '需要授权手机号才能继续',
-                    icon: 'none'
-                })
-            }
-        },
-
-        /**
-         * 解密手机号
-         */
-        async decryptPhoneNumber(code) {
-            try {
-                // 导入API工具
-                const { api } = require('../../utils/api.js')
-                
-                // 调用后端接口解密手机号
-                const response = await api.decryptPhoneNumber(code)
-                
-                console.log('手机号解密响应:', response)
-                
-                if (response && response.code === 0 && response.result) {
-                    // 确保返回的数据包含手机号
-                    const phoneData = response.result
-                    if (phoneData.phoneNumber || phoneData.purePhoneNumber) {
-                        return {
-                            phoneNumber: phoneData.phoneNumber || phoneData.purePhoneNumber,
-                            purePhoneNumber: phoneData.purePhoneNumber || phoneData.phoneNumber,
-                            countryCode: phoneData.countryCode || '86'
-                        }
-                    } else {
-                        throw new Error('返回数据中不包含手机号')
-                    }
-                } else {
-                    throw new Error(response.msg || '解密手机号失败')
-                }
-            } catch (error) {
-                console.error('解密手机号失败:', error)
-                throw error // 重新抛出错误，让调用方处理
-            }
-        },
-
-        /**
          * 点击头像事件
          */
         onAvatarTap() {
-            // console.log('点击头像，开始用户信息授权流程')
-            
             // 检查是否已经有完整的用户信息
             const userInfo = wx.getStorageSync('userInfo')
-            // console.log('当前存储的用户信息:', userInfo)
-            // console.log('当前组件状态:', this.data)
             
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
-                // console.log('用户信息已完整，显示用户信息')
                 wx.showToast({
                     title: '用户信息已授权',
                     icon: 'success',
@@ -233,8 +79,6 @@ Component({
                 return
             }
 
-            // console.log('用户信息不完整，开始授权流程')
-            
             // 显示授权提示
             wx.showModal({
                 title: '授权提示',
@@ -244,7 +88,6 @@ Component({
                         // 用户确认授权，开始获取用户信息
                         this.getUserProfile()
                     } else {
-                        // console.log('用户取消授权')
                         wx.showToast({
                             title: '您取消了授权',
                             icon: 'none',
@@ -261,11 +104,9 @@ Component({
         async checkAndGetUserInfo() {
             const userInfo = wx.getStorageSync('userInfo')
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
-                // console.log('用户信息已完整，无需重新授权')
                 return
             }
 
-            // console.log('用户信息不完整，开始授权流程')
             // 先尝试一次性获取用户信息
             this.getUserProfile()
         },
@@ -274,19 +115,15 @@ Component({
          * 一次性获取用户信息
          */
         getUserProfile() {
-            // console.log('尝试一次性获取用户信息')
             wx.getUserProfile({
                 desc: '用于完善用户资料',
                 success: (res) => {
-                    // console.log('一次性获取用户信息成功:', res.userInfo)
                     this.handleUserInfoSuccess(res.userInfo)
                 },
                 fail: (err) => {
-                    // console.error('一次性获取用户信息失败:', err)
                     if (err.errMsg.includes('cancel')) {
                         wx.showToast({ title: '用户取消授权', icon: 'none' })
                     } else {
-                        // console.log('尝试分别授权获取用户信息')
                         // 如果一次性获取失败，尝试分别授权
                         this.getUserInfoSeparately()
                     }
@@ -298,8 +135,6 @@ Component({
          * 分别授权获取用户信息
          */
         getUserInfoSeparately() {
-            // console.log('开始分别授权获取用户信息')
-            
             // 由于wx.chooseAvatar不兼容，直接获取昵称并使用默认头像
             const userInfo = wx.getStorageSync('userInfo') || {}
             userInfo.avatarUrl = '/imgs/logo.png' // 使用默认头像
@@ -320,7 +155,6 @@ Component({
                 placeholderText: '请输入昵称',
                 success: (res) => {
                     if (res.confirm && res.content) {
-                        // console.log('用户输入昵称:', res.content)
                         const userInfo = wx.getStorageSync('userInfo') || {}
                         userInfo.nickName = res.content
                         wx.setStorageSync('userInfo', userInfo)
@@ -338,7 +172,6 @@ Component({
          * 完成用户信息获取
          */
         completeUserInfo(userInfo) {
-            // console.log('完成用户信息获取:', userInfo)
             this.handleUserInfoSuccess(userInfo)
         },
 
@@ -347,8 +180,6 @@ Component({
          */
         async handleUserInfoSuccess(userInfo) {
             try {
-                // console.log('处理用户信息成功:', userInfo)
-                
                 // 保存用户信息到本地存储
                 wx.setStorageSync('userInfo', userInfo)
                 
@@ -373,7 +204,6 @@ Component({
                 this.triggerEvent('userInfoUpdated', { userInfo })
                 
             } catch (error) {
-                // console.error('处理用户信息失败:', error)
                 wx.showToast({ 
                     title: '获取用户信息失败', 
                     icon: 'none' 
@@ -385,27 +215,22 @@ Component({
          * 刷新用户信息状态
          */
         refreshUserInfo() {
-            // console.log('刷新用户信息状态')
             const userInfo = wx.getStorageSync('userInfo')
-            // console.log('从本地存储获取的用户信息:', userInfo)
             
             if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
                 this.setData({
                     showLoginBtn: false,
                     userInfo: userInfo
                 })
-                // console.log('用户信息完整，隐藏登录按钮，更新用户信息')
             } else {
                 this.setData({
                     showLoginBtn: true,
                     userInfo: null
                 })
-                // console.log('用户信息不完整，显示登录按钮，清空用户信息')
             }
         },
 
         async onAuthUserInfo(event) {
-            // console.log(event.detail)
             if (event.detail.userInfo) {
                 this.handleUserInfoSuccess(event.detail.userInfo)
             }
@@ -449,7 +274,6 @@ Component({
                 // 通知父组件已更新
                 this.triggerEvent('userInfoUpdated', { userInfo })
             } catch (err) {
-                // console.error('选择头像失败:', err)
                 wx.showToast({ title: '选择头像失败', icon: 'none' })
             }
         }

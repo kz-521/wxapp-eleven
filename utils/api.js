@@ -206,17 +206,6 @@ const api = {
     })
   },
 
-  // 解密手机号
-  decryptPhoneNumber: (code) => {
-    return request({
-      url: '/qingting/v1/user/decrypt-phone',
-      method: 'POST',
-      data: {
-        code: code
-      }
-    })
-  },
-
   // 取消订单
   cancelOrder: (orderId) => {
     return request({
