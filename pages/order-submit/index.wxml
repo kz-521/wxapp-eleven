@@ -31,7 +31,7 @@
       </view>
     </view>
   </view>
-  <view class="group_7">
+  <!-- <view class="group_7">
     <view class="block_4">
       <view class="image-text_6">
         <image src="/imgs/time.png" class="label_4"></image>
@@ -46,10 +46,8 @@
       <view class="section_3"></view>
     </view>
     <view class="text-wrapper_4">
-      <!-- <text lines="1" class="text_13">前方还有3杯/</text>
-      <text lines="1" class="text_14">共6杯商品制作</text> -->
     </view>
-  </view>
+  </view> -->
   <view class="group_8">
     <text lines="1" class="text_15">商品明细</text>
     <!-- 动态显示购物车中的商品 -->
@@ -57,7 +55,6 @@
       <view class="image-text_7">
         <view class="image-wrapper_1">
           <image src="{{item.image}}" class="image_3"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_4"></image>
         </view>
         <view class="text-group_10">
           <text lines="1" class="text_16">{{item.name}}</text>

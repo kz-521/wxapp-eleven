@@ -20,7 +20,7 @@
         <text lines="1" class="text-group_4">可取茶</text>
       </view>
     </view>
-    <view class="box_4">
+    <!-- <view class="box_4">
       <view class="image-text_11">
         <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng82bfc13238b25fe5c6aef2c1cd6a93c4eacf63ef7ae5050cbab106a3e4bf4e61" class="label_6"></image>
         <text lines="1" class="text-group_5">预计时间</text>
@@ -32,7 +32,7 @@
     </view>
     <view class="group_3">
       <view class="group_4"></view>
-    </view>
+    </view> -->
     <view class="text-wrapper_2">
       <!-- <text lines="1" class="text_7">前方还有3杯/</text>
       <text lines="1" class="text_8">共6杯商品制作</text> -->
@@ -61,7 +61,6 @@
       <view class="image-text_13">
         <view class="image-wrapper_1">
           <image src="{{item.image}}" class="image_7"></image>
-          <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_8"></image>
         </view>
         <view class="text-group_11">
           <text lines="1" class="text_16">{{item.name}}</text>

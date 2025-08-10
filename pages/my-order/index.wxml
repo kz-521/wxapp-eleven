@@ -41,7 +41,6 @@
         <view class="image-text_1">
           <view class="image-wrapper_2">
             <image src="{{product.image}}" class="image_5"></image>
-            <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng0a408debc0ddcd1c1279c8ff220c279c1cb56d171f09304dba0ccd9dbac20f78" class="image_6"></image>
           </view>
           <view class="text-group_1">
             <text lines="1" class="text_10">{{product.name}}</text>
