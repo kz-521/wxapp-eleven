@@ -186,11 +186,12 @@ const api = {
   },
 
   // 获取订单列表
-  getOrderList: (status = '', page = 1, per_page = 10) => {
-    let url = `/qingting/v1/order/list?page=${page}&per_page=${per_page}`
-    if (status !== '') {
-      url += `&status=${status}`
+  getOrderList: (status = '') => {
+    let url = `/qingting/v1/order/list`
+    if (status !== '' && status !== null && status !== undefined) {
+      url += `?status=${status}`
     }
+    console.log('订单列表API调用URL:', url)
     return request({
       url: url,
       method: 'GET'
@@ -202,6 +203,17 @@ const api = {
     return request({
       url: `/qingting/v1/order/detail/${orderId}`,
       method: 'GET'
+    })
+  },
+
+  // 解密手机号
+  decryptPhoneNumber: (code) => {
+    return request({
+      url: '/qingting/v1/user/decrypt-phone',
+      method: 'POST',
+      data: {
+        code: code
+      }
     })
   },
 

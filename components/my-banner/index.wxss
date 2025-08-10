@@ -73,7 +73,9 @@
 .user-info-container {
     flex: 1;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8rpx;
 }
 
 .user-nickname {
@@ -83,14 +85,29 @@
     line-height: 1.2;
 }
 
-.auth-btn{
+.user-phone {
+    font-size: 24rpx;
+    color: #666666;
+    line-height: 1.2;
+}
+
+.phone-btn{
     position: absolute;
-    top:28rpx;
-    /*top: -50rpx;*/
+    top: 28rpx;
     right: 0;
     border-top-left-radius: 60rpx;
     border-bottom-left-radius: 60rpx;
-    font-size:24rpx;
+    font-size: 24rpx;
+    color: #FFFFFF;
+}
+
+.auth-btn{
+    position: absolute;
+    top: 88rpx;
+    right: 0;
+    border-top-left-radius: 60rpx;
+    border-bottom-left-radius: 60rpx;
+    font-size: 24rpx;
     color: #157658;
 }
 

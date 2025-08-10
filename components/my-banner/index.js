@@ -30,6 +30,9 @@ Component({
             // console.log('优惠券数量:', this.properties.couponCount)
             // console.log('余额:', this.properties.balance)
             
+            // 清除可能存在的模拟手机号数据
+            this.clearMockPhoneNumber()
+            
             // 检查用户信息状态
             const userInfo = wx.getStorageSync('userInfo')
             const hasAuth = await this.hasAuthUserInfo()
@@ -72,6 +75,143 @@ Component({
      * 组件的方法列表
      */
     methods: {
+        /**
+         * 清除模拟手机号数据
+         */
+        clearMockPhoneNumber() {
+            const userInfo = wx.getStorageSync('userInfo')
+            if (userInfo) {
+                // 如果存在模拟手机号，清除它
+                if (userInfo.phoneNumber === '138****8888' || userInfo.purePhoneNumber === '13888888888') {
+                    delete userInfo.phoneNumber
+                    delete userInfo.purePhoneNumber
+                    delete userInfo.countryCode
+                    wx.setStorageSync('userInfo', userInfo)
+                    this.setData({
+                        userInfo: userInfo
+                    })
+                    console.log('已清除模拟手机号数据')
+                }
+            }
+        },
+
+        /**
+         * 获取手机号
+         */
+        async onGetPhoneNumber(event) {
+            console.log('获取手机号事件:', event)
+            
+            if (event.detail.errMsg === 'getPhoneNumber:ok') {
+                try {
+                    wx.showLoading({
+                        title: '获取手机号中...'
+                    })
+                    
+                    // 获取code
+                    const { code } = event.detail
+                    console.log('手机号授权code:', code)
+                    
+                    // 调用后端接口解密手机号
+                    const phoneResult = await this.decryptPhoneNumber(code)
+                    
+                    console.log('解密后的手机号结果:', phoneResult)
+                    
+                    if (phoneResult && (phoneResult.phoneNumber || phoneResult.purePhoneNumber)) {
+                        // 优先使用phoneNumber，如果没有则使用purePhoneNumber
+                        const displayPhone = phoneResult.phoneNumber || phoneResult.purePhoneNumber
+                        
+                        // 更新用户信息
+                        const userInfo = wx.getStorageSync('userInfo') || {}
+                        userInfo.phoneNumber = displayPhone
+                        userInfo.purePhoneNumber = phoneResult.purePhoneNumber || displayPhone
+                        userInfo.countryCode = phoneResult.countryCode || '86'
+                        
+                        // 保存到本地存储
+                        wx.setStorageSync('userInfo', userInfo)
+                        
+                        // 更新组件数据
+                        this.setData({
+                            userInfo: userInfo
+                        })
+                        
+                        // 触发父组件更新事件
+                        this.triggerEvent('userInfoUpdated', {
+                            userInfo: userInfo
+                        })
+                        
+                        wx.hideLoading()
+                        wx.showToast({
+                            title: '手机号绑定成功',
+                            icon: 'success'
+                        })
+                        
+                        console.log('手机号绑定成功:', displayPhone)
+                    } else {
+                        throw new Error('获取手机号失败：返回数据格式不正确')
+                    }
+                } catch (error) {
+                    wx.hideLoading()
+                    console.error('获取手机号失败:', error)
+                    
+                    // 根据错误类型显示不同的提示
+                    let errorMessage = '获取手机号失败'
+                    if (error.message.includes('网络')) {
+                        errorMessage = '网络连接失败，请检查网络后重试'
+                    } else if (error.message.includes('解密')) {
+                        errorMessage = '手机号解密失败，请重试'
+                    } else if (error.message.includes('后端')) {
+                        errorMessage = '服务器暂时不可用，请稍后重试'
+                    }
+                    
+                    wx.showToast({
+                        title: errorMessage,
+                        icon: 'none',
+                        duration: 3000
+                    })
+                }
+            } else {
+                console.log('用户拒绝授权手机号:', event.detail.errMsg)
+                wx.showToast({
+                    title: '需要授权手机号才能继续',
+                    icon: 'none'
+                })
+            }
+        },
+
+        /**
+         * 解密手机号
+         */
+        async decryptPhoneNumber(code) {
+            try {
+                // 导入API工具
+                const { api } = require('../../utils/api.js')
+                
+                // 调用后端接口解密手机号
+                const response = await api.decryptPhoneNumber(code)
+                
+                console.log('手机号解密响应:', response)
+                
+                if (response && response.code === 0 && response.result) {
+                    // 确保返回的数据包含手机号
+                    const phoneData = response.result
+                    if (phoneData.phoneNumber || phoneData.purePhoneNumber) {
+                        return {
+                            phoneNumber: phoneData.phoneNumber || phoneData.purePhoneNumber,
+                            purePhoneNumber: phoneData.purePhoneNumber || phoneData.phoneNumber,
+                            countryCode: phoneData.countryCode || '86'
+                        }
+                    } else {
+                        throw new Error('返回数据中不包含手机号')
+                    }
+                } else {
+                    throw new Error(response.msg || '解密手机号失败')
+                }
+            } catch (error) {
+                console.error('解密手机号失败:', error)
+                throw error // 重新抛出错误，让调用方处理
+            }
+        },
+
         /**
          * 点击头像事件
          */

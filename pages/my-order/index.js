@@ -29,6 +29,9 @@ Page({
         this.setData({ activeKey, activeTab: activeKey })
         console.log('设置页面状态:', { activeKey, activeTab: activeKey })
         
+        // 测试API调用（可选，用于调试）
+        // await this.testOrderListAPI()
+        
         await this.loadOrders(true)
     },
 
@@ -64,11 +67,13 @@ Page({
             console.log('开始加载订单数据:', {
                 page: this.data.page,
                 status: status,
-                activeKey: this.data.activeKey
+                statusType: typeof status,
+                activeKey: this.data.activeKey,
+                per_page: this.data.per_page
             })
             
             // 调用新的API接口
-            const response = await api.getOrderList(status, this.data.page, this.data.per_page)
+            const response = await api.getOrderList(status)
             console.log('订单API响应:', response)
             
             if (response.code === 0 && response.result && response.result.data) {
@@ -182,15 +187,35 @@ Page({
     },
 
     /**
+     * 测试不同status参数的API调用
+     */
+    async testOrderListAPI() {
+        console.log('开始测试订单列表API...')
+        
+        const testStatuses = [1, 2, 3] // 只测试实际存在的状态
+        
+        for (const status of testStatuses) {
+            try {
+                console.log(`测试status=${status}的API调用`)
+                const response = await api.getOrderList(status)
+                console.log(`status=${status}的响应:`, response)
+            } catch (error) {
+                console.error(`status=${status}的API调用失败:`, error)
+            }
+        }
+    },
+
+    /**
      * 根据activeKey获取状态参数
      */
     getStatusByActiveKey(activeKey) {
         const statusMap = {
-            0: '', // 全部
-            1: 1,  // 待取茶
-            2: 2,  // 已完成
-            3: 3   // 已取消
+            0: '', // 全部 - 不传status参数
+            1: 1,  // 待取茶 - status=1
+            2: 2,  // 已完成 - status=2
+            3: 3   // 已取消 - status=3
         }
+        console.log('Tab映射关系:', { activeKey, status: statusMap[activeKey] })
         return statusMap[activeKey] || ''
     },
 

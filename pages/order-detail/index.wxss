@@ -585,10 +585,9 @@
   font-size: 28rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
   line-height: 40rpx;
-  margin-right: 246rpx;
 }
 .text_17 {
   width: 386rpx;

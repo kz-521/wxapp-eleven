@@ -138,14 +138,12 @@ class Order {
     }
     /**
      * 获取订单列表（新API）
-     * @param {number} page 页码，默认1
-     * @param {number} per_page 每页数量，默认10
      * @param {string} status 订单状态，可选
      */
-    static async getOrderList(page = 1, per_page = 10, status = null) {
-        let url = `qingting/v1/order/list?page=${page}&per_page=${per_page}`
+    static async getOrderList(status = null) {
+        let url = `qingting/v1/order/list`
         if (status) {
-            url += `&status=${status}`
+            url += `?status=${status}`
         }
         
         return await Http.request({

@@ -921,7 +921,7 @@
   z-index: 1;
   position: absolute;
   top: 35rpx;
-  right: 50rpx;
+  right: 52rpx;
   font-family: PingFang-SC, PingFang-SC;
   font-weight: 500;
   font-size: 22rpx;

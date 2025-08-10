@@ -54,6 +54,7 @@ Page({
     },
 
     onUserInfoUpdated(event) {
+      console.log('用户信息更新事件:', event.detail)
       wx.showToast({
           title: '用户信息已更新',
           icon: 'success',

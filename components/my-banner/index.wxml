@@ -27,8 +27,24 @@
             <view class="user-info-container">
                 <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text>
                 <text class="user-nickname" wx:else>点击头像登录</text>
+                
+                <!-- 手机号显示 -->
+                <text class="user-phone" wx:if="{{userInfo && userInfo.phoneNumber && userInfo.phoneNumber !== '138****8888'}}">{{userInfo.phoneNumber}}</text>
+                <text class="user-phone" wx:elif="{{userInfo && userInfo.purePhoneNumber && userInfo.purePhoneNumber !== '13888888888'}}">{{userInfo.purePhoneNumber}}</text>
+                <text class="user-phone" wx:else>未绑定手机号</text>
             </view>
         </view>
+        
+        <!-- 获取手机号按钮 -->
+        <l-button wx:if="{{!userInfo || (!userInfo.phoneNumber && !userInfo.purePhoneNumber) || (userInfo.phoneNumber === '138****8888' && userInfo.purePhoneNumber === '13888888888')}}" 
+                  l-class="phone-btn"
+                  bg-color="#477676"
+                  open-type="getPhoneNumber"
+                  bind:getphonenumber="onGetPhoneNumber"
+                  height="48"
+                  width="120">
+            绑定手机号
+        </l-button>
         
         <l-button wx:if="{{showLoginBtn}}" l-class="auth-btn"
                   bg-color="#DCEBE6"

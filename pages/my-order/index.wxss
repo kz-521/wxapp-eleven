@@ -2,7 +2,6 @@
   background-color: rgba(249,248,250,1);
   position: relative;
   width: 750rpx;
-  height: 1624rpx;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -75,6 +74,20 @@
   justify-content: space-between;
   margin: 39rpx 76rpx 0 81rpx;
 }
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.tab-underline {
+  width: 56rpx;
+  height: 8rpx;
+  margin-top: 6rpx;
+}
+
 .text_3 {
   overflow-wrap: break-word;
   color: rgba(0,0,0,0.85);
@@ -167,10 +180,10 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .text-wrapper_2 {
-  /* background: url(https://lanhu-oss-proxy.lanhuapp.com/SketchPng7a80ee2b0c65072580e8f939a257821d1757279a78cecd2a501167df456533fa) 100% no-repeat; */
   background-size: 100% 100%;
   display: flex;
   flex-direction: column;
+  /* align-items: center; */
   width: 56rpx;
   height: 36rpx;
   background: linear-gradient( 180deg, #477676 0%, #080E0E 100%), #D8D8D8;
@@ -195,6 +208,7 @@ border-radius: 4rpx;
   white-space: nowrap;
   line-height: 40rpx;
   margin-left: 16rpx;
+  margin-top: -4rpx;
 }
 .text_9 {
   overflow-wrap: break-word;
@@ -256,10 +270,9 @@ border-radius: 4rpx;
   font-size: 28rpx;
   font-family: PingFangSC-Medium;
   font-weight: 500;
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
   line-height: 40rpx;
-  margin-right: 246rpx;
 }
 .text_11 {
   width: 386rpx;
@@ -364,6 +377,7 @@ border-radius: 4rpx;
   flex-direction: row;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 10rpx 0 0 0;
 }
 .text_16 {
