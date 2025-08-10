@@ -1,5 +1,6 @@
 // pages/order-submit/order-submit.js
 const { api } = require('../../utils/api.js')
+import { Location } from '../../utils/location.js'
 
 Page({
     data: {
@@ -30,11 +31,6 @@ Page({
         this.checkCachedCoupon()
         // 获取门店距离
         this.getStoreDistance()
-        
-        // 测试优惠券逻辑
-        setTimeout(() => {
-            this.testCouponLogic()
-        }, 1000)
     },
 
     onShow() {
@@ -678,35 +674,47 @@ Page({
         })
     },
 
-    getStoreDistance() {
-        const that = this
-        wx.getLocation({
-          type: 'gcj02',
-          success(res) {
-            const distance = that.getDistance(
-              res.latitude, res.longitude,
-              that.data.storeLocation.latitude, that.data.storeLocation.longitude
-            )
-            that.setData({ distance })
-          },
-          fail() {
-            that.setData({ distance: '定位失败' })
-          }
-        })
-    },
-    Rad(d) {
-      return d * Math.PI / 180.0
-    },
-    getDistance(lat1, lng1, lat2, lng2) {
-      var radLat1 = this.Rad(lat1)
-      var radLat2 = this.Rad(lat2)
-      var a = radLat1 - radLat2
-      var b = this.Rad(lng1) - this.Rad(lng2)
-      var s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
-        Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)))
-      s = s * 6378.137
-      s = Math.round(s * 10000) / 10000
-      s = s.toFixed(2) + '公里'
-      return s
+    /**
+     * 获取门店距离
+     */
+    async getStoreDistance() {
+        try {
+            console.log('开始获取门店距离')
+            
+            // 先检查位置权限
+            const permissionStatus = await Location.checkLocationPermission()
+            
+            if (permissionStatus.status === 'denied') {
+                // 用户之前拒绝了权限，引导开启
+                try {
+                    await Location.requestLocationPermission()
+                } catch (err) {
+                    console.log('用户拒绝开启位置权限')
+                    this.setData({ distance: '位置权限未开启' })
+                    return
+                }
+            }
+            
+            // 获取位置并计算距离
+            const result = await Location.getUserLocationAndDistance(this.data.storeLocation)
+            
+            this.setData({
+                distance: result.distanceText
+            })
+            
+            console.log('门店距离获取成功:', result.distanceText)
+            
+        } catch (error) {
+            console.error('获取门店距离失败:', error)
+            
+            // 根据错误类型显示不同的提示
+            if (error.errMsg && error.errMsg.includes('auth deny')) {
+                this.setData({ distance: '位置权限被拒绝' })
+            } else if (error.errMsg && error.errMsg.includes('timeout')) {
+                this.setData({ distance: '定位超时' })
+            } else {
+                this.setData({ distance: '定位失败' })
+            }
+        }
     },
 }) 

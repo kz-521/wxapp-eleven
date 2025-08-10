@@ -41,6 +41,12 @@ class Spu {
      * @param {Object} response API响应数据
      */
     static formatRecommendData(response) {
+        // 检查response是否存在且有效
+        if (!response || typeof response !== 'object') {
+            console.warn('formatRecommendData: response is null or invalid:', response)
+            return null
+        }
+        
         if (response.code === 200 && response.result && response.result.list) {
             return response.result.list.map(item => ({
                 id: item.id,

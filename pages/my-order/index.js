@@ -33,8 +33,10 @@ Page({
     },
 
     onShow() {
-        // 页面显示时重新加载数据
-        this.loadOrders(true)
+        // 页面显示时重新加载数据，但避免重复加载
+        if (!this.data.loading) {
+            this.loadOrders(true)
+        }
     },
 
     /**

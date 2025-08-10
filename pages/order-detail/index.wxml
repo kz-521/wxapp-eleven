@@ -6,17 +6,17 @@
     </view>
     <view class="box_3">
       <view class="image-text_8">
-        <image src="/imgs/ordered.png" class="label_4"></image>
-        <text lines="1" class="text-group_2">已下单</text>
+        <image src="/imgs/noordered.png" class="label_4"></image>
+        <text lines="1" class="text-group_2">未下单</text>
       </view>
       <view class="image_3"></view>
       <view class="image-text_9">
-        <image src="/imgs/making.png" class="label_5"></image>
+        <image src="/imgs/nomaking.png" class="label_5"></image>
         <text lines="1" class="text-group_3">制作中</text>
       </view>
       <view class="image_4"></view>
       <view class="image-text_10">
-        <image src="/imgs/ready.png" class="image_5"></image>
+        <image src="/imgs/noready.png" class="image_5"></image>
         <text lines="1" class="text-group_4">可取茶</text>
       </view>
     </view>

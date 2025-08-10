@@ -75,7 +75,7 @@ class Location {
     } else if (distance < 1) {
       return Math.round(distance * 1000) + '米'
     } else {
-      return distance.toFixed(precision) + '公里'
+      return distance.toFixed(precision) + 'km'
     }
   }
 

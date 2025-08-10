@@ -9,6 +9,20 @@ App({
         totalPrice: 0, // 购物车总价格
         selectedCoupon: null // 选中的优惠券
     },
+    
+    /**
+     * 确保token有效的方法
+     */
+    async ensureToken() {
+        try {
+            await (new Token()).verify();
+            return true;
+        } catch (error) {
+            console.error('Token验证失败:', error);
+            return false;
+        }
+    },
+    
     async onLaunch() {
 
         await (new Token()).verify();

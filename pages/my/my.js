@@ -82,17 +82,24 @@ Page({
             // 刷新用户信息显示
             this.refreshUserInfo()
             
-            // 刷新优惠券数据
-            const response = await Coupon.getUserCoupons()
-            let couponCount = 0
-            if (response.code === 0 && response.result && response.result.data) {
-                // 处理优惠券数据，获取可用优惠券数量
-                const processedData = Coupon.processCouponsData(response)
-                couponCount = processedData.availableCoupons.length
+            // 避免频繁调用API，只在必要时刷新优惠券数据
+            const currentTime = Date.now()
+            const lastUpdateTime = this.lastCouponUpdateTime || 0
+            
+            // 如果距离上次更新超过30秒，才重新获取优惠券数据
+            if (currentTime - lastUpdateTime > 30000) {
+                const response = await Coupon.getUserCoupons()
+                let couponCount = 0
+                if (response.code === 0 && response.result && response.result.data) {
+                    // 处理优惠券数据，获取可用优惠券数量
+                    const processedData = Coupon.processCouponsData(response)
+                    couponCount = processedData.availableCoupons.length
+                }
+                this.setData({
+                    couponCount: couponCount
+                })
+                this.lastCouponUpdateTime = currentTime
             }
-            this.setData({
-                couponCount: couponCount
-            })
         } catch (error) {
             console.error('页面显示时获取优惠券数据失败:', error)
         }

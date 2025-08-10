@@ -39,7 +39,14 @@ Page({
     this.loadProductsByCategory(1)
   },
   onShow() {
-    this.loadCartData()
+    // 只在必要时重新加载购物车数据
+    const app = getApp()
+    const currentCartCount = this.data.cartCount || 0
+    const globalCartCount = app.globalData.cartCount || 0
+    
+    if (currentCartCount !== globalCartCount) {
+      this.loadCartData()
+    }
   },
   onHide() {
     // 移除tabBar相关代码

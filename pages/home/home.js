@@ -29,7 +29,13 @@ Page({
     },
 
     onShow() {
-      this.checkLoginStatus()
+        // 检查登录状态是否发生变化
+        const userInfo = wx.getStorageSync('userInfo')
+        const currentLoginStatus = userInfo ? true : false
+        
+        if (this.data.isLogin !== currentLoginStatus) {
+            this.checkLoginStatus()
+        }
     },
 
     /**
@@ -210,6 +216,13 @@ Page({
         try {
             console.log('开始获取今日推荐数据')
             const response = await Spu.getRecommendSpu(3)
+            
+            // 检查response是否有效
+            if (!response) {
+                console.warn('getRecommendData: API返回null，跳过数据处理')
+                return
+            }
+            
             const formattedDrinks = Spu.formatRecommendData(response)
             if (formattedDrinks) {
                 console.log('获取今日推荐成功:', formattedDrinks.length, '条数据')
@@ -217,7 +230,7 @@ Page({
                     drinks: formattedDrinks
                 })
             } else {
-                console.log('今日推荐数据为空')
+                console.log('今日推荐数据为空或格式不正确')
             }
         } catch (error) {
             console.error('获取今日推荐失败:', error)

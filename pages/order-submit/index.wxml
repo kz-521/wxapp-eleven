@@ -10,7 +10,10 @@
       <image src="/imgs/orderBg.png" class="order-bg"></image>
     </view>
     <view class="store-address" style="height: 30rpx;">
-      {{storeLocation.address}} {{distance}}
+      {{storeLocation.address}}
+    </view>
+    <view class="store-distance" wx:if="{{distance}}">
+      <text class="distance-text">{{distance}}</text>
     </view>
     <!-- 中部分：堂食和外带选项 -->
     <view class="dining-options">

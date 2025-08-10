@@ -26,12 +26,16 @@ Page({
         completeTime: '',
         pickupNumber: '8195', // 取茶号
         estimatedTime: '6', // 预计时间（分钟）
-        storePhone: '1342137123' // 店铺电话
+        storePhone: '1342137123', // 店铺电话
+        // 模拟状态控制
+        isMockMode: true, // 是否为模拟模式
+        mockStatus: 'pending' // 模拟状态
     },
 
     onLoad(options) {
         console.log('订单详情页面加载')
         console.log('页面参数:', options)
+        console.log('初始数据状态:', this.data)
         
         // 通过eventChannel接收从订单提交页面传递的订单数据
         try {
@@ -68,6 +72,12 @@ Page({
         
         // 获取门店距离
         this.getStoreDistance()
+        
+        // 测试图片路径
+        console.log('测试图片路径:')
+        console.log('noordered.png:', '/imgs/noordered.png')
+        console.log('nomaking.png:', '/imgs/nomaking.png')
+        console.log('noready.png:', '/imgs/noready.png')
     },
 
     onShow() {
@@ -131,6 +141,9 @@ Page({
                 specs: item.specs || '默认规格',
                 totalPrice: item.total_price
             }))
+        } else if (orderInfo.products && Array.isArray(orderInfo.products)) {
+            // 处理从订单提交页面传递的数据
+            orderProducts = orderInfo.products
         }
         
         // 获取订单状态
@@ -138,30 +151,70 @@ Page({
         const orderStatusText = this.getOrderStatusText(orderInfo.status)
         
         // 格式化时间
-        const createTime = orderInfo.create_time || orderInfo.placed_time || ''
-        const payTime = orderInfo.paid_time || ''
+        const createTime = orderInfo.create_time || orderInfo.placed_time || orderInfo.createTime || ''
+        const payTime = orderInfo.paid_time || orderInfo.payTime || ''
         
         this.setData({
             orderInfo: orderInfo,
             orderProducts: orderProducts,
-            totalAmount: orderInfo.total_price || '0.00',
+            totalAmount: orderInfo.total_price || orderInfo.totalAmount || '0.00',
             orderStatus: orderStatus,
             orderStatusText: orderStatusText,
             createTime: createTime,
             payTime: payTime,
             remark: orderInfo.remark || '无备注',
-            pickupNumber: Math.floor(Math.random() * 9000) + 1000, // 随机生成取茶号
-            estimatedTime: '6', // 预计时间（分钟）
-            storePhone: '1342137123' // 店铺电话
+            pickupNumber: orderInfo.pickupNumber || Math.floor(Math.random() * 9000) + 1000, // 随机生成取茶号
+            estimatedTime: orderInfo.estimatedTime || '6', // 预计时间（分钟）
+            storePhone: orderInfo.storePhone || '1342137123', // 店铺电话
+            // 如果是模拟模式，设置初始模拟状态
+            mockStatus: this.data.isMockMode ? orderStatus : this.data.mockStatus
         })
         
         console.log('订单详情数据设置完成:', {
             orderProducts: orderProducts.length,
-            totalAmount: orderInfo.total_price,
+            totalAmount: orderInfo.total_price || orderInfo.totalAmount,
             orderStatus: orderStatus,
             orderStatusText: orderStatusText,
             createTime: createTime
         })
+    },
+
+    /**
+     * 设置模拟订单数据
+     */
+    setMockOrderData() {
+        console.log('设置模拟订单数据')
+        
+        const mockOrderData = {
+            id: 'mock_' + Date.now(),
+            order_no: 'MO' + Math.floor(Math.random() * 1000000),
+            total_price: '32.00',
+            total_count: 1,
+            status: 1, // 默认状态
+            create_time: new Date().toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).replace(/\//g, '/'),
+            remark: '模拟订单数据',
+            snap_items: [
+                {
+                    id: 1,
+                    title: '佛手映月',
+                    img: 'https://qn.jixiangjiaoyu.com/2025/8/6d6421a35c54686e3614123366bf0bb941754456860367.png',
+                    count: 1,
+                    final_price: '32.00',
+                    total_price: '32.00',
+                    specs: '大、热、不额外加糖、脱脂牛奶'
+                }
+            ]
+        }
+        
+        this.setOrderDetailData(mockOrderData)
     },
 
     /**
@@ -192,17 +245,100 @@ Page({
     },
 
     /**
+     * 切换模拟模式
+     */
+    toggleMockMode() {
+        const newMockMode = !this.data.isMockMode
+        this.setData({
+            isMockMode: newMockMode
+        })
+        
+        wx.showToast({
+            title: newMockMode ? '已开启模拟模式' : '已关闭模拟模式',
+            icon: 'success'
+        })
+    },
+
+    /**
+     * 设置模拟状态
+     */
+    setMockStatus(status) {
+        console.log('设置模拟状态:', status)
+        const orderStatusText = this.getOrderStatusText(status)
+        
+        this.setData({
+            mockStatus: status,
+            orderStatus: status,
+            orderStatusText: orderStatusText
+        })
+        
+        wx.showToast({
+            title: `已切换到${orderStatusText}状态`,
+            icon: 'success'
+        })
+    },
+
+    /**
+     * 切换到未下单状态
+     */
+    switchToPending() {
+        this.setMockStatus('pending')
+    },
+
+    /**
+     * 切换到已下单状态
+     */
+    switchToPaid() {
+        this.setMockStatus('paid')
+    },
+
+    /**
+     * 切换到制作中状态
+     */
+    switchToPreparing() {
+        this.setMockStatus('preparing')
+    },
+
+    /**
+     * 切换到待取茶状态
+     */
+    switchToReady() {
+        this.setMockStatus('ready')
+    },
+
+    /**
+     * 切换到已完成状态
+     */
+    switchToCompleted() {
+        this.setMockStatus('completed')
+    },
+
+    /**
+     * 切换到已取消状态
+     */
+    switchToCancelled() {
+        this.setMockStatus('cancelled')
+    },
+
+    /**
      * 获取状态对应的图片
      */
     getStatusImage(status) {
+        // 使用传入的状态参数，如果没有则使用当前订单状态
+        const currentStatus = status || this.data.orderStatus
+        
         const imageMap = {
-            'pending': '/imgs/order/ordered.png',
-            'paid': '/imgs/order/ordered.png',
-            'preparing': '/imgs/order/making.png',
-            'ready': '/imgs/order/ready.png',
-            'completed': '/imgs/order/ready.png'
+            'pending': '/imgs/noordered.png',    // 未下单
+            'paid': '/imgs/ordered.png',         // 已下单
+            'preparing': '/imgs/nomaking.png',   // 制作中
+            'ready': '/imgs/noready.png',        // 待取茶
+            'completed': '/imgs/noready.png',    // 已完成
+            'cancelled': '/imgs/noordered.png'   // 已取消
         }
-        return imageMap[status] || '/imgs/order/ordered.png'
+        
+        const imagePath = imageMap[currentStatus] || '/imgs/noordered.png'
+        console.log('状态图片路径:', currentStatus, imagePath)
+        return imagePath
     },
 
     /**

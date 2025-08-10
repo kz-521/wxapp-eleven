@@ -26,11 +26,17 @@ class Http {
                 }
             });
         } catch (e) {
+            console.error('网络请求失败:', e);
             if (throwError) {
                 throw new HttpException(-1, codes[-1]);
             }
             this.showError(-1);
-            return null;
+            // 返回标准化的错误响应对象，而不是null
+            return {
+                code: -1,
+                message: codes[-1] || '网络请求失败',
+                success: false
+            };
         }
 
         const code = res.statusCode.toString();
@@ -68,9 +74,37 @@ class Http {
         const app = getApp()
         // 使用app.js中的ensureToken方法，避免重复获取token
         if (app && app.ensureToken) {
-            await app.ensureToken()
+            try {
+                const success = await app.ensureToken()
+                if (success) {
+                    return await this.request({ url, data, method, retry: false });
+                } else {
+                    // Token刷新失败，直接登出
+                    this.handleLogout();
+                    return {
+                        code: 401,
+                        message: '用户未授权',
+                        success: false
+                    };
+                }
+            } catch (error) {
+                console.error('Token刷新失败:', error);
+                this.handleLogout();
+                return {
+                    code: 401,
+                    message: '用户未授权',
+                    success: false
+                };
+            }
+        } else {
+            // 如果没有ensureToken方法，直接登出
+            this.handleLogout();
+            return {
+                code: 401,
+                message: '用户未授权',
+                success: false
+            };
         }
-        return await this.request({ url, data, method, retry: false });
     }
 
     static handleLogout() {
