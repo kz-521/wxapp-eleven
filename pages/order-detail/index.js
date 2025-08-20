@@ -24,7 +24,7 @@ Page({
         createTime: '',
         payTime: '',
         completeTime: '',
-        pickupNumber: '8195', // 取茶号
+        pickupNumber: '', // 取茶号
         estimatedTime: '6', // 预计时间（分钟）
         storePhone: '1342137123', // 店铺电话
         // 模拟状态控制
@@ -56,14 +56,17 @@ Page({
             console.error('eventChannel错误:', error)
         }
         
-        // 获取订单ID
-        if (options.orderId) {
-            console.log('通过orderId获取订单详情:', options.orderId)
+        // 获取订单ID - 优先使用全局变量的order_id
+        const app = getApp()
+        let orderId = app.globalData.lastOrderId || options.orderId
+        
+        if (orderId) {
+            console.log('获取到订单ID:', orderId, '来源:', app.globalData.lastOrderId ? '全局变量' : '页面参数')
             this.setData({
-                orderId: options.orderId
+                orderId: orderId
             })
             // 获取订单详情
-            this.getOrderDetail(options.orderId)
+            this.getOrderDetail(orderId)
         } else {
             // 如果没有orderId，使用模拟数据
             console.log('使用模拟订单数据')
@@ -82,6 +85,13 @@ Page({
 
     onShow() {
         // 页面显示时的逻辑
+    },
+
+    onUnload() {
+        // 页面卸载时清理全局变量的订单ID
+        const app = getApp()
+        app.globalData.lastOrderId = null
+        console.log('页面卸载，已清理全局变量的订单ID')
     },
 
     /**
@@ -124,6 +134,25 @@ Page({
     },
 
     /**
+     * 生成取茶号
+     * @param {string|number} orderId 订单ID
+     * @returns {string} 取茶号（4位数字，不足补0）
+     */
+    generatePickupNumber(orderId) {
+        if (!orderId) return '0000'
+        
+        // 将订单ID转换为字符串
+        const orderIdStr = String(orderId)
+        
+        // 获取最后4位，不足4位补0
+        const last4Digits = orderIdStr.slice(-4)
+        const pickupNumber = last4Digits.padStart(4, '0')
+        
+        console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
+        return pickupNumber
+    },
+
+    /**
      * 设置订单详情数据
      */
     setOrderDetailData(orderInfo) {
@@ -154,6 +183,19 @@ Page({
         const createTime = orderInfo.create_time || orderInfo.placed_time || orderInfo.createTime || ''
         const payTime = orderInfo.paid_time || orderInfo.payTime || ''
         
+        // 生成取茶号
+        let pickupNumber = '0000'
+        if (orderInfo.pickupNumber) {
+            // 如果订单数据中有取茶号，直接使用
+            pickupNumber = orderInfo.pickupNumber
+        } else if (orderInfo.id) {
+            // 使用订单ID生成取茶号
+            pickupNumber = this.generatePickupNumber(orderInfo.id)
+        } else if (this.data.orderId) {
+            // 使用页面参数中的订单ID生成取茶号
+            pickupNumber = this.generatePickupNumber(this.data.orderId)
+        }
+        
         this.setData({
             orderInfo: orderInfo,
             orderProducts: orderProducts,
@@ -163,7 +205,7 @@ Page({
             createTime: createTime,
             payTime: payTime,
             remark: orderInfo.remark || '无备注',
-            pickupNumber: orderInfo.pickupNumber || Math.floor(Math.random() * 9000) + 1000, // 随机生成取茶号
+            pickupNumber: pickupNumber, // 使用生成的取茶号
             estimatedTime: orderInfo.estimatedTime || '6', // 预计时间（分钟）
             storePhone: orderInfo.storePhone || '1342137123', // 店铺电话
             // 如果是模拟模式，设置初始模拟状态
@@ -185,8 +227,9 @@ Page({
     setMockOrderData() {
         console.log('设置模拟订单数据')
         
+        const mockId = 'mock_' + Date.now()
         const mockOrderData = {
-            id: 'mock_' + Date.now(),
+            id: mockId,
             order_no: 'MO' + Math.floor(Math.random() * 1000000),
             total_price: '32.00',
             total_count: 1,
@@ -201,6 +244,7 @@ Page({
                 hour12: false
             }).replace(/\//g, '/'),
             remark: '模拟订单数据',
+            pickupNumber: this.generatePickupNumber(mockId), // 生成模拟取茶号
             snap_items: [
                 {
                     id: 1,

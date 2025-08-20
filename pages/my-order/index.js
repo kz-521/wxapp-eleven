@@ -8,7 +8,7 @@ Page({
      */
     data: {
         activeKey: 0, // 当前选中的tab，0=全部, 1=待取茶, 2=已完成, 3=已取消
-        activeTab: 0, // 与activeKey同步
+        activeTab: 0, // 当前选中的tab索引
         orders: [], // 订单列表
         loading: false,
         page: 1,
@@ -26,8 +26,17 @@ Page({
         const activeKey = parseInt(options.key) || 0
         console.log('解析后的activeKey:', activeKey)
         
-        this.setData({ activeKey, activeTab: activeKey })
+        // 确保activeTab值正确设置
+        this.setData({ 
+            activeKey: activeKey, 
+            activeTab: activeKey 
+        })
         console.log('设置页面状态:', { activeKey, activeTab: activeKey })
+        
+        // 验证activeTab设置
+        setTimeout(() => {
+            console.log('验证activeTab设置:', this.data.activeTab)
+        }, 100)
         
         // 测试API调用（可选，用于调试）
         // await this.testOrderListAPI()
@@ -90,7 +99,7 @@ Page({
                         is_array: Array.isArray(firstOrder.snap_items)
                     })
                 }
-                
+                console.log(response.result.data , 'rd');
                 const formattedOrders = this.formatOrderData(response.result.data)
                 
                 if (formattedOrders.length > 0) {
@@ -145,7 +154,7 @@ Page({
                 products = order.snap_items.map(item => ({
                     id: item.id,
                     name: item.title,
-                    image: item.img,
+                    image: order.snap_img,
                     count: item.count,
                     price: item.final_price,
                     specs: item.specs || '默认规格',
@@ -236,7 +245,7 @@ Page({
      */
     switchTab(event) {
         const tab = parseInt(event.currentTarget.dataset.tab)
-        console.log('切换标签页:', tab)
+        console.log('切换到标签页:', tab)
         
         this.setData({
             activeKey: tab,
@@ -271,6 +280,11 @@ Page({
     goToOrderDetail(event) {
         const orderId = event.currentTarget.dataset.orderId
         console.log('跳转到订单详情:', orderId)
+        
+        // 存储order_id到全局变量，用于取茶号生成
+        const app = getApp()
+        app.globalData.lastOrderId = orderId
+        console.log('已存储订单ID到全局变量:', orderId)
         
         wx.navigateTo({
             url: `/pages/order-detail/index?orderId=${orderId}`

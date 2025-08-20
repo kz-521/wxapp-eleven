@@ -2,7 +2,7 @@
   <view class="group_1">
     <view class="text-wrapper_1">
       <view class="tab-item">
-        <text lines="1" class="text_3 {{activeTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">全部</text>
+        <text lines="1" class="text_3 {{activeTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">全部</text>
         <image wx:if="{{activeTab === 0}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
       </view>
       <view class="tab-item">

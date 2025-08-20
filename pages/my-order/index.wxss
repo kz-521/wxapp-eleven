@@ -5,6 +5,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 .group_1 {
   display: flex;
@@ -241,12 +242,13 @@ border-radius: 4rpx;
   justify-content: space-between;
 }
 .image-wrapper_2 {
-  background-color: rgba(249,248,250,1);
-  border-radius: 4rpx;
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 19rpx 28rpx 64rpx 30rpx;
+  width: 129rpx;
+  height: 131rpx;
+  background: #F9F8FA;
+  border-radius: 4rpx;
 }
 .image_5 {
   width: 100%;

@@ -7,7 +7,8 @@ App({
         cartItems: [], // 购物车商品列表
         cartCount: 0,  // 购物车商品总数
         totalPrice: 0, // 购物车总价格
-        selectedCoupon: null // 选中的优惠券
+        selectedCoupon: null, // 选中的优惠券
+        lastOrderId: null // 最后提交的订单ID，用于取茶号生成
     },
     
     /**

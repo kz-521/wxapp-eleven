@@ -235,6 +235,10 @@ Page({
      * 跳转到订单详情页的辅助方法
      */
     navigateToOrderDetail() {
+        // 从全局变量获取最后提交的订单ID
+        const app = getApp()
+        const lastOrderId = app.globalData.lastOrderId
+        
         // 构建传递给订单详情页的数据
         const orderDetailData = {
             products: this.data.orderProducts,
@@ -246,13 +250,13 @@ Page({
             diningType: this.data.diningType,
             createTime: new Date().toLocaleString('zh-CN'),
             storeLocation: this.data.storeLocation,
-            pickupNumber: Math.floor(Math.random() * 9000) + 1000,
+            orderId: lastOrderId, // 传递订单ID
+            pickupNumber: lastOrderId ? this.generatePickupNumber(lastOrderId) : Math.floor(Math.random() * 9000) + 1000,
             estimatedTime: '6',
             storePhone: '1342137123'
         }
         
         // 清空购物车
-        const app = getApp()
         app.globalData.cartItems = []
         app.globalData.cartCount = 0
         app.globalData.totalPrice = 0
@@ -611,6 +615,12 @@ Page({
                 
                 if (orderId) {
                     console.log('订单提交成功，开始调用支付接口，订单ID:', orderId)
+                    
+                    // 存储order_id到全局变量，用于取茶号生成
+                    const app = getApp()
+                    app.globalData.lastOrderId = orderId
+                    console.log('已存储订单ID到全局变量:', orderId)
+                    
                     // 调用支付接口
                     this.callPayment(orderId)
                 } else {
@@ -637,6 +647,25 @@ Page({
                 icon: 'none'
             })
         })
+    },
+
+    /**
+     * 生成取茶号
+     * @param {string|number} orderId 订单ID
+     * @returns {string} 取茶号（4位数字，不足补0）
+     */
+    generatePickupNumber(orderId) {
+        if (!orderId) return '0000'
+        
+        // 将订单ID转换为字符串
+        const orderIdStr = String(orderId)
+        
+        // 获取最后4位，不足4位补0
+        const last4Digits = orderIdStr.slice(-4)
+        const pickupNumber = last4Digits.padStart(4, '0')
+        
+        console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
+        return pickupNumber
     },
 
     /**
