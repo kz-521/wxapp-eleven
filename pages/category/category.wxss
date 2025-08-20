@@ -1258,7 +1258,7 @@ page {
 }
 
 .product-image {
-  width: 104rpx;
+  width: 163rpx;
   height: 163rpx;
   border-radius: 8rpx;
   margin-right: 30rpx;

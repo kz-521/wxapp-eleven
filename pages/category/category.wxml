@@ -32,7 +32,7 @@
                 <view wx:if="{{products.length > 0}}">
                     <view class="product-item" wx:for="{{products}}" wx:key="index">
                         <view class="product-content">
-                            <image src="{{item.image}}" class="product-image"></image>
+                            <image src="{{item.image}}-thumb" class="product-image"></image>
                             <view class="product-info">
                                 <view>
                                     <text class="product-name">{{item.name}}</text>

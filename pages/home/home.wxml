@@ -1,7 +1,7 @@
 <view class="home-page  safe-bottom">
   <!-- 顶部logo区域 -->
   <view class="logo-wrapper flexca">
-    <image src="/imgs/logo.png" class="logo-image"></image>
+    <image src="https://qn.jixiangjiaoyu.com/2025/08/2a108202508191419092205.png" class="logo-image"></image>
   </view>
 
   <!-- 登录区域 -->

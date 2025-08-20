@@ -11,8 +11,8 @@ Page({
         userLocation: null, // 用户位置
         distance: '', // 距离
         storeLocation: {
-          latitude: 30.3972, // 杭州市余杭区瓶窑镇的经纬度
-          longitude: 120.0183,
+          latitude: 30.384879, // 杭州市余杭区瓶窑镇的经纬度
+          longitude: 119.952247,
           name: '清汀.新养生空间',
           address: '余杭区瓶窑镇南山村横山60号1幢1楼106室'
         }
