@@ -777,6 +777,23 @@ Page({
       // 已存在，增加数量
       cartItems[existingItemIndex].count += currentQuantity
     } else {
+      // 构建order_options数组供后台使用
+      const order_options = []
+      if (product.order_options && product.order_options.length > 0) {
+        product.order_options.forEach(option => {
+          const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+          if (selectedValue) {
+            order_options.push({
+              option_id: option.id,
+              option_name: option.name,
+              value_id: selectedValue.id,
+              value: selectedValue.value,
+              extra_price: selectedValue.extra_price || 0
+            })
+          }
+        })
+      }
+
       // 新增商品到购物车
       const cartItem = {
         id: product.id,
@@ -789,7 +806,8 @@ Page({
         tags: product.tags ? product.tags.split(',') : [],
         subtitle: product.subtitle,
         description: product.description,
-        selectedOptions: selectedOptions
+        selectedOptions: selectedOptions,
+        order_options: order_options // 新增：口味选择数据供后台使用
       }
 
       cartItems.unshift(cartItem)

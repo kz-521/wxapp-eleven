@@ -224,8 +224,8 @@ Page({
      */
     getOrderStatusText(status) {
         const statusMap = {
-            1: '待取茶',
-            2: '已完成',
+            1: '未支付',
+            2: '已付款',
             3: '已取消'
         }
         return statusMap[status] || '未知状态'

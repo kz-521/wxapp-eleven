@@ -582,7 +582,8 @@ Page({
         const apiOrderData = {
             sku_info_list: this.data.orderProducts.map(item => ({
                 id: item.id,
-                count: parseInt(item.count) || 1
+                count: parseInt(item.count) || 1,
+                order_options: item.order_options || [] // 添加口味选择数据
             })),
             remark: this.data.remark || '',
             dining_type: this.data.diningType,
