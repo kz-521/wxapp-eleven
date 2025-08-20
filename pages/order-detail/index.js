@@ -131,9 +131,9 @@ Page({
         // 将订单ID转换为字符串
         const orderIdStr = String(orderId)
         
-        // 获取最后4位，不足4位在末尾补0
+        // 获取最后4位，不足4位在前面补0
         const last4Digits = orderIdStr.slice(-4)
-        const pickupNumber = last4Digits.padEnd(4, '0')
+        const pickupNumber = last4Digits.padStart(4, '0')
         
         console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
         return pickupNumber
