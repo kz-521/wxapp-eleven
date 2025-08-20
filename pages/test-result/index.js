@@ -80,7 +80,7 @@ Page({
       '金行': '/imgs/test2.png', 
       '水行': '/imgs/test4.png',
       '土行': '/imgs/test3.png',
-      '火行': '/imgs/test5.png'
+      '火行': '/imgs/test4.png'
     }
     
     const typeRightImageMap = {
@@ -292,7 +292,7 @@ Page({
     const testProduct = {
       id: 'test_001',
       name: '测试商品',
-      image: '/imgs/test-product.png',
+      image: '/imgs/home/drink-item.png',
       price: 25.00,
       originalPrice: 30.00,
       tags: ['测试', '推荐'],

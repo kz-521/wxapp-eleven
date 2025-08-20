@@ -17,9 +17,9 @@
     
     <!-- 去测测体质（登录与未登录均显示） -->
     <view class="test-card" bindtap="goToTest">
-      <image src="/imgs/形状@2x.png" class="test-icon"></image>
+      <image src="/imgs/test-icon.png" class="test-icon"></image>
       <text class="test-text">去测测体质</text>
-      <image src="/imgs/编组 2@2x.png" class="refresh-icon"></image>
+      <image src="/imgs/test-user.png" class="refresh-icon"></image>
     </view>
   </view>
 

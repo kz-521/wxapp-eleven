@@ -7,7 +7,7 @@
       <view class="store-details">
         <text class="store-name">{{storeLocation.name}}</text>
       </view>
-      <image src="/imgs/orderBg.png" class="order-bg"></image>
+      <image src="/imgs/order-bg.png" class="order-bg"></image>
     </view>
     <view class="store-address" style="height: 30rpx;">
       {{storeLocation.address}}

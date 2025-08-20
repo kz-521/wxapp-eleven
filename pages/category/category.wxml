@@ -9,7 +9,7 @@
             </view>
         </view>
         <view class="slipper-icons">
-            <image src="/imgs/编组 3@2x.png" class="slipper-icon"></image>
+            <image src="/imgs/slipper-icon.png" class="slipper-icon"></image>
         </view>
     </view>
 

@@ -36,7 +36,7 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:else>
-    <image src="/imgs/empty.png" class="empty-icon"></image>
+    <image src="/components/imgs/empty.png" class="empty-icon"></image>
     <text class="empty-text">暂无优惠券</text>
     <text class="empty-desc">快去领取优惠券吧</text>
   </view>

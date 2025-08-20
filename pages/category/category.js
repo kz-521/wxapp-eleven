@@ -1,4 +1,3 @@
-// pages/category/category.js
 const { api } = require('../../utils/api.js')
 import { Category } from '../../models/category.js'
 

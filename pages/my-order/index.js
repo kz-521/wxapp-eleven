@@ -166,7 +166,7 @@ Page({
                 products = [{
                     id: order.id || 'default',
                     name: order.snap_title || '未知商品',
-                    image: order.snap_img || '/imgs/default-product.png',
+                    image: order.snap_img || '/imgs/home/drink-item.png',
                     count: order.total_count || 1,
                     price: order.total_price || '0.00',
                     specs: '默认规格',

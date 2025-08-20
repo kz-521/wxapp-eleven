@@ -204,7 +204,7 @@ Page({
                 return [{
                     id: orderInfo.id || orderInfo.order_id || 'unknown',
                     name: orderInfo.snap_title || '商品',
-                    image: orderInfo.snap_img || '/imgs/default-product.png',
+                    image: orderInfo.snap_img || '/imgs/home/drink-item.png',
                     count: totalCount,
                     price: (totalPrice / totalCount).toFixed(2),
                     specs: '默认规格',
@@ -215,7 +215,7 @@ Page({
         }
 
         // 映射为页面需要的字段
-        const fallbackImage = orderInfo.snap_img || '/imgs/default-product.png'
+        const fallbackImage = orderInfo.snap_img || '/imgs/home/drink-item.png'
         return rawList.map(item => {
             const id = item.id || item.sku_id || item.product_id || 'unknown'
             const name = item.title || item.name || item.product_name || orderInfo.snap_title || '商品'
