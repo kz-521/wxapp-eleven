@@ -179,27 +179,65 @@ Page({
     },
 
     /**
+     * 规范化订单商品列表
+     * 兼容后端不同字段命名，尽量还原到页面所需的结构
+     */
+    normalizeOrderProducts(orderInfo) {
+        if (!orderInfo || typeof orderInfo !== 'object') return []
+
+        // 可能的字段：snap_items、items、order_items、orderItemList、products
+        const candidates = [
+            orderInfo.snap_items,
+            orderInfo.items,
+            orderInfo.order_items,
+            orderInfo.orderItemList,
+            orderInfo.products
+        ]
+
+        let rawList = candidates.find(arr => Array.isArray(arr))
+
+        // 如果没有数组但有快照字段，构造一个“汇总”商品以避免空列表
+        if (!rawList || rawList.length === 0) {
+            const totalCount = parseInt(orderInfo.total_count) || 0
+            const totalPrice = parseFloat(orderInfo.total_price) || 0
+            if (totalCount > 0) {
+                return [{
+                    id: orderInfo.id || orderInfo.order_id || 'unknown',
+                    name: orderInfo.snap_title || '商品',
+                    image: orderInfo.snap_img || '/imgs/default-product.png',
+                    count: totalCount,
+                    price: (totalPrice / totalCount).toFixed(2),
+                    specs: '默认规格',
+                    totalPrice: totalPrice.toFixed(2)
+                }]
+            }
+            return []
+        }
+
+        // 映射为页面需要的字段
+        const fallbackImage = orderInfo.snap_img || '/imgs/default-product.png'
+        return rawList.map(item => {
+            const id = item.id || item.sku_id || item.product_id || 'unknown'
+            const name = item.title || item.name || item.product_name || orderInfo.snap_title || '商品'
+            const image = item.img || item.image || item.pic || fallbackImage
+            const count = parseInt(item.count || item.quantity || 1)
+            const unitPrice = item.final_price || item.price || (item.total_price && count ? (parseFloat(item.total_price) / count) : undefined)
+            const price = unitPrice ? parseFloat(unitPrice).toFixed(2) : '0.00'
+            const totalPrice = (item.total_price ? parseFloat(item.total_price).toFixed(2) : (parseFloat(price) * count).toFixed(2))
+            const specs = item.specs || item.specification || item.options || '默认规格'
+
+            return { id, name, image, count, price, specs, totalPrice }
+        })
+    },
+
+    /**
      * 设置订单详情数据
      */
     setOrderDetailData(orderInfo) {
         console.log('设置订单详情数据:', orderInfo)
         
-        // 处理商品列表
-        let orderProducts = []
-        if (orderInfo.snap_items && Array.isArray(orderInfo.snap_items)) {
-            orderProducts = orderInfo.snap_items.map(item => ({
-                id: item.id,
-                name: item.title,
-                image: item.img,
-                count: item.count,
-                price: item.final_price,
-                specs: item.specs || '默认规格',
-                totalPrice: item.total_price
-            }))
-        } else if (orderInfo.products && Array.isArray(orderInfo.products)) {
-            // 处理从订单提交页面传递的数据
-            orderProducts = orderInfo.products
-        }
+        // 处理商品列表（兼容多种返回格式）
+        const orderProducts = this.normalizeOrderProducts(orderInfo)
         
         // 获取订单状态
         const orderStatus = this.getOrderStatus(orderInfo.status)
