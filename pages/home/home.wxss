@@ -227,6 +227,9 @@ page {
   text-align: left;
   font-style: normal;
   margin-bottom: 8rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .drink-price {

@@ -36,46 +36,23 @@ Page({
         console.log('订单详情页面加载')
         console.log('页面参数:', options)
         console.log('初始数据状态:', this.data)
-        
-        // 通过eventChannel接收从订单提交页面传递的订单数据
-        try {
-            const eventChannel = this.getOpenerEventChannel()
-            if (eventChannel && typeof eventChannel.on === 'function') {
-                console.log('找到eventChannel，等待接收订单数据')
-                eventChannel.on('orderData', (orderData) => {
-                    console.log('接收到订单数据:', orderData)
-                    console.log('订单商品数量:', orderData.products ? orderData.products.length : 0)
-                    console.log('订单总金额:', orderData.totalAmount)
-                    console.log('创建时间:', orderData.createTime)
-                    this.setOrderDetailData(orderData)
-                })
-            } else {
-                console.log('没有找到eventChannel或eventChannel.on不是函数')
-            }
-        } catch (error) {
-            console.error('eventChannel错误:', error)
-        }
-        
-        // 获取订单ID - 优先使用全局变量的order_id
+
+        // 统一通过 URL 参数或全局变量获取订单ID
         const app = getApp()
-        let orderId = app.globalData.lastOrderId || options.orderId
-        
+        const orderId = options.orderId || app.globalData.lastOrderId
+
         if (orderId) {
-            console.log('获取到订单ID:', orderId, '来源:', app.globalData.lastOrderId ? '全局变量' : '页面参数')
-            this.setData({
-                orderId: orderId
-            })
-            // 获取订单详情
+            console.log('获取到订单ID:', orderId, '来源:', options.orderId ? '页面参数' : '全局变量')
+            this.setData({ orderId })
             this.getOrderDetail(orderId)
         } else {
-            // 如果没有orderId，使用模拟数据
-            console.log('使用模拟订单数据')
+            console.log('未获取到订单ID，使用模拟订单数据')
             this.setMockOrderData()
         }
-        
+
         // 获取门店距离
         this.getStoreDistance()
-        
+
         // 测试图片路径
         console.log('测试图片路径:')
         console.log('noordered.png:', '/imgs/noordered.png')
@@ -102,24 +79,34 @@ Page({
             title: '加载中...'
         })
 
-        // 调用获取订单详情API
+        // 调用获取订单详情API（兼容 result 或 result.data 为对象/数组）
         api.getOrderDetail(orderId).then(res => {
             wx.hideLoading()
             console.log('订单详情响应:', res)
-            
-            if (res.code === 0 && res.result && res.result.data && res.result.data.length > 0) {
-                // 找到对应的订单
-                const orderInfo = res.result.data.find(order => order.id == orderId)
+
+            if (res && res.code === 0) {
+                const payload = res.result || {}
+                const data = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : payload)
+
+                let orderInfo = null
+
+                if (Array.isArray(data)) {
+                    orderInfo = data.find(item => (item && (item.id == orderId || item.order_id == orderId))) || data[0]
+                } else if (data && typeof data === 'object') {
+                    orderInfo = data
+                }
+
                 if (orderInfo) {
+                    console.log('解析得到的订单详情:', orderInfo)
                     this.setOrderDetailData(orderInfo)
                 } else {
-                    console.log('未找到对应订单，使用第一个订单数据')
-                    this.setOrderDetailData(res.result.data[0])
+                    console.warn('未解析到订单详情，使用模拟数据')
+                    this.setMockOrderData()
                 }
             } else {
                 console.log('API返回错误或数据为空:', res)
                 wx.showToast({
-                    title: res.msg || '获取订单详情失败',
+                    title: (res && res.msg) || '获取订单详情失败',
                     icon: 'none'
                 })
             }
@@ -144,12 +131,51 @@ Page({
         // 将订单ID转换为字符串
         const orderIdStr = String(orderId)
         
-        // 获取最后4位，不足4位补0
+        // 获取最后4位，不足4位在末尾补0
         const last4Digits = orderIdStr.slice(-4)
-        const pickupNumber = last4Digits.padStart(4, '0')
+        const pickupNumber = last4Digits.padEnd(4, '0')
         
         console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
         return pickupNumber
+    },
+
+    /**
+     * 格式化时间
+     * @param {string|Date} time 时间字符串或Date对象
+     * @returns {string} 格式化后的时间字符串
+     */
+    formatTime(time) {
+        if (!time) return ''
+        
+        try {
+            let date
+            if (typeof time === 'string') {
+                // 如果是字符串，尝试解析
+                date = new Date(time)
+            } else if (time instanceof Date) {
+                date = time
+            } else {
+                return String(time)
+            }
+            
+            // 检查日期是否有效
+            if (isNaN(date.getTime())) {
+                return String(time)
+            }
+            
+            // 格式化为 yyyy/mm/dd hh:mm:ss
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const hours = String(date.getHours()).padStart(2, '0')
+            const minutes = String(date.getMinutes()).padStart(2, '0')
+            const seconds = String(date.getSeconds()).padStart(2, '0')
+            
+            return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
+        } catch (error) {
+            console.error('时间格式化失败:', error, time)
+            return String(time)
+        }
     },
 
     /**
@@ -180,21 +206,35 @@ Page({
         const orderStatusText = this.getOrderStatusText(orderInfo.status)
         
         // 格式化时间
-        const createTime = orderInfo.create_time || orderInfo.placed_time || orderInfo.createTime || ''
-        const payTime = orderInfo.paid_time || orderInfo.payTime || ''
+        const createTime = this.formatTime(orderInfo.create_time || orderInfo.placed_time || orderInfo.createTime || '')
+        const payTime = this.formatTime(orderInfo.paid_time || orderInfo.payTime || '')
         
-        // 生成取茶号
+        // 生成取茶号 - 优先使用全局变量中的订单ID
         let pickupNumber = '0000'
+        const app = getApp()
+        const globalOrderId = app.globalData.lastOrderId
+        
         if (orderInfo.pickupNumber) {
             // 如果订单数据中有取茶号，直接使用
             pickupNumber = orderInfo.pickupNumber
+        } else if (globalOrderId) {
+            // 优先使用全局变量中的订单ID生成取茶号
+            pickupNumber = this.generatePickupNumber(globalOrderId)
         } else if (orderInfo.id) {
-            // 使用订单ID生成取茶号
+            // 使用订单数据中的ID生成取茶号
             pickupNumber = this.generatePickupNumber(orderInfo.id)
         } else if (this.data.orderId) {
             // 使用页面参数中的订单ID生成取茶号
             pickupNumber = this.generatePickupNumber(this.data.orderId)
         }
+        
+        console.log('取茶号生成过程:', {
+            orderInfoPickupNumber: orderInfo.pickupNumber,
+            globalOrderId: globalOrderId,
+            orderInfoId: orderInfo.id,
+            pageOrderId: this.data.orderId,
+            finalPickupNumber: pickupNumber
+        })
         
         this.setData({
             orderInfo: orderInfo,
@@ -211,6 +251,8 @@ Page({
             // 如果是模拟模式，设置初始模拟状态
             mockStatus: this.data.isMockMode ? orderStatus : this.data.mockStatus
         })
+        
+        console.log('订单详情数据设置完成，取茶号:', pickupNumber)
         
         console.log('订单详情数据设置完成:', {
             orderProducts: orderProducts.length,
@@ -234,15 +276,7 @@ Page({
             total_price: '32.00',
             total_count: 1,
             status: 1, // 默认状态
-            create_time: new Date().toLocaleString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }).replace(/\//g, '/'),
+            create_time: this.formatTime(new Date()), // 使用格式化时间
             remark: '模拟订单数据',
             pickupNumber: this.generatePickupNumber(mockId), // 生成模拟取茶号
             snap_items: [
@@ -463,6 +497,13 @@ Page({
                                 duration: 3000
                             })
                             
+                            // 支付成功后清空购物车（全局与本地缓存）
+                            const app = getApp()
+                            app.globalData.cartItems = []
+                            app.globalData.cartCount = 0
+                            app.globalData.totalPrice = 0
+                            wx.setStorageSync('cartItems', [])
+
                             // 刷新订单详情
                             setTimeout(() => {
                                 this.getOrderDetail(this.data.orderId)

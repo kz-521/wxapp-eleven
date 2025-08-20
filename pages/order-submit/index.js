@@ -238,37 +238,14 @@ Page({
         // 从全局变量获取最后提交的订单ID
         const app = getApp()
         const lastOrderId = app.globalData.lastOrderId
-        
-        // 构建传递给订单详情页的数据
-        const orderDetailData = {
-            products: this.data.orderProducts,
-            coupon: this.data.selectedCoupon,
-            remark: this.data.remark,
-            totalAmount: this.data.totalAmount,
-            couponAmount: this.data.couponAmount,
-            payAmount: this.data.payAmount,
-            diningType: this.data.diningType,
-            createTime: new Date().toLocaleString('zh-CN'),
-            storeLocation: this.data.storeLocation,
-            orderId: lastOrderId, // 传递订单ID
-            pickupNumber: lastOrderId ? this.generatePickupNumber(lastOrderId) : Math.floor(Math.random() * 9000) + 1000,
-            estimatedTime: '6',
-            storePhone: '1342137123'
-        }
-        
-        // 清空购物车
-        app.globalData.cartItems = []
-        app.globalData.cartCount = 0
-        app.globalData.totalPrice = 0
-        
+
+        // 统一通过 URL 参数跳转，避免依赖 eventChannel
+        const url = lastOrderId
+            ? `/pages/order-detail/index?orderId=${lastOrderId}`
+            : '/pages/order-detail/index'
+
         setTimeout(() => {
-            wx.navigateTo({
-                url: '/pages/order-detail/index',
-                success: (res) => {
-                    // 通过eventChannel向被打开页面传送数据
-                    res.eventChannel.emit('orderData', orderDetailData)
-                }
-            })
+            wx.navigateTo({ url })
         }, 2000)
     },
 
@@ -308,6 +285,7 @@ Page({
                             app.globalData.cartItems = []
                             app.globalData.cartCount = 0
                             app.globalData.totalPrice = 0
+                            wx.setStorageSync('cartItems', [])
                             
                             // 清除缓存的优惠券数据
                             wx.removeStorageSync('selectedCoupon')
@@ -660,12 +638,51 @@ Page({
         // 将订单ID转换为字符串
         const orderIdStr = String(orderId)
         
-        // 获取最后4位，不足4位补0
+        // 获取最后4位，不足4位在末尾补0
         const last4Digits = orderIdStr.slice(-4)
-        const pickupNumber = last4Digits.padStart(4, '0')
+        const pickupNumber = last4Digits.padEnd(4, '0')
         
         console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
         return pickupNumber
+    },
+
+    /**
+     * 格式化时间
+     * @param {string|Date} time 时间字符串或Date对象
+     * @returns {string} 格式化后的时间字符串
+     */
+    formatTime(time) {
+        if (!time) return ''
+        
+        try {
+            let date
+            if (typeof time === 'string') {
+                // 如果是字符串，尝试解析
+                date = new Date(time)
+            } else if (time instanceof Date) {
+                date = time
+            } else {
+                return String(time)
+            }
+            
+            // 检查日期是否有效
+            if (isNaN(date.getTime())) {
+                return String(time)
+            }
+            
+            // 格式化为 yyyy/mm/dd hh:mm:ss
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const hours = String(date.getHours()).padStart(2, '0')
+            const minutes = String(date.getMinutes()).padStart(2, '0')
+            const seconds = String(date.getSeconds()).padStart(2, '0')
+            
+            return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
+        } catch (error) {
+            console.error('时间格式化失败:', error, time)
+            return String(time)
+        }
     },
 
     /**

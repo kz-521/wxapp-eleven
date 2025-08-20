@@ -395,8 +395,6 @@ Page({
    */
   async loadCategories() {
     try {
-      console.log('开始获取分类列表')
-
       const response = await Category.getCategoryList()
       console.log('分类API响应:', response)
 
@@ -404,7 +402,8 @@ Page({
       if (formattedData) {
         console.log('获取分类成功:', formattedData.level1Categories)
         this.setData({
-          categories: formattedData.level1Categories
+          categories: formattedData.level1Categories,
+          sectionTitle: response.result[0].name
         })
 
         // 更新右侧标题为第一个分类名称
