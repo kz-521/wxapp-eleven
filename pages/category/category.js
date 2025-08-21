@@ -456,13 +456,6 @@ Page({
    * 根据分类加载商品数据
    */
   loadProductsByCategory(categoryId) {
-    console.log('开始加载分类商品，categoryId:', categoryId)
-    console.log('API调用: /qingting/v1/spu/category/' + categoryId)
-
-    // 检查token是否存在
-    const token = wx.getStorageSync('wechat_token') || wx.getStorageSync('access_token')
-    console.log('购物车页面 - Token检查:', token ? '存在' : '不存在')
-
     api.getSpuByCategory(categoryId).then(res => {
       console.log('API响应:', res)
       if (res.code === 200 && res.result && res.result.list) {

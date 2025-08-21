@@ -1,4 +1,3 @@
-// pages/home/home.js
 const { api } = require('../../utils/api.js')
 import { Spu } from '../../models/spu.js'
 import { Location } from '../../utils/location.js'
@@ -22,7 +21,7 @@ Page({
         this.checkLoginStatus()
         
         // 获取今日推荐数据
-        await this.getRecommendData()
+        this.getRecommendData()
         
         // 获取用户位置和计算距离
         this.initUserLocation()
@@ -32,7 +31,6 @@ Page({
         // 检查登录状态是否发生变化
         const userInfo = wx.getStorageSync('userInfo')
         const currentLoginStatus = userInfo ? true : false
-        
         if (this.data.isLogin !== currentLoginStatus) {
             this.checkLoginStatus()
         }
@@ -66,24 +64,18 @@ Page({
      * 获取token和用户信息
      */
     getTokenAndUserInfo(code) {
-        console.log('微信登录code:', code)
-        
         // 调用正确的token接口
         api.wxLogin(code).then(res => {
-            console.log(res, 'resxcxxcxc');
             if (res.code === 200 && res.result && res.result.token) {
-                // 保存token
                 wx.setStorageSync('wechat_token', res.result.token)
                 console.log('Token保存成功:', res.result.token)
                 
                 // 获取用户信息
                 this.getUserProfile()
             } else {
-                console.error('获取token失败:', res)
                 wx.showToast({ title: '登录失败', icon: 'none' })
             }
         }).catch(err => {
-            console.error('获取token失败:', err)
             wx.showToast({ title: '登录失败', icon: 'none' })
         })
     },
@@ -95,7 +87,6 @@ Page({
         wx.getUserProfile({
             desc: '用于完善用户资料',
             success: (res) => {
-                console.log('一次性获取用户信息成功:', res.userInfo)
                 // 保存用户信息到本地存储
                 wx.setStorageSync('userInfo', res.userInfo)
                 
@@ -110,11 +101,9 @@ Page({
                 })
             },
             fail: (err) => {
-                console.error('一次性获取用户信息失败:', err)
                 if (err.errMsg.includes('cancel')) {
                     wx.showToast({ title: '用户取消授权', icon: 'none' })
                 } else {
-                    console.log('尝试分别授权获取用户信息')
                     // 如果一次性获取失败，尝试分别授权
                     this.getUserInfoSeparately()
                 }
@@ -126,14 +115,10 @@ Page({
      * 分别授权获取用户信息
      */
     getUserInfoSeparately() {
-        console.log('开始分别授权获取用户信息')
-        
         // 由于wx.chooseAvatar不兼容，直接获取昵称并使用默认头像
         const userInfo = wx.getStorageSync('userInfo') || {}
         userInfo.avatarUrl = '/imgs/logo.png' // 使用默认头像
         wx.setStorageSync('userInfo', userInfo)
-        
-        // 直接获取昵称
         this.getNickName()
     },
 
@@ -185,7 +170,7 @@ Page({
      * 跳转到购物车页面
      */
     goToCart() {
-        wx.switchTab({
+        wx.switchTab({  
             url: '/pages/category/category'
         })
     },
@@ -214,26 +199,18 @@ Page({
      */
     async getRecommendData() {
         try {
-            console.log('开始获取今日推荐数据')
             const response = await Spu.getRecommendSpu(3)
             
             // 检查response是否有效
-            if (!response) {
-                console.warn('getRecommendData: API返回null，跳过数据处理')
-                return
-            }
-            
+            if (!response) return
             const formattedDrinks = Spu.formatRecommendData(response)
             if (formattedDrinks) {
-                console.log('获取今日推荐成功:', formattedDrinks.length, '条数据')
                 this.setData({
                     drinks: formattedDrinks
                 })
             } else {
-                console.log('今日推荐数据为空或格式不正确')
             }
         } catch (error) {
-            console.error('获取今日推荐失败:', error)
         }
     },
 
@@ -242,30 +219,23 @@ Page({
      */
     async initUserLocation() {
         try {
-            console.log('开始初始化用户位置')
             // 先检查位置权限
             const permissionStatus = await Location.checkLocationPermission()
-            
             if (permissionStatus.status === 'denied') {
-                // 用户之前拒绝了权限，引导开启
                 try {
                     await Location.requestLocationPermission()
                 } catch (err) {
-                    console.log('用户拒绝开启位置权限')
                     this.setData({ distance: '位置权限未开启' })
                     return
                 }
             }
-            
             // 获取位置并计算距离
             const result = await Location.getUserLocationAndDistance(this.data.storeLocation)
-            
             this.setData({
                 userLocation: result.userLocation,
                 distance: result.distanceText
             })
         } catch (error) {
-            // 根据错误类型显示不同的提示
             if (error.errMsg && error.errMsg.includes('auth deny')) {
                 this.setData({ distance: '位置权限被拒绝' })
             } else if (error.errMsg && error.errMsg.includes('timeout')) {

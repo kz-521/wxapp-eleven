@@ -10,31 +10,12 @@ App({
         selectedCoupon: null, // 选中的优惠券
         lastOrderId: null // 最后提交的订单ID，用于取茶号生成
     },
-    
-    /**
-     * 确保token有效的方法
-     */
-    async ensureToken() {
-        try {
-            await (new Token()).verify();
-            return true;
-        } catch (error) {
-            console.error('Token验证失败:', error);
-            return false;
-        }
-    },
-    
     async onLaunch() {
-
         await (new Token()).verify();
-
         if (wx.canIUse('getUpdateManager')) {
             const updateManager = wx.getUpdateManager()
             updateManager.onCheckForUpdate(function (res) {
                 if (res.hasUpdate) {
-                    try {} catch (e) {
-                        console.log(e)
-                    }
                     updateManager.onUpdateReady(function () {
                         updateManager.applyUpdate();
                     })
