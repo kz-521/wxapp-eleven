@@ -1,64 +1,67 @@
 <view class="page">
-  <view class="group_1">
-    <view class="text-wrapper_1">
+  <!-- 标签页头部 -->
+  <view class="tab-header">
+    <view class="tab-container">
       <view class="tab-item">
-        <text lines="1" class="text_3 {{activeTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">全部</text>
+        <text class="tab-text {{activeTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">全部</text>
         <image wx:if="{{activeTab === 1}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
       </view>
       <view class="tab-item">
-        <text lines="1" class="text_4 {{activeTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">待取茶</text>
+        <text class="tab-text {{activeTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-tab="2">待取茶</text>
         <image wx:if="{{activeTab === 2}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
       </view>
       <view class="tab-item">
-        <text lines="1" class="text_5 {{activeTab === 3 ? 'active' : ''}}" bindtap="switchTab" data-tab="3">已完成</text>
+        <text class="tab-text {{activeTab === 3 ? 'active' : ''}}" bindtap="switchTab" data-tab="3">已完成</text>
         <image wx:if="{{activeTab === 3}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
       </view>
       <view class="tab-item">
-        <text lines="1" class="text_6 {{activeTab === 4 ? 'active' : ''}}" bindtap="switchTab" data-tab="4">已取消</text>
+        <text class="tab-text {{activeTab === 4 ? 'active' : ''}}" bindtap="switchTab" data-tab="4">已取消</text>
         <image wx:if="{{activeTab === 4}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
       </view>
     </view>
-    <view class="image-wrapper_1">
-      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="image_3"></image>
+    <view class="tab-divider">
+      <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="divider-line"></image>
     </view>
   </view>
   
   <!-- 订单列表 -->
-  <view style="padding-bottom: 80rpx;" wx:if="{{orders.length > 0}}">
-    <view class="group_2" wx:for="{{orders}}" wx:key="id" bindtap="goToOrderDetail" data-order-id="{{item.id}}">
-      <view class="section_1">
-        <view style="display: flex;">
-          <view class="text-wrapper_2">
-            <text lines="1" class="text_7">堂食</text>
+  <view class="order-list" wx:if="{{orders.length > 0}}">
+    <view class="order-item" wx:for="{{orders}}" wx:key="id" bindtap="goToOrderDetail" data-order-id="{{item.id}}">
+      <!-- 订单头部信息 -->
+      <view class="order-header">
+        <view class="order-type-info">
+          <view class="order-type-tag">
+            <text class="order-type-text">堂食</text>
           </view>
-          <text lines="1" class="text_8">清汀.新养生空间</text>
+          <text class="store-name">清汀.新养生空间</text>
         </view>
-        <text lines="1" class="text_9">{{item.statusText}}</text>
+        <text class="order-status">{{item.statusText}}</text>
       </view>
       
       <!-- 商品列表 -->
-      <view class="section_2" wx:for="{{item.products}}" wx:key="id" wx:for-item="product">
-        <view class="image-text_1">
-          <view class="image-wrapper_2">
-            <image src="{{product.image}}" class="image_5"></image>
+      <view class="product-item" wx:for="{{item.products}}" wx:key="id" wx:for-item="product">
+        <view class="product-info">
+          <view class="product-image-wrapper">
+            <image src="{{product.image}}" class="product-image"></image>
           </view>
-          <view class="text-group_1">
-            <text lines="1" class="text_10">{{product.name}}</text>
-            <text lines="1" class="text_11">{{product.specs}}</text>
+          <view class="product-details">
+            <text class="product-name">{{product.name}}</text>
+            <text class="product-specs">{{product.specs}}</text>
           </view>
         </view>
-        <text lines="1" decode="true" class="text_12">x&nbsp;{{product.count}}</text>
+        <text class="product-count">x {{product.count}}</text>
       </view>
       
-      <view class="section_4">
-        <text lines="1" decode="true" class="text_16">{{item.createTime}}</text>
-        <view class="text-wrapper_3">
-          <text lines="1" decode="true" class="text_17">共{{item.totalCount}}件商品&nbsp;合计：</text>
-          <text lines="1" class="text_18">¥{{item.totalPrice}}</text>
+      <!-- 订单底部信息 -->
+      <view class="order-footer">
+        <text class="order-time">{{item.createTime}}</text>
+        <view class="order-summary">
+          <text class="order-summary-text">共{{item.totalCount}}件商品 合计：</text>
+          <text class="order-total-price">¥{{item.totalPrice}}</text>
         </view>
       </view>
     </view>
-    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="image_10" wx:if="{{index < orders.length - 1}}"></image>
+    <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="order-separator" wx:if="{{index < orders.length - 1}}"></image>
   </view>
   
   <!-- 空状态 -->

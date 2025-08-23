@@ -1,4 +1,3 @@
-// pages/coupon-select/index.js
 import { Coupon } from '../../models/coupon.js'
 
 Page({

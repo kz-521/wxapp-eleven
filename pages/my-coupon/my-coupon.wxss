@@ -1,5 +1,3 @@
-/* pages/my-coupon/my-coupon.wxss */
-
 .coupon-page {
   background-color: #f8f8f8;
   min-height: 100vh;

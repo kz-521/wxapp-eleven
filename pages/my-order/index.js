@@ -1,11 +1,6 @@
-// pages/my-order/my-order.js
 const { api } = require('../../utils/api.js')
 
 Page({
-
-    /**
-     * 页面的初始数据
-     */
     data: {
         activeKey: 0, // 当前选中的tab，0=全部, 1=待取茶, 2=已完成, 3=已取消
         activeTab: 0, // 当前选中的tab索引
@@ -15,10 +10,6 @@ Page({
         per_page: 10,
         hasMore: true
     },
-
-    /**
-     * 生命周期函数--监听页面加载
-     */
     onLoad: async function (options) {
         console.log('订单列表页面加载，参数:', options)
         
@@ -256,18 +247,13 @@ Page({
         this.loadOrders(true)
     },
 
-    /**
-     * 下拉刷新
-     */
     onPullDownRefresh() {
         this.loadOrders(true).then(() => {
             wx.stopPullDownRefresh()
         })
     },
 
-    /**
-     * 上拉加载更多
-     */
+ 
     onReachBottom() {
         if (this.data.hasMore && !this.data.loading) {
             this.loadOrders(false)
