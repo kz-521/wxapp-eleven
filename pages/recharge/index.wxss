@@ -1,0 +1,142 @@
+.recharge-page {
+  background-color: #FFFFFF;
+  min-height: 100vh;
+  padding: 40rpx 50rpx;
+  box-sizing: border-box;
+}
+
+/* 余额信息卡片 */
+.balance-card {
+  width: 650rpx;
+  background: #F9F8FA;
+  border-radius: 20rpx;
+  padding: 60rpx 40rpx;
+  box-sizing: border-box;
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.balance-title {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.65);
+  font-family: PingFang-SC-Medium;
+  line-height: 40rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.balance-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.currency {
+  font-size: 36rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+}
+
+.amount {
+  font-size: 72rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 充值金额选择区域 */
+.amount-section {
+  margin-bottom: 80rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 45rpx;
+  display: block;
+  margin-bottom: 40rpx;
+}
+
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.amount-item {
+  width: 315rpx;
+  height: 120rpx;
+  background: #F9F8FA;
+  border-radius: 16rpx;
+  border: 3rpx solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.amount-item.selected {
+  background: #2EAA5B;
+  border-color: #2EAA5B;
+}
+
+.amount-text {
+  font-size: 36rpx;
+  color: rgba(0,0,0,0.85);
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 50rpx;
+}
+
+.amount-item.selected .amount-text {
+  color: #FFFFFF;
+}
+
+/* 充值按钮 */
+.recharge-button-wrapper {
+  position: fixed;
+  bottom: 60rpx;
+  left: 50rpx;
+  right: 50rpx;
+}
+
+.recharge-button {
+  width: 100%;
+  height: 100rpx;
+  background: #CCCCCC;
+  border-radius: 50rpx;
+  border: none;
+  font-size: 32rpx;
+  color: #FFFFFF;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.recharge-button.active {
+  background: #2EAA5B;
+}
+
+.recharge-button.active:active {
+  background: #269149;
+  transform: scale(0.98);
+}
+
+.recharge-button.disabled:active {
+  transform: none;
+}
+
+/* 确保页面背景为白色 */
+page {
+  background-color: #FFFFFF;
+}

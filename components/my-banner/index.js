@@ -249,10 +249,8 @@ Component({
         },
 
         onGotoBalance(event) {
-            wx.showToast({
-                title: '余额功能开发中',
-                icon: 'none',
-                duration: 2000
+            wx.navigateTo({
+                url: '/pages/recharge/index'
             })
         },
 

@@ -3,7 +3,7 @@ import {Coupon} from "../../models/coupon";
 Page({
     data: {
         couponCount: 0,
-        balance: 0
+        balance: 188.50 // 设置默认余额
     },
 
     onLoad: async function (options) {
@@ -20,7 +20,7 @@ Page({
             }
             this.setData({
                 couponCount,
-                balance: 0 // 模拟余额数据
+                balance: wx.getStorageSync('userBalance') || 188.50 // 从本地存储获取余额
             })
             
         } catch (error) {
@@ -28,7 +28,7 @@ Page({
             // 设置默认值
             this.setData({
                 couponCount: 0,
-                balance: 0
+                balance: wx.getStorageSync('userBalance') || 188.50 // 从本地存储获取余额
             })
         }
     },
@@ -82,6 +82,11 @@ Page({
         try {
             // 刷新用户信息显示
             this.refreshUserInfo()
+            
+            // 刷新余额数据
+            this.setData({
+                balance: wx.getStorageSync('userBalance') || 188.50
+            })
             
             // 避免频繁调用API，只在必要时刷新优惠券数据
             const currentTime = Date.now()
