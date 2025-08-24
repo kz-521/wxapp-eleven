@@ -3,6 +3,7 @@
   min-height: 100vh;
   padding: 40rpx 50rpx;
   box-sizing: border-box;
+  padding-bottom: 200rpx; /* 为底部按钮留出空间 */
 }
 
 /* 余额信息卡片 */
@@ -30,6 +31,7 @@
   align-items: baseline;
   justify-content: center;
   gap: 8rpx;
+  margin-bottom: 20rpx;
 }
 
 .currency {
@@ -47,9 +49,16 @@
   line-height: 1;
 }
 
+.balance-tip {
+  font-size: 24rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Regular;
+  line-height: 34rpx;
+}
+
 /* 充值金额选择区域 */
 .amount-section {
-  margin-bottom: 80rpx;
+  margin-bottom: 60rpx;
 }
 
 .section-title {
@@ -66,6 +75,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20rpx;
+  margin-bottom: 40rpx;
 }
 
 .amount-item {
@@ -75,10 +85,12 @@
   border-radius: 16rpx;
   border: 3rpx solid transparent;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  position: relative;
 }
 
 .amount-item.selected {
@@ -96,6 +108,119 @@
 
 .amount-item.selected .amount-text {
   color: #FFFFFF;
+}
+
+.amount-bonus {
+  font-size: 22rpx;
+  color: #FF6B35;
+  font-family: PingFang-SC-Regular;
+  line-height: 30rpx;
+  margin-top: 8rpx;
+}
+
+.amount-item.selected .amount-bonus {
+  color: #FFE4D6;
+}
+
+/* 充值说明 */
+.recharge-tips {
+  background: #F9F8FA;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 60rpx;
+}
+
+.tips-title {
+  font-size: 28rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 40rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.tips-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.tip-item {
+  font-size: 24rpx;
+  color: rgba(0,0,0,0.65);
+  font-family: PingFang-SC-Regular;
+  line-height: 34rpx;
+}
+
+/* 充值记录 */
+.recharge-history {
+  margin-bottom: 40rpx;
+}
+
+.history-title {
+  font-size: 28rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 40rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #F9F8FA;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+}
+
+.history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.history-amount {
+  font-size: 32rpx;
+  color: #2EAA5B;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 45rpx;
+}
+
+.history-time {
+  font-size: 24rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFang-SC-Regular;
+  line-height: 34rpx;
+}
+
+.history-status {
+  font-size: 24rpx;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 34rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.history-status.success {
+  color: #2EAA5B;
+  background: rgba(46, 170, 91, 0.1);
+}
+
+.history-status.pending {
+  color: #FF9500;
+  background: rgba(255, 149, 0, 0.1);
 }
 
 /* 充值按钮 */

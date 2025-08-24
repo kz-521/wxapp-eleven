@@ -1,4 +1,3 @@
-// pages/order-submit/order-submit.js
 const { api } = require('../../utils/api.js')
 import { Location } from '../../utils/location.js'
 
@@ -18,7 +17,25 @@ Page({
           name: '清汀.新养生空间',
           address: '浙江省杭州市余杭区瓶窑镇南山村横山60号1幢1楼106室'
         },
-        distance: ''
+        distance: '',
+        // 支付方式相关
+        selectedPaymentMethod: 'wechat', // 默认选择微信支付
+        paymentMethods: [
+            {
+                id: 'wechat',
+                name: '微信支付',
+                description: '使用微信快捷支付',
+                icon: '/imgs/weixin.png',
+                selected: true
+            },
+            {
+                id: 'balance',
+                name: '余额支付',
+                description: '使用钱包余额支付',
+                icon: '/imgs/balance.png', // 余额图标
+                selected: false
+            }
+        ]
     },
 
     onLoad(options) {
@@ -253,9 +270,12 @@ Page({
      * 调用支付接口
      */
     callPayment(orderId) {
-        console.log('开始调用支付接口，订单ID:', orderId)
+        console.log('开始调用支付接口，订单ID:', orderId, '支付方式:', this.data.selectedPaymentMethod)
         
-        api.payPreorder(orderId).then(res => {
+        // 根据支付方式设置pay_way字段
+        const payWay = this.data.selectedPaymentMethod === 'balance' ? 2 : 1
+        
+        api.payPreorder(orderId, { pay_way: payWay }).then(res => {
             console.log('支付接口响应:', res)
             
             if (res.code === 0 && res.result) {
@@ -559,6 +579,7 @@ Page({
         }).replace(/\//g, '/')
 
         console.log('生成的下单时间:', createTime)
+        console.log('选择的支付方式:', this.data.selectedPaymentMethod)
 
         // 构建API期望的订单数据格式
         const apiOrderData = {
@@ -572,10 +593,16 @@ Page({
             total_amount: parseFloat(this.data.totalAmount),
             coupon_amount: parseFloat(this.data.couponAmount) || 0,
             pay_amount: parseFloat(this.data.payAmount),
-            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null
+            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null,
+            payment_method: this.data.selectedPaymentMethod, // 添加支付方式
+            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1 // 添加pay_way字段
         }
 
         console.log('发送给API的订单数据:', apiOrderData)
+        console.log('支付方式字段:', {
+            selectedPaymentMethod: this.data.selectedPaymentMethod,
+            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1
+        })
 
         // 调用提交订单API
         api.submitOrder(apiOrderData).then(res => {
@@ -599,8 +626,14 @@ Page({
                     app.globalData.lastOrderId = orderId
                     console.log('已存储订单ID到全局变量:', orderId)
                     
-                    // 调用支付接口
-                    this.callPayment(orderId)
+                    // 根据选择的支付方式执行不同的支付流程
+                    if (this.data.selectedPaymentMethod === 'balance') {
+                        // 余额支付
+                        this.processBalancePayment(orderId)
+                    } else {
+                        // 微信支付
+                        this.callPayment(orderId)
+                    }
                 } else {
                     console.error('订单提交成功但未获取到订单ID:', res)
                     wx.showToast({
@@ -625,6 +658,74 @@ Page({
                 icon: 'none'
             })
         })
+    },
+
+    /**
+     * 处理余额支付
+     */
+    processBalancePayment(orderId) {
+        console.log('开始处理余额支付，订单ID:', orderId, '支付方式: 余额支付')
+        
+        // 检查用户余额是否足够
+        const userBalance = wx.getStorageSync('userBalance') || 0
+        const payAmount = parseFloat(this.data.payAmount)
+        
+        if (userBalance < payAmount) {
+            wx.showModal({
+                title: '余额不足',
+                content: `当前余额：¥${userBalance}\n需要支付：¥${payAmount}\n是否前往充值？`,
+                confirmText: '去充值',
+                cancelText: '取消',
+                success: (res) => {
+                    if (res.confirm) {
+                        // 跳转到充值页面
+                        wx.navigateTo({
+                            url: '/pages/recharge/index'
+                        })
+                    }
+                }
+            })
+            return
+        }
+        
+        // 余额足够，执行支付
+        wx.showLoading({
+            title: '余额支付中...'
+        })
+        
+        // 模拟余额支付处理
+        setTimeout(() => {
+            wx.hideLoading()
+            
+            // 扣除余额
+            const newBalance = userBalance - payAmount
+            wx.setStorageSync('userBalance', newBalance)
+            
+            wx.showToast({
+                title: '余额支付成功！',
+                icon: 'success',
+                duration: 3000
+            })
+            
+            // 清空购物车
+            const app = getApp()
+            app.globalData.cartItems = []
+            app.globalData.cartCount = 0
+            app.globalData.totalPrice = 0
+            wx.setStorageSync('cartItems', [])
+            
+            // 清除缓存的优惠券数据
+            wx.removeStorageSync('selectedCoupon')
+            wx.removeStorageSync('couponAmount')
+            wx.removeStorageSync('payAmount')
+            
+            // 跳转到订单详情页
+            setTimeout(() => {
+                wx.redirectTo({
+                    url: `/pages/order-detail/index?orderId=${orderId}`
+                })
+            }, 2000)
+        }, 2000)
     },
 
     /**
@@ -727,5 +828,48 @@ Page({
                 this.setData({ distance: '定位失败' })
             }
         }
+    },
+
+    /**
+     * 测试支付方式选择
+     */
+    testPaymentMethodSelection() {
+        console.log('=== 测试支付方式选择 ===')
+        console.log('当前选择的支付方式:', this.data.selectedPaymentMethod)
+        console.log('支付方式数组:', this.data.paymentMethods)
+        
+        // 测试pay_way字段计算
+        const payWay = this.data.selectedPaymentMethod === 'balance' ? 2 : 1
+        console.log('计算出的pay_way字段:', payWay)
+        
+        // 测试支付方式切换
+        const testMethods = ['wechat', 'balance']
+        testMethods.forEach(method => {
+            const testPayWay = method === 'balance' ? 2 : 1
+            console.log(`支付方式 ${method} -> pay_way: ${testPayWay}`)
+        })
+        
+        console.log('=== 测试完成 ===')
+    },
+
+    /**
+     * 选择支付方式
+     */
+    selectPaymentMethod(e) {
+        const methodId = e.currentTarget.dataset.method;
+        console.log('选择支付方式:', methodId);
+        
+        // 更新支付方式选择状态
+        const updatedMethods = this.data.paymentMethods.map(method => ({
+            ...method,
+            selected: method.id === methodId
+        }));
+        
+        this.setData({
+            selectedPaymentMethod: methodId,
+            paymentMethods: updatedMethods
+        });
+        
+        console.log('支付方式已更新:', methodId);
     },
 }) 

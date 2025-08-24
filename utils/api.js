@@ -151,11 +151,14 @@ const api = {
   },
 
   // 支付接口
-  payPreorder: (orderId) => {
+  payPreorder: (orderId, extraData = {}) => {
     return request({
       url: `/qingting/v1/pay/preorder`,
       method: 'POST',
-      data: { order_id: orderId }
+      data: { 
+        order_id: orderId,
+        ...extraData  // 支持传递额外参数，如pay_way
+      }
     })
   },
 
@@ -219,6 +222,31 @@ const api = {
     return request({
       url: `/qingting/v1/order/pickup/${orderId}`,
       method: 'POST'
+    })
+  },
+
+  // 获取用户余额
+  getUserBalance: () => {
+    return request({
+      url: '/qingting/v1/user/balance',
+      method: 'GET'
+    })
+  },
+
+  // 充值接口
+  recharge: (amount) => {
+    return request({
+      url: '/qingting/v1/user/recharge',
+      method: 'POST',
+      data: { amount }
+    })
+  },
+
+  // 获取充值记录
+  getRechargeHistory: (page = 1, size = 10) => {
+    return request({
+      url: `/qingting/v1/user/recharge/history?page=${page}&size=${size}`,
+      method: 'GET'
     })
   }
 }
