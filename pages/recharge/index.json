@@ -2,5 +2,7 @@
   "navigationBarTitleText": "余额充值",
   "navigationBarBackgroundColor": "#FFFFFF",
   "navigationBarTextStyle": "black",
-  "backgroundColor": "#FFFFFF"
+  "backgroundColor": "#FFFFFF",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
 }

@@ -1,5 +1,5 @@
 const { api } = require('../../utils/api.js');
-const { mockRechargeAPI } = require('../../utils/mockRechargeAPI.js');
+import { Balance } from '../../models/balance.js';
 
 Page({
   data: {
@@ -7,7 +7,7 @@ Page({
     selectedAmount: null, // 选中的充值金额
     rechargeAmount: 0, // 实际充值金额
     canRecharge: false, // 是否可以充值
-    rechargeAmounts: [100, 200, 500, 1000, 2000, 5000], // 固定充值金额选项
+    rechargeAmounts: [0.01, 200, 500, 1000, 2000, 5000], // 固定充值金额选项
     rechargeHistory: [], // 充值记录
     isLoading: false // 加载状态
   },
@@ -23,37 +23,30 @@ Page({
     wx.showLoading({ title: '加载中...' });
     
     try {
-      // 使用模拟API获取余额
-      const response = await mockRechargeAPI.getUserBalance();
-      if (response.success) {
-        const balance = response.data.balance;
+      const response = await Balance.getUserBalance();
+      if (response && (response.code === 0 || response.code === 200)) {
+        const balance = response.result?.balance || response.data?.balance || 0;
         this.setData({ balance: balance });
         
         // 更新本地存储
         wx.setStorageSync('userBalance', balance);
+      } else {
+        throw new Error(response?.msg || '获取余额失败');
       }
     } catch (error) {
       console.error('获取余额失败:', error);
       // 如果API失败，使用本地存储的余额
-      const localBalance = wx.getStorageSync('userBalance') || 188.50;
+      const localBalance = wx.getStorageSync('userBalance') || 0.00;
       this.setData({ balance: localBalance });
       
       wx.showToast({
-        title: '获取余额失败，使用本地数据',
+        title: '获取余额失败',
         icon: 'none'
       });
     } finally {
       this.setData({ isLoading: false });
       wx.hideLoading();
     }
-    
-    // 实际项目中应该调用真实API
-    // try {
-    //   const response = await api.getUserBalance();
-    //   this.setData({ balance: response.data.balance });
-    // } catch (error) {
-    //   console.error('获取余额失败:', error);
-    // }
   },
 
   // 选择充值金额
@@ -77,9 +70,12 @@ Page({
     }
 
     const amount = this.data.rechargeAmount;
-    if (amount < 10) {
+    
+    // 使用Balance模型验证充值金额
+    const validation = Balance.validateRechargeAmount(amount);
+    if (!validation.valid) {
       wx.showToast({
-        title: '充值金额不能少于10元',
+        title: validation.message,
         icon: 'none'
       });
       return;
@@ -87,10 +83,10 @@ Page({
 
     wx.showModal({
       title: '确认充值',
-      content: `确定要充值 ¥${amount} 吗？`,
+      content: `确定要充值 ¥${Balance.formatBalance(amount)} 吗？`,
       success: (res) => {
         if (res.confirm) {
-          this.processRecharge(amount);
+          this.processRecharge(validation.amount);
         }
       }
     });
@@ -102,136 +98,228 @@ Page({
     
     this.setData({ isLoading: true });
     wx.showLoading({
-      title: '充值中...'
+      title: '创建订单中...'
     });
 
     try {
-      // 使用模拟充值API
-      const response = await mockRechargeAPI.recharge(amount);
-      if (response.success) {
-        this.handleRechargeSuccess(response.data);
+      // 创建充值订单
+      const response = await Balance.createRecharge(amount);
+      if (response && (response.code === 0 || response.code === 200)) {
+        const { recharge_id, order_no, pay_params } = response.result || response.data;
+        
+        // 更新加载状态
+        wx.showLoading({
+          title: '拉起支付中...'
+        });
+        
+        // 拉起微信支付
+        await this.initiateWechatPay({
+          amount,
+          recharge_id,
+          order_no,
+          pay_params
+        });
+      } else {
+        throw new Error(response?.msg || '订单创建失败');
       }
     } catch (error) {
       console.error('充值失败:', error);
       this.handleRechargeFailure(error);
     } finally {
       this.setData({ isLoading: false });
+      wx.hideLoading();
     }
-    
-    // 实际项目中应该调用真实API
-    // try {
-    //   const response = await api.recharge(amount);
-    //   this.handleRechargeSuccess(response.data);
-    // } catch (error) {
-    //   this.handleRechargeFailure(error);
-    // }
   },
 
-  // 处理充值成功
-  handleRechargeSuccess(data) {
-    wx.hideLoading();
+  // 拉起微信支付
+  async initiateWechatPay(paymentData) {
+    const { amount, recharge_id, order_no, pay_params } = paymentData;
     
-    const { amount, bonus, totalAmount, newBalance, orderNo } = data;
+    return new Promise((resolve, reject) => {
+      wx.requestPayment({
+        timeStamp: pay_params.timeStamp,
+        nonceStr: pay_params.nonceStr,
+        package: pay_params.package,
+        signType: pay_params.signType || 'RSA',
+        paySign: pay_params.paySign,
+        success: (res) => {
+          console.log('微信支付成功:', res);
+          // 支付成功后处理
+          this.handlePaymentSuccess({
+            amount,
+            recharge_id,
+            order_no
+          });
+          resolve(res);
+        },
+        fail: (err) => {
+          console.log('微信支付失败:', err);
+          // 支付失败处理
+          this.handlePaymentFailure({
+            amount,
+            recharge_id,
+            order_no,
+            error: err
+          });
+          reject(err);
+        }
+      });
+    });
+  },
+
+  // 处理支付成功
+  async handlePaymentSuccess(data) {
+    const { amount, recharge_id, order_no } = data;
     
-    // 更新本地存储
-    wx.setStorageSync('userBalance', newBalance);
-    
-    // 添加充值记录
-    const rechargeRecord = {
-      id: Date.now(),
-      amount: amount,
-      bonus: bonus,
-      totalAmount: totalAmount,
-      status: 'success',
-      createTime: this.formatTime(new Date()),
-      orderNo: orderNo
-    };
-    
-    // 更新页面数据
-    this.setData({
-      balance: newBalance,
-      selectedAmount: null,
-      rechargeAmount: 0,
-      canRecharge: false,
-      rechargeHistory: [rechargeRecord, ...this.data.rechargeHistory]
+    wx.showLoading({
+      title: '充值完成中...'
     });
     
-    // 显示成功提示
+    try {
+      // 重新获取用户余额
+      await this.getUserBalance();
+      
+      // 添加充值记录到本地显示
+      const rechargeRecord = {
+        id: recharge_id || Date.now(),
+        amount: Balance.formatBalance(amount),
+        status: 'success',
+        statusText: '充值成功',
+        createTime: Balance.formatDateTime(new Date()),
+        orderNo: order_no
+      };
+      
+      // 更新页面数据
+      this.setData({
+        selectedAmount: null,
+        rechargeAmount: 0,
+        canRecharge: false,
+        rechargeHistory: [rechargeRecord, ...this.data.rechargeHistory]
+      });
+      
+      wx.hideLoading();
+      
+      // 显示成功提示
+      wx.showModal({
+        title: '充值成功',
+        content: `充值金额：¥${Balance.formatBalance(amount)}\n订单号：${order_no}\n余额已实时更新`,
+        showCancel: false,
+        confirmText: '确定',
+        success: () => {
+          // 刷新充值记录
+          this.getRechargeHistory();
+        }
+      });
+    } catch (error) {
+      wx.hideLoading();
+      console.error('获取余额失败:', error);
+      
+      // 即使获取余额失败，也显示充值成功
+      wx.showModal({
+        title: '充值成功',
+        content: `充值金额：¥${Balance.formatBalance(amount)}\n订单号：${order_no}\n请刷新页面查看最新余额`,
+        showCancel: false,
+        confirmText: '确定'
+      });
+    }
+  },
+
+  // 处理支付失败
+  handlePaymentFailure(data) {
+    const { amount, order_no, error } = data;
+    
+    wx.hideLoading();
+    
+    let title = '支付失败';
+    let content = '支付已取消或失败';
+    
+    // 根据错误类型显示不同信息
+    if (error.errMsg) {
+      if (error.errMsg.includes('cancel')) {
+        title = '支付已取消';
+        content = '您已取消支付，订单未完成';
+      } else if (error.errMsg.includes('fail')) {
+        title = '支付失败';
+        content = '支付过程中出现错误，请重试';
+      }
+    }
+    
     wx.showModal({
-      title: '充值成功',
-      content: `充值金额：¥${amount}\n赠送金额：¥${bonus}\n到账金额：¥${totalAmount}\n订单号：${orderNo}`,
-      showCancel: false,
-      success: () => {
-        // 1秒后返回上一页
-        setTimeout(() => {
-          wx.navigateBack();
-        }, 1000);
+      title: title,
+      content: `${content}\n充值金额：¥${Balance.formatBalance(amount)}\n订单号：${order_no}`,
+      showCancel: true,
+      confirmText: '重试',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户选择重试，重新发起充值
+          setTimeout(() => {
+            this.processRecharge(amount);
+          }, 500);
+        }
       }
     });
   },
 
-  // 处理充值失败
+  // 处理充值失败（订单创建失败）
   handleRechargeFailure(error) {
     wx.hideLoading();
-    wx.showToast({
-      title: error.message || '充值失败，请重试',
-      icon: 'none',
-      duration: 3000
+    
+    wx.showModal({
+      title: '订单创建失败',
+      content: error.message || '创建充值订单失败，请检查网络后重试',
+      showCancel: true,
+      confirmText: '重试',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          // 用户选择重试
+          setTimeout(() => {
+            this.doRecharge();
+          }, 500);
+        }
+      }
     });
   },
 
   // 获取充值记录
   async getRechargeHistory() {
     try {
-      // 使用模拟API获取充值记录
-      const response = await mockRechargeAPI.getRechargeHistory(1, 10);
-      if (response.success) {
+      const response = await Balance.getRechargeHistory(1, 10);
+      if (response && (response.code === 0 || response.code === 200)) {
+        const records = Balance.formatRechargeHistory(response);
         this.setData({
-          rechargeHistory: response.data.list
+          rechargeHistory: records
         });
       }
     } catch (error) {
       console.error('获取充值记录失败:', error);
-      // 如果API失败，使用模拟数据
-      const mockHistory = [
-        {
-          id: 1,
-          amount: 500,
-          bonus: 0,
-          status: 'success',
-          createTime: '2024-01-15 14:30'
-        },
-        {
-          id: 2,
-          amount: 1000,
-          bonus: 100,
-          status: 'success',
-          createTime: '2024-01-10 09:15'
-        }
-      ];
-      
+      // 如果API失败，显示空列表
       this.setData({
-        rechargeHistory: mockHistory
+        rechargeHistory: []
       });
     }
-    
-    // 实际项目中应该调用真实API
-    // try {
-    //   const response = await api.getRechargeHistory(1, 10);
-    //   this.setData({ rechargeHistory: response.data.list });
-    // } catch (error) {
-    //   console.error('获取充值记录失败:', error);
-    // }
   },
 
-  // 格式化时间
-  formatTime(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
+  // 自定义输入金额
+  onAmountInput(e) {
+    const value = e.detail.value;
+    const amount = parseFloat(value) || 0;
     
-    return `${year}-${month}-${day} ${hour}:${minute}`;
+    this.setData({
+      selectedAmount: null, // 清除预设选项选中状态
+      rechargeAmount: amount,
+      canRecharge: amount > 0
+    });
+  },
+
+  // 刷新页面数据
+  onPullDownRefresh() {
+    Promise.all([
+      this.getUserBalance(),
+      this.getRechargeHistory()
+    ]).finally(() => {
+      wx.stopPullDownRefresh();
+    });
   }
 });

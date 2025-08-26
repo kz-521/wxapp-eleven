@@ -122,6 +122,60 @@
   color: #FFE4D6;
 }
 
+/* 自定义金额输入 */
+.custom-amount {
+  margin-top: 40rpx;
+}
+
+.custom-title {
+  font-size: 28rpx;
+  color: #000000;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  line-height: 40rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #F9F8FA;
+  border-radius: 16rpx;
+  padding: 0 30rpx;
+  height: 100rpx;
+  border: 3rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: #2EAA5B;
+}
+
+.currency-symbol {
+  font-size: 32rpx;
+  color: rgba(0,0,0,0.85);
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  margin-right: 10rpx;
+}
+
+.amount-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: rgba(0,0,0,0.85);
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.amount-input::placeholder {
+  color: rgba(0,0,0,0.45);
+  font-weight: 400;
+}
+
 /* 充值说明 */
 .recharge-tips {
   background: #F9F8FA;

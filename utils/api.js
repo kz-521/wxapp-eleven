@@ -248,6 +248,15 @@ const api = {
       url: `/qingting/v1/user/recharge/history?page=${page}&size=${size}`,
       method: 'GET'
     })
+  },
+
+  // 创建余额充值订单
+  createBalanceRecharge: (amount) => {
+    return request({
+      url: '/qingting/v1/balance/recharge/create',
+      method: 'POST',
+      data: { amount }
+    })
   }
 }
 

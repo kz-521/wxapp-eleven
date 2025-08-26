@@ -22,15 +22,55 @@
         <text class="amount-text">¥{{item}}</text>
       </view>
     </view>
+    
+    <!-- 自定义金额输入 -->
+    <view class="custom-amount">
+      <text class="custom-title">自定义金额</text>
+      <view class="input-wrapper">
+        <text class="currency-symbol">¥</text>
+        <input 
+          class="amount-input" 
+          type="digit"
+          placeholder="请输入充值金额"
+          value="{{selectedAmount ? '' : rechargeAmount}}"
+          bindinput="onAmountInput"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 充值说明 -->
+  <view class="recharge-tips">
+    <text class="tips-title">充值说明</text>
+    <view class="tips-content">
+      <text class="tip-item">• 充值金额实时到账，可用于购买商品</text>
+      <text class="tip-item">• 最低充值金额为1元，最高单次充值10000元</text>
+      <text class="tip-item">• 充值记录可在下方查看</text>
+    </view>
+  </view>
+
+  <!-- 充值记录 -->
+  <view class="recharge-history" wx:if="{{rechargeHistory.length > 0}}">
+    <text class="history-title">最近充值记录</text>
+    <view class="history-list">
+      <view class="history-item" wx:for="{{rechargeHistory}}" wx:key="id">
+        <view class="history-info">
+          <text class="history-amount">+¥{{item.amount}}</text>
+          <text class="history-time">{{item.createTime}}</text>
+        </view>
+        <view class="history-status {{item.status}}">{{item.statusText}}</view>
+      </view>
+    </view>
   </view>
 
   <!-- 充值按钮 -->
   <view class="recharge-button-wrapper">
     <button 
-      class="recharge-button {{selectedAmount ? 'active' : 'disabled'}}"
+      class="recharge-button {{canRecharge ? 'active' : 'disabled'}}"
       bindtap="doRecharge"
+      disabled="{{isLoading}}"
     >
-      立即充值
+      {{isLoading ? '处理中...' : '立即充值'}}
     </button>
   </view>
 </view>
