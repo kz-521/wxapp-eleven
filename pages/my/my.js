@@ -1,4 +1,5 @@
 import {Coupon} from "../../models/coupon";
+import {User} from "../../models/user";
 
 Page({
     data: {
@@ -7,9 +8,16 @@ Page({
     },
 
     onLoad: async function (options) {
+
+    },
+    onShow: async function () {
         try {
             // 使用新的API接口获取优惠券数据
             const response = await Coupon.getUserCoupons()
+            const user = await User.getUserInfo();
+
+            wx.setStorageSync("userInfo", user.result);
+
             let couponCount = 0
             if (response.code === 0 && response.result && response.result.data) {
                 // 处理优惠券数据，获取可用优惠券数量
@@ -20,9 +28,9 @@ Page({
             }
             this.setData({
                 couponCount,
-                balance: wx.getStorageSync('userBalance') || 188.50 // 从本地存储获取余额
+                user: user.result
             })
-            
+
         } catch (error) {
             console.error('获取优惠券数据失败:', error)
             // 设置默认值
@@ -76,38 +84,5 @@ Page({
           icon: 'none',
           duration: 2000
       })
-    },
-
-    onShow: async function () {
-        try {
-            // 刷新用户信息显示
-            this.refreshUserInfo()
-            
-            // 刷新余额数据
-            this.setData({
-                balance: wx.getStorageSync('userBalance') || 188.50
-            })
-            
-            // 避免频繁调用API，只在必要时刷新优惠券数据
-            const currentTime = Date.now()
-            const lastUpdateTime = this.lastCouponUpdateTime || 0
-            
-            // 如果距离上次更新超过30秒，才重新获取优惠券数据
-            if (currentTime - lastUpdateTime > 30000) {
-                const response = await Coupon.getUserCoupons()
-                let couponCount = 0
-                if (response.code === 0 && response.result && response.result.data) {
-                    // 处理优惠券数据，获取可用优惠券数量
-                    const processedData = Coupon.processCouponsData(response)
-                    couponCount = processedData.availableCoupons.length
-                }
-                this.setData({
-                    couponCount: couponCount
-                })
-                this.lastCouponUpdateTime = currentTime
-            }
-        } catch (error) {
-            console.error('页面显示时获取优惠券数据失败:', error)
-        }
-    },
+    }
 })

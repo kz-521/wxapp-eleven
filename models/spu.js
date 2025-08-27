@@ -31,7 +31,7 @@ class Spu {
      */
     static async getRecommendSpu(size = 3) {
         return await Http.request({
-            url: `qingting/v1/spu/recommend?size=${size}`,
+            url: `spu/recommend?size=${size}`,
             method: 'GET'
         });
     }
@@ -46,7 +46,7 @@ class Spu {
             console.warn('formatRecommendData: response is null or invalid:', response)
             return null
         }
-        
+
         if (response.code === 200 && response.result && response.result.list) {
             return response.result.list.map(item => ({
                 id: item.id,

@@ -17,7 +17,7 @@ class Category {
      */
     static async getCategoryList() {
         return await Http.request({
-            url: 'qingting/v1/category/list',
+            url: 'category/list',
             method: 'GET'
         })
     }
@@ -31,7 +31,7 @@ class Category {
             // 按level分组，level 2是二级分类，level 1是一级分类
             const level1Categories = response.result.filter(item => item.level === 1)
             const level2Categories = response.result.filter(item => item.level === 2)
-            
+
             // 格式化为UI需要的格式
             const formattedCategories = level2Categories.map((item, index) => ({
                 id: item.id,

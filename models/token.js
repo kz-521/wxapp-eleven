@@ -9,8 +9,8 @@ class Token {
     // 静默登录
     constructor() {
         // 使用正确的token URL
-        this.tokenUrl = config.apiBaseUrl + "qingting/v1/token"
-        this.verifyUrl = config.apiBaseUrl + "qingting/v1/token/verify"
+        this.tokenUrl = config.apiBaseUrl + "token"
+        this.verifyUrl = config.apiBaseUrl + "token/verify"
     }
 
     async verify() {
@@ -49,7 +49,7 @@ class Token {
         } else if (res.data.token) {
             // 旧版API响应格式
             const newToken = res.data.token
-            wx.setStorageSync('wechat_token', newToken) 
+            wx.setStorageSync('wechat_token', newToken)
             return newToken
         } else {
             throw new Error('获取token失败')

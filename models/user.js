@@ -13,7 +13,7 @@ class User{
 
     static async updateUserInfo(data) {
         return Http.request({
-            url:`user/wx_info`,
+            url:`user/update`,
             data,
             method:'POST'
         })
@@ -21,7 +21,7 @@ class User{
 
     static async getUserInfo(data) {
         return Http.request({
-            url:`index/user`
+            url:`user/detail`
         })
     }
 

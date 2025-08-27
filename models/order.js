@@ -141,11 +141,11 @@ class Order {
      * @param {string} status 订单状态，可选
      */
     static async getOrderList(status = null) {
-        let url = `qingting/v1/order/list`
+        let url = `order/list`
         if (status) {
             url += `?status=${status}`
         }
-        
+
         return await Http.request({
             url: url,
             method: 'GET'
@@ -213,10 +213,10 @@ class Order {
      */
     static formatOrderTime(timeString) {
         if (!timeString) return ''
-        
+
         // 如果已经是格式化后的时间，直接返回
         if (timeString.includes('/')) return timeString
-        
+
         // 转换 "2025-08-04 13:05:00" 格式
         const date = new Date(timeString)
         const year = date.getFullYear()
@@ -224,7 +224,7 @@ class Order {
         const day = String(date.getDate()).padStart(2, '0')
         const hour = String(date.getHours()).padStart(2, '0')
         const minute = String(date.getMinutes()).padStart(2, '0')
-        
+
         return `${year}/${month}/${day} ${hour}:${minute}`
     }
 

@@ -1,3 +1,5 @@
+import {User} from "../../models/user";
+
 const { api } = require('../../utils/api.js');
 import { Balance } from '../../models/balance.js';
 
@@ -14,20 +16,21 @@ Page({
 
   onLoad(options) {
     this.getUserBalance();
-    this.getRechargeHistory();
+    //this.getRechargeHistory();
   },
 
   // 获取用户余额
   async getUserBalance() {
     this.setData({ isLoading: true });
     wx.showLoading({ title: '加载中...' });
-    
+
     try {
-      const response = await Balance.getUserBalance();
+      const response = await User.getUserInfo();
+
       if (response && (response.code === 0 || response.code === 200)) {
         const balance = response.result?.balance || response.data?.balance || 0;
         this.setData({ balance: balance });
-        
+
         // 更新本地存储
         wx.setStorageSync('userBalance', balance);
       } else {
@@ -38,7 +41,7 @@ Page({
       // 如果API失败，使用本地存储的余额
       const localBalance = wx.getStorageSync('userBalance') || 0.00;
       this.setData({ balance: localBalance });
-      
+
       wx.showToast({
         title: '获取余额失败',
         icon: 'none'
@@ -70,7 +73,7 @@ Page({
     }
 
     const amount = this.data.rechargeAmount;
-    
+
     // 使用Balance模型验证充值金额
     const validation = Balance.validateRechargeAmount(amount);
     if (!validation.valid) {
@@ -95,7 +98,7 @@ Page({
   // 处理充值
   async processRecharge(amount) {
     if (this.data.isLoading) return;
-    
+
     this.setData({ isLoading: true });
     wx.showLoading({
       title: '创建订单中...'
@@ -106,12 +109,12 @@ Page({
       const response = await Balance.createRecharge(amount);
       if (response && (response.code === 0 || response.code === 200)) {
         const { recharge_id, order_no, pay_params } = response.result || response.data;
-        
+
         // 更新加载状态
         wx.showLoading({
           title: '拉起支付中...'
         });
-        
+
         // 拉起微信支付
         await this.initiateWechatPay({
           amount,
@@ -134,7 +137,7 @@ Page({
   // 拉起微信支付
   async initiateWechatPay(paymentData) {
     const { amount, recharge_id, order_no, pay_params } = paymentData;
-    
+
     return new Promise((resolve, reject) => {
       wx.requestPayment({
         timeStamp: pay_params.timeStamp,
@@ -170,15 +173,15 @@ Page({
   // 处理支付成功
   async handlePaymentSuccess(data) {
     const { amount, recharge_id, order_no } = data;
-    
+
     wx.showLoading({
       title: '充值完成中...'
     });
-    
+
     try {
       // 重新获取用户余额
       await this.getUserBalance();
-      
+
       // 添加充值记录到本地显示
       const rechargeRecord = {
         id: recharge_id || Date.now(),
@@ -188,7 +191,7 @@ Page({
         createTime: Balance.formatDateTime(new Date()),
         orderNo: order_no
       };
-      
+
       // 更新页面数据
       this.setData({
         selectedAmount: null,
@@ -196,9 +199,9 @@ Page({
         canRecharge: false,
         rechargeHistory: [rechargeRecord, ...this.data.rechargeHistory]
       });
-      
+
       wx.hideLoading();
-      
+
       // 显示成功提示
       wx.showModal({
         title: '充值成功',
@@ -213,7 +216,7 @@ Page({
     } catch (error) {
       wx.hideLoading();
       console.error('获取余额失败:', error);
-      
+
       // 即使获取余额失败，也显示充值成功
       wx.showModal({
         title: '充值成功',
@@ -227,12 +230,12 @@ Page({
   // 处理支付失败
   handlePaymentFailure(data) {
     const { amount, order_no, error } = data;
-    
+
     wx.hideLoading();
-    
+
     let title = '支付失败';
     let content = '支付已取消或失败';
-    
+
     // 根据错误类型显示不同信息
     if (error.errMsg) {
       if (error.errMsg.includes('cancel')) {
@@ -243,7 +246,7 @@ Page({
         content = '支付过程中出现错误，请重试';
       }
     }
-    
+
     wx.showModal({
       title: title,
       content: `${content}\n充值金额：¥${Balance.formatBalance(amount)}\n订单号：${order_no}`,
@@ -264,7 +267,7 @@ Page({
   // 处理充值失败（订单创建失败）
   handleRechargeFailure(error) {
     wx.hideLoading();
-    
+
     wx.showModal({
       title: '订单创建失败',
       content: error.message || '创建充值订单失败，请检查网络后重试',
@@ -305,7 +308,7 @@ Page({
   onAmountInput(e) {
     const value = e.detail.value;
     const amount = parseFloat(value) || 0;
-    
+
     this.setData({
       selectedAmount: null, // 清除预设选项选中状态
       rechargeAmount: amount,
