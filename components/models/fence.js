@@ -43,10 +43,30 @@ class Fence {
     }
 
     _setCellSkuImg(cell, skuList) {
-        const specCode = cell.getCellCode()
-        const matchedSku = skuList.find(s=>s.code.includes(specCode))
-        if(matchedSku){
+        const specCode = cell.getCellCode() // 形式为 "1-77"
+        console.log('Looking for spec code:', specCode)
+        
+        // 尝试多种匹配方式
+        let matchedSku = skuList.find(s => s.code && s.code.includes(specCode))
+        
+        if (!matchedSku) {
+            // 如果没有code匹配，尝试通过specs匹配
+            matchedSku = skuList.find(s => {
+                if (s.specs && s.specs.length > 0) {
+                    return s.specs.some(spec => 
+                        spec.key_id == cell.spec.key_id && 
+                        spec.value_id == cell.spec.value_id
+                    )
+                }
+                return false
+            })
+        }
+        
+        if (matchedSku) {
             cell.skuImg = matchedSku.img
+            console.log('Found matched SKU for cell:', cell.title, matchedSku)
+        } else {
+            console.log('No matched SKU found for cell:', cell.title, 'spec code:', specCode)
         }
     }
 

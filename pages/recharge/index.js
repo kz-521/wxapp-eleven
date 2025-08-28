@@ -9,7 +9,7 @@ Page({
     selectedAmount: null, // 选中的充值金额
     rechargeAmount: 0, // 实际充值金额
     canRecharge: false, // 是否可以充值
-    rechargeAmounts: [0.01, 200, 500, 1000, 2000, 5000], // 固定充值金额选项
+    rechargeAmounts: [100, 200, 500, 1000, 2000, 5000], // 固定充值金额选项
     rechargeHistory: [], // 充值记录
     isLoading: false // 加载状态
   },

@@ -180,12 +180,29 @@ Page({
 
     /**
      * 规范化订单商品列表
-     * 兼容后端不同字段命名，尽量还原到页面所需的结构
+     * 根据实际API返回结构处理数据
      */
     normalizeOrderProducts(orderInfo) {
-        if (!orderInfo || typeof orderInfo !== 'object') return []
+        if (!orderInfo || typeof orderInfo !== 'object') {
+            console.warn('订单信息为空或格式错误')
+            return []
+        }
 
-        // 可能的字段：snap_items、items、order_items、orderItemList、products
+        console.log('处理订单商品数据:', orderInfo)
+
+        // 检查是否有snap_items.skus（新的数据结构）
+        if (orderInfo.snap_items && orderInfo.snap_items.skus && Array.isArray(orderInfo.snap_items.skus)) {
+            console.log('使用snap_items.skus数据结构')
+            return this.formatOrderSkusData(orderInfo.snap_items.skus)
+        }
+
+        // 检查是否直接有skus字段
+        if (orderInfo.skus && Array.isArray(orderInfo.skus)) {
+            console.log('使用直接skus数据结构')
+            return this.formatOrderSkusData(orderInfo.skus)
+        }
+
+        // 兼容其他可能的数据结构
         const candidates = [
             orderInfo.snap_items,
             orderInfo.items,
@@ -194,40 +211,130 @@ Page({
             orderInfo.products
         ]
 
-        let rawList = candidates.find(arr => Array.isArray(arr))
+        const rawList = candidates.find(arr => Array.isArray(arr))
 
-        // 如果没有数组但有快照字段，构造一个“汇总”商品以避免空列表
-        if (!rawList || rawList.length === 0) {
-            const totalCount = parseInt(orderInfo.total_count) || 0
-            const totalPrice = parseFloat(orderInfo.total_price) || 0
-            if (totalCount > 0) {
-                return [{
-                    id: orderInfo.id || orderInfo.order_id || 'unknown',
-                    name: orderInfo.snap_title || '商品',
-                    image: orderInfo.snap_img || '/imgs/home/drink-item.png',
-                    count: totalCount,
-                    price: (totalPrice / totalCount).toFixed(2),
-                    specs: '默认规格',
-                    totalPrice: totalPrice.toFixed(2)
-                }]
-            }
+        if (rawList && rawList.length > 0) {
+            console.log('使用兼容数据结构:', rawList)
+            return this.formatLegacyOrderData(rawList, orderInfo)
+        }
+
+        // 如果都没有找到，创建一个汇总商品
+        console.warn('未找到商品数据，使用汇总信息')
+        return this.createSummaryProduct(orderInfo)
+    },
+
+    /**
+     * 格式化订单SKU数据
+     */
+    formatOrderSkusData(skus) {
+        if (!Array.isArray(skus) || skus.length === 0) {
             return []
         }
 
-        // 映射为页面需要的字段
+        return skus.map(sku => {
+            console.log('处理SKU数据:', sku)
+
+            // 处理规格信息
+            let specsText = ''
+            if (sku.specs && Array.isArray(sku.specs) && sku.specs.length > 0) {
+                specsText = sku.specs.map(spec => `${spec.key}:${spec.value}`).join('、')
+            }
+
+            // 处理订单选项（口味选择）
+            let orderOptionsText = ''
+            if (sku.order_options && Array.isArray(sku.order_options) && sku.order_options.length > 0) {
+                orderOptionsText = sku.order_options.map(option => {
+                    const extraPrice = parseFloat(option.extra_price || 0)
+                    return extraPrice > 0 
+                        ? `${option.option_name}:${option.value}(+¥${extraPrice.toFixed(2)})`
+                        : `${option.option_name}:${option.value}`
+                }).join('、')
+            }
+
+            // 组合完整规格描述
+            const specsParts = [specsText, orderOptionsText].filter(Boolean)
+            const fullSpecsText = specsParts.length > 0 ? specsParts.join('、') : '默认规格'
+
+            // 处理图片URL
+            let imageUrl = sku.img || ''
+            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                imageUrl = 'https://qn.jixiangjiaoyu.com' + (imageUrl.startsWith('/') ? '' : '/') + imageUrl
+            } else if (imageUrl && imageUrl.startsWith('/')) {
+                imageUrl = 'https://qn.jixiangjiaoyu.com' + imageUrl
+            }
+
+            return {
+                id: sku.id,
+                name: sku.title || '商品',
+                image: imageUrl || '/imgs/home/drink-item.png',
+                count: parseInt(sku.count) || 1,
+                price: parseFloat(sku.final_price || sku.price || 0).toFixed(2),
+                totalPrice: parseFloat(sku.total_price || (sku.final_price || sku.price || 0) * sku.count || 0).toFixed(2),
+                fullSpecsText: fullSpecsText,
+                specsText: specsText,
+                orderOptionsText: orderOptionsText,
+                specs: sku.specs || [],
+                orderOptions: sku.order_options || []
+            }
+        })
+    },
+
+    /**
+     * 格式化旧版订单数据（兼容处理）
+     */
+    formatLegacyOrderData(items, orderInfo) {
         const fallbackImage = orderInfo.snap_img || '/imgs/home/drink-item.png'
-        return rawList.map(item => {
+        
+        return items.map(item => {
             const id = item.id || item.sku_id || item.product_id || 'unknown'
             const name = item.title || item.name || item.product_name || orderInfo.snap_title || '商品'
             const image = item.img || item.image || item.pic || fallbackImage
             const count = parseInt(item.count || item.quantity || 1)
-            const unitPrice = item.final_price || item.price || (item.total_price && count ? (parseFloat(item.total_price) / count) : undefined)
-            const price = unitPrice ? parseFloat(unitPrice).toFixed(2) : '0.00'
-            const totalPrice = (item.total_price ? parseFloat(item.total_price).toFixed(2) : (parseFloat(price) * count).toFixed(2))
+            const unitPrice = item.final_price || item.price || (item.total_price && count ? (parseFloat(item.total_price) / count) : 0)
+            const price = parseFloat(unitPrice).toFixed(2)
+            const totalPrice = parseFloat(item.total_price || (unitPrice * count)).toFixed(2)
             const specs = item.specs || item.specification || item.options || '默认规格'
 
-            return { id, name, image, count, price, specs, totalPrice }
+            return {
+                id,
+                name,
+                image,
+                count,
+                price,
+                totalPrice,
+                fullSpecsText: typeof specs === 'string' ? specs : '默认规格',
+                specsText: typeof specs === 'string' ? specs : '',
+                orderOptionsText: '',
+                specs: specs,
+                orderOptions: []
+            }
         })
+    },
+
+    /**
+     * 创建汇总商品（当无法找到具体商品数据时）
+     */
+    createSummaryProduct(orderInfo) {
+        const totalCount = parseInt(orderInfo.total_count) || 0
+        const totalPrice = parseFloat(orderInfo.total_price) || 0
+
+        if (totalCount <= 0) {
+            return []
+        }
+
+        return [{
+            id: orderInfo.id || orderInfo.order_id || 'unknown',
+            name: orderInfo.snap_title || '商品',
+            image: orderInfo.snap_img || '/imgs/home/drink-item.png',
+            count: totalCount,
+            price: (totalPrice / totalCount).toFixed(2),
+            totalPrice: totalPrice.toFixed(2),
+            fullSpecsText: '默认规格',
+            specsText: '',
+            orderOptionsText: '',
+            specs: [],
+            orderOptions: []
+        }]
     },
 
     /**

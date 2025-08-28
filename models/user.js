@@ -25,6 +25,20 @@ class User{
         })
     }
 
+    /**
+     * 余额支付接口
+     * @param {string} orderId 订单ID
+     */
+    static async balancePayment(orderId) {
+        return Http.request({
+            url: `pay/balance`,
+            method: 'POST',
+            data: {
+                order_id: orderId
+            }
+        })
+    }
+
 
     static async getShopInfo() {
         return Http.request({

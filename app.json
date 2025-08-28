@@ -54,6 +54,7 @@
   ],
   "usingComponents": {
       "l-icon": "/miniprogram_npm/lin-ui/icon/index",
+      "l-price": "/miniprogram_npm/lin-ui/price/index",
       "l-button": "/miniprogram_npm/lin-ui/button/index"
   }
 }

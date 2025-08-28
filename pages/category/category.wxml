@@ -17,7 +17,7 @@
     <view class="main-content">
         <!-- 左侧分类栏 -->
         <view class="category-sidebar">
-            <view class="category-item {{currentCategory == index ? 'active' : ''}}" 
+            <view class="category-item {{currentCategory == index ? 'active' : ''}}"
                   wx:for="{{categories}}" wx:key="id" wx:for-index="index"
                   bindtap="switchCategory" data-index="{{index}}">
                 <text class="category-text">{{item.displayName || item.name}}</text>
@@ -143,37 +143,27 @@
                         <text class="product-detail-subtitle">{{currentProduct.subtitle}}</text>
                     </view>
                 </view>
-                  <view class="product-detail-actions" bindtap="closeProductDetail">×</view>
+                <view class="product-detail-actions" bindtap="closeProductDetail">×</view>
             </view>
 
-            <!-- 规格选择区域 -->
-            <view class="product-options" wx:if="{{currentProduct.order_options && currentProduct.order_options.length > 0}}">
-                <text class="options-title">口味选择</text>
-                
-                <!-- 动态渲染规格选项 -->
-                <view wx:for="{{currentProduct.order_options}}" wx:key="id" class="option-group">
-                    <view class="option-group-header">
-                        <text class="option-group-name">{{item.name}}</text>
-                        <!-- <text class="option-required" wx:if="{{item.type === 1}}">(*必选)</text> -->
-                    </view>
-                    <view class="option-values">
-                        <view wx:for="{{item.values}}" wx:key="id" wx:for-item="option" 
-                              class="option-value {{selectedOptions[item.id] === option.id ? 'selected' : ''}}"
-                              bindtap="selectOption" 
-                              data-index="{{item.id}}" 
-                              data-option="{{option.id}}">
-                            <text class="option-text">{{option.full_text}}</text>
-                            <view class="recommend-tag" wx:if="{{option.recommend}}">推荐</view>
-                        </view>
-                    </view>
-                </view>
+            <!-- SKU规格选择区域（使用Realm组件） -->
+            <view class="sku-selection" wx:if="{{currentProduct.skuList && currentProduct.skuList.length > 0 && !isNoSpecProduct}}">
+                <text class="options-title">规格选择</text>
+                <s-realm
+                    spu="{{currentProduct}}"
+                    bind:specchange="onSpecChange"
+                    bind:shopping="onShopping"
+                    bind:orderoptionschange="onOrderOptionsChange"
+                    order-way="add_cart"
+                    now-count="{{currentQuantity}}">
+                </s-realm>
             </view>
 
             <!-- 底部价格和操作栏 -->
             <view class="product-detail-footer">
                 <view class="price-section">
-                    <text class="current-price">¥{{currentProduct.price}}</text>
-                    <text class="original-price" wx:if="{{currentProduct.originalPrice && currentProduct.originalPrice !== currentProduct.price}}">¥{{currentProduct.originalPrice}}</text>
+                    <text class="current-price">¥{{currentSelectedPrice}}</text>
+                    <text class="original-price" wx:if="{{currentProduct.originalPrice && currentProduct.originalPrice !== currentSelectedPrice}}">¥{{currentProduct.originalPrice}}</text>
                 </view>
                 <view class="quantity-section">
                     <view class="quantity-control">
@@ -182,8 +172,8 @@
                         <view class="quantity-btn plus" bindtap="increaseProductQuantity">+</view>
                     </view>
                 </view>
-                <view class="add-to-cart-btn" bindtap="confirmSelection">
-                    <text class="add-to-cart-text">加入购物车</text>
+                <view class="add-to-cart-btn {{!canAddToCart ? 'disabled' : ''}}" bindtap="confirmSelection">
+                    <text class="add-to-cart-text">{{addToCartText}}</text>
                 </view>
             </view>
         </view>

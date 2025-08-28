@@ -26,6 +26,11 @@ Page({
     currentProduct: null, // 当前选中的商品详情
     selectedOptions: {}, // 用户选择的规格选项
     currentQuantity: 1, // 当前选择的数量
+    currentSelectedPrice: '0.00', // 当前选中的价格
+    isNoSpecProduct: false, // 是否为无规格商品
+    currentSelectedSku: null, // 当前选中的SKU
+    canAddToCart: false, // 是否可以加入购物车
+    addToCartText: '请选择规格', // 加入购物车按钮文本
   },
 
   async onLoad(options) {
@@ -154,10 +159,8 @@ Page({
     const currentQuantity = this.data.currentQuantity
     this.setData({
       currentQuantity: currentQuantity + 1
-    }, () => {
-      // 重新计算价格
-      this.calculateProductPrice()
     })
+    this.recalculatePrice()
   },
 
   /**
@@ -168,10 +171,8 @@ Page({
     if (currentQuantity > 1) {
       this.setData({
         currentQuantity: currentQuantity - 1
-      }, () => {
-        // 重新计算价格
-        this.calculateProductPrice()
       })
+      this.recalculatePrice()
     }
   },
 
@@ -605,6 +606,9 @@ Page({
   async getProductDetailAndShow(spuId) {
     const detail = await this.getSpuDetail(spuId)
     if (detail) {
+      // 格式化数据以适配Realm组件
+      const formattedProduct = this.formatProductForRealm(detail)
+      
       // 设置默认选中的选项
       const selectedOptions = {}
       if (detail.order_options && detail.order_options.length > 0) {
@@ -616,28 +620,30 @@ Page({
         })
       }
       
-      // 计算初始价格（包含默认选项的额外费用）
-      // let initialPrice = parseFloat(detail.discount_price || detail.price)
-
-      let initialPrice = parseFloat(detail.skuList[0].price || detail.price)
-      if (detail.order_options && detail.order_options.length > 0) {
-        detail.order_options.forEach(option => {
-          const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
-          if (selectedValue && selectedValue.extra_price) {
-            initialPrice += parseFloat(selectedValue.extra_price)
-          }
-        })
+      // 检查是否为无规格商品
+      const isNoSpec = this.checkIsNoSpecProduct(formattedProduct)
+      
+      // 计算初始价格和设置初始SKU
+      let initialPrice = this.calculateInitialPrice(formattedProduct, selectedOptions)
+      let initialSelectedSku = null
+      
+      if (isNoSpec && formattedProduct.sku_list && formattedProduct.sku_list.length > 0) {
+        // 无规格商品直接选中第一个SKU
+        initialSelectedSku = formattedProduct.sku_list[0]
+        const skuPrice = this.calculateFinalPrice(initialSelectedSku, selectedOptions, formattedProduct)
+        initialPrice = skuPrice
       }
       
       this.setData({
         showProductDetail: true,
-        currentProduct: {
-          ...detail,
-          price: initialPrice.toFixed(2),
-          originalPrice: detail.price
-        },
+        currentProduct: formattedProduct,
         selectedOptions: selectedOptions,
-        currentQuantity: 1
+        currentQuantity: 1,
+        currentSelectedPrice: (initialPrice * 1).toFixed(2), // 初始数量为1
+        currentSelectedSku: initialSelectedSku, // 设置初始选中的SKU
+        isNoSpecProduct: isNoSpec,
+        canAddToCart: isNoSpec, // 无规格商品可以直接加入购物车
+        addToCartText: isNoSpec ? '加入购物车' : '请选择规格'
       })
     }
   },
@@ -672,33 +678,7 @@ Page({
    * 计算商品价格（包含选项额外费用）
    */
   calculateProductPrice() {
-    const product = this.data.currentProduct
-    const selectedOptions = this.data.selectedOptions
-    const currentQuantity = this.data.currentQuantity
-    
-    if (!product) return
-    
-    // 基础价格
-    // let basePrice = parseFloat(product.discount_price || product.originalPrice)
-
-    let basePrice = parseFloat(product.skuList[0].price || product.originalPrice)
-    
-    // 加上选项的额外费用
-    if (product.order_options && product.order_options.length > 0) {
-      product.order_options.forEach(option => {
-        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
-        if (selectedValue && selectedValue.extra_price) {
-          basePrice += parseFloat(selectedValue.extra_price)
-        }
-      })
-    }
-    
-    // 计算总价格（价格 × 数量）
-    const totalPrice = basePrice * currentQuantity
-    
-    this.setData({
-      'currentProduct.price': totalPrice.toFixed(2)
-    })
+    this.recalculatePrice()
   },
 
   /**
@@ -708,10 +688,21 @@ Page({
     const product = this.data.currentProduct
     const selectedOptions = this.data.selectedOptions
     const currentQuantity = this.data.currentQuantity
+    const currentSelectedSku = this.data.currentSelectedSku
+    const isNoSpecProduct = this.data.isNoSpecProduct
 
     if (!product) {
       wx.showToast({
         title: '商品信息错误',
+        icon: 'none'
+      })
+      return
+    }
+
+    // 检查规格是否完整选择
+    if (!isNoSpecProduct && !this.data.canAddToCart) {
+      wx.showToast({
+        title: '请选择完整规格',
         icon: 'none'
       })
       return
@@ -729,95 +720,30 @@ Page({
       return
     }
 
-    // 构建规格描述
-    let specsDescription = ''
-    if (product.order_options && product.order_options.length > 0) {
-      const selectedSpecs = product.order_options.map(option => {
-        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
-        return selectedValue ? selectedValue.value : ''
-      }).filter(spec => spec)
-      specsDescription = selectedSpecs.join('、')
+    // 获取当前选中的SKU
+    const selectedSku = currentSelectedSku || (product.sku_list && product.sku_list[0])
+    if (!selectedSku) {
+      wx.showToast({
+        title: '商品规格错误',
+        icon: 'none'
+      })
+      return
     }
 
-    // 计算单价（不包含数量）
-    // let unitPrice = parseFloat(product.discount_price || product.originalPrice)
-    let unitPrice = parseFloat(product.skuList[0].price || product.originalPrice)
-   
-    if (product.order_options && product.order_options.length > 0) {
-      product.order_options.forEach(option => {
-        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
-        if (selectedValue && selectedValue.extra_price) {
-          unitPrice += parseFloat(selectedValue.extra_price)
-        }
-      })
-    }
+    // 构建规格描述
+    let specsDescription = this.buildSpecsDescription(selectedSku, selectedOptions, product)
+
+    // 计算单价
+    const unitPrice = this.calculateFinalPrice(selectedSku, selectedOptions, product)
 
     // 添加到购物车
-    let cartItems = this.data.cartItems || []
-    
-    // 查找是否已存在相同的商品和规格
-    const existingItemIndex = cartItems.findIndex(item => 
-      item.id === product.id && item.specs === specsDescription
-    )
-
-    if (existingItemIndex >= 0) {
-      // 已存在，增加数量
-      cartItems[existingItemIndex].count += currentQuantity
-    } else {
-      // 构建order_options数组供后台使用
-      const order_options = []
-      if (product.order_options && product.order_options.length > 0) {
-        product.order_options.forEach(option => {
-          const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
-          if (selectedValue) {
-            order_options.push({
-              option_id: option.id,
-              option_name: option.name,
-              value_id: selectedValue.id,
-              value: selectedValue.value,
-              extra_price: selectedValue.extra_price || 0
-            })
-          }
-        })
-      }
-
-      // 新增商品到购物车
-      const cartItem = {
-        id: product.id,
-        name: product.title,
-        image: product.img,
-        count: currentQuantity,
-        price: unitPrice.toFixed(2), // 单价
-        originalPrice: product.originalPrice,
-        specs: specsDescription,
-        tags: product.tags ? product.tags.split(',') : [],
-        subtitle: product.subtitle,
-        description: product.description,
-        selectedOptions: selectedOptions,
-        order_options: order_options // 新增：口味选择数据供后台使用
-      }
-
-      cartItems.unshift(cartItem)
-    }
-
-    this.setData({
-      cartItems: cartItems,
-      showProductDetail: false,
-      currentProduct: null,
-      selectedOptions: {},
-      currentQuantity: 1
-    })
-    
-    // 同步到globalData和本地存储
-    const app = getApp()
-    app.globalData.cartItems = cartItems
-    wx.setStorageSync('cartItems', cartItems)
-    
-    this.loadCartData()
-
-    wx.showToast({
-      title: '已添加到购物车',
-      icon: 'success'
+    this.addItemToCart({
+      product,
+      selectedSku,
+      selectedOptions,
+      currentQuantity,
+      specsDescription,
+      unitPrice
     })
   },
 
@@ -1055,6 +981,330 @@ Page({
       currentProduct: mockProduct,
       selectedOptions: selectedOptions,
       currentQuantity: 1
+    })
+  },
+
+  /**
+   * 格式化商品数据以适配Realm组件
+   */
+  formatProductForRealm(detail) {
+    // 处理SKU列表，确保specs和code字段存在
+    const formattedSkuList = detail.skuList.map((sku, index) => {
+      const formattedSku = {
+        ...sku,
+        specs: sku.specs || [], // 确保specs是数组
+        title: sku.title || detail.title,
+        img: sku.img || detail.img // 确保有图片
+      }
+      
+      // 如果specs为null或undefined，设置为空数组
+      if (!Array.isArray(formattedSku.specs)) {
+        formattedSku.specs = []
+      }
+      
+      // 生成code字段：格式为 "spuId$spec1-spec2#spec3-spec4"
+      if (!formattedSku.code && formattedSku.specs.length > 0) {
+        const specCodes = formattedSku.specs.map(spec => `${spec.key_id}-${spec.value_id}`)
+        formattedSku.code = `${detail.id}$${specCodes.join('#')}`
+      } else if (!formattedSku.code) {
+        // 无规格商品的code
+        formattedSku.code = `${detail.id}$${index}`
+      }
+      
+      console.log('Formatted SKU:', formattedSku)
+      return formattedSku
+    })
+
+    return {
+      ...detail,
+      sku_list: formattedSkuList, // Realm组件期望sku_list字段
+      skuList: formattedSkuList // 保留原字段
+    }
+  },
+
+  /**
+   * 检查是否为无规格商品
+   */
+  checkIsNoSpecProduct(product) {
+    if (!product.sku_list || product.sku_list.length === 0) {
+      return true
+    }
+    
+    if (product.sku_list.length === 1) {
+      const sku = product.sku_list[0]
+      return !sku.specs || sku.specs.length === 0
+    }
+    
+    return false
+  },
+
+  /**
+   * 计算初始价格
+   */
+  calculateInitialPrice(product, selectedOptions) {
+    // 获取基础价格（第一个SKU的价格或SPU价格）
+    let basePrice = 0
+    if (product.sku_list && product.sku_list.length > 0) {
+      basePrice = parseFloat(product.sku_list[0].price || product.discount_price || product.price || 0)
+    } else {
+      basePrice = parseFloat(product.discount_price || product.price || 0)
+    }
+    console.log('Initial base price:', basePrice)
+
+    // 加上选项的额外费用
+    if (product.order_options && product.order_options.length > 0) {
+      product.order_options.forEach(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        if (selectedValue && selectedValue.extra_price) {
+          const extraPrice = parseFloat(selectedValue.extra_price)
+          basePrice += extraPrice
+          console.log('Adding initial extra price:', extraPrice)
+        }
+      })
+    }
+
+    console.log('Initial final price:', basePrice)
+    return basePrice
+  },
+
+  /**
+   * 计算最终价格
+   */
+  calculateFinalPrice(sku, selectedOptions, product) {
+    // 优先使用SKU的价格，fallback到商品价格
+    let unitPrice = parseFloat(sku.price || product.discount_price || product.price || 0)
+    console.log('SKU base price:', unitPrice, 'from sku:', sku)
+   
+    // 加上订单选项的额外费用
+    if (product.order_options && product.order_options.length > 0) {
+      product.order_options.forEach(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        if (selectedValue && selectedValue.extra_price) {
+          const extraPrice = parseFloat(selectedValue.extra_price)
+          unitPrice += extraPrice
+          console.log('Adding extra price:', extraPrice, 'for option:', selectedValue.value)
+        }
+      })
+    }
+
+    console.log('Final unit price:', unitPrice)
+    return unitPrice
+  },
+
+  /**
+   * 构建规格描述
+   */
+  buildSpecsDescription(sku, selectedOptions, product) {
+    let specsDescription = ''
+    
+    // 先添加SKU规格
+    if (sku.specs && sku.specs.length > 0) {
+      const skuSpecs = sku.specs.map(spec => spec.value).filter(value => value)
+      specsDescription = skuSpecs.join('、')
+    }
+    
+    // 再添加订单选项
+    if (product.order_options && product.order_options.length > 0) {
+      const orderSpecs = product.order_options.map(option => {
+        const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+        return selectedValue ? selectedValue.value : ''
+      }).filter(spec => spec)
+      
+      if (orderSpecs.length > 0) {
+        specsDescription = specsDescription ? 
+          specsDescription + '、' + orderSpecs.join('、') : 
+          orderSpecs.join('、')
+      }
+    }
+    
+    return specsDescription || '默认规格'
+  },
+
+  /**
+   * 添加商品到购物车
+   */
+  addItemToCart({ product, selectedSku, selectedOptions, currentQuantity, specsDescription, unitPrice }) {
+    let cartItems = this.data.cartItems || []
+    
+    // 查找是否已存在相同的商品和规格
+    const existingItemIndex = cartItems.findIndex(item => 
+      item.id === product.id && item.skuId === selectedSku.id && item.specs === specsDescription
+    )
+
+    if (existingItemIndex >= 0) {
+      // 已存在，增加数量
+      cartItems[existingItemIndex].count += currentQuantity
+    } else {
+      // 构建order_options数组供后台使用
+      const order_options = []
+      if (product.order_options && product.order_options.length > 0) {
+        product.order_options.forEach(option => {
+          const selectedValue = option.values.find(value => value.id === selectedOptions[option.id])
+          if (selectedValue) {
+            order_options.push({
+              option_id: option.id,
+              option_name: option.name,
+              value_id: selectedValue.id,
+              value: selectedValue.value,
+              extra_price: selectedValue.extra_price || 0
+            })
+          }
+        })
+      }
+
+      // 新增商品到购物车
+      const cartItem = {
+        id: product.id,
+        skuId: selectedSku.id,
+        name: product.title,
+        image: selectedSku.img || product.img,
+        count: currentQuantity,
+        price: unitPrice.toFixed(2), // 单价
+        originalPrice: product.price,
+        specs: specsDescription,
+        tags: product.tags ? (typeof product.tags === 'string' ? product.tags.split(',') : product.tags) : [],
+        subtitle: product.subtitle,
+        description: product.description,
+        selectedOptions: selectedOptions,
+        order_options: order_options, // 口味选择数据供后台使用
+        sku: selectedSku // 保存SKU信息
+      }
+
+      cartItems.unshift(cartItem)
+    }
+
+    this.setData({
+      cartItems: cartItems,
+      showProductDetail: false,
+      currentProduct: null,
+      selectedOptions: {},
+      currentQuantity: 1,
+      currentSelectedSku: null,
+      canAddToCart: false,
+      addToCartText: '请选择规格'
+    })
+    
+    // 同步到globalData和本地存储
+    const app = getApp()
+    app.globalData.cartItems = cartItems
+    wx.setStorageSync('cartItems', cartItems)
+    
+    this.loadCartData()
+
+    wx.showToast({
+      title: '已添加到购物车',
+      icon: 'success'
+    })
+  },
+
+  /**
+   * Realm组件规格变化事件
+   */
+  onSpecChange(event) {
+    console.log('Spec change event:', event.detail)
+    const detail = event.detail
+    
+    if (detail.noSpec) {
+      // 无规格商品
+      const sku = this.data.currentProduct.sku_list[0]
+      this.setData({
+        currentSelectedSku: sku,
+        canAddToCart: true,
+        addToCartText: '加入购物车'
+      })
+      // 直接计算价格，不用等recalculatePrice
+      const finalPrice = this.calculateFinalPrice(sku, this.data.selectedOptions, this.data.currentProduct)
+      this.setData({
+        currentSelectedPrice: (finalPrice * this.data.currentQuantity).toFixed(2)
+      })
+    } else if (detail.skuIntact) {
+      // 规格完整，需要找到对应的SKU对象
+      const selectedSku = this.data.currentProduct.sku_list.find(sku => sku.id === detail.skuId)
+      console.log('Found selected SKU:', selectedSku, 'for skuId:', detail.skuId)
+      
+      if (selectedSku) {
+        this.setData({
+          currentSelectedSku: selectedSku,
+          canAddToCart: true,
+          addToCartText: '加入购物车'
+        })
+        // 直接计算价格
+        const finalPrice = this.calculateFinalPrice(selectedSku, this.data.selectedOptions, this.data.currentProduct)
+        this.setData({
+          currentSelectedPrice: (finalPrice * this.data.currentQuantity).toFixed(2)
+        })
+      } else {
+        console.error('SKU not found for skuId:', detail.skuId)
+        this.setData({
+          currentSelectedSku: null,
+          canAddToCart: false,
+          addToCartText: '规格错误'
+        })
+      }
+    } else {
+      // 规格不完整
+      const missingKeys = detail.missingKeys || []
+      this.setData({
+        currentSelectedSku: null,
+        canAddToCart: false,
+        addToCartText: missingKeys.length > 0 ? `请选择${missingKeys.join('、')}` : '请选择规格'
+      })
+      // 规格不完整时，显示基础价格
+      const basePrice = this.calculateInitialPrice(this.data.currentProduct, this.data.selectedOptions)
+      this.setData({
+        currentSelectedPrice: (basePrice * this.data.currentQuantity).toFixed(2)
+      })
+    }
+  },
+
+  /**
+   * Realm组件购物事件
+   */
+  onShopping(event) {
+    console.log('Shopping event:', event.detail)
+    // 这里可以直接触发加入购物车逻辑
+    this.confirmSelection()
+  },
+
+  /**
+   * Realm组件订单选项变化事件
+   */
+  onOrderOptionsChange(event) {
+    console.log('Order options change event:', event.detail)
+    const { orderOptions, spu } = event.detail
+    
+    // 更新选中的订单选项
+    this.setData({
+      selectedOptions: orderOptions
+    })
+    
+    // 重新计算价格
+    this.recalculatePrice()
+  },
+
+  /**
+   * 重新计算价格
+   */
+  recalculatePrice() {
+    const product = this.data.currentProduct
+    const selectedOptions = this.data.selectedOptions
+    const currentSelectedSku = this.data.currentSelectedSku
+    
+    if (!product) return
+    
+    let newPrice = 0
+    if (currentSelectedSku && currentSelectedSku.price) {
+      // 有选中SKU且有价格，使用SKU价格
+      newPrice = this.calculateFinalPrice(currentSelectedSku, selectedOptions, product)
+      console.log('Using selected SKU price:', currentSelectedSku.price, 'final price:', newPrice)
+    } else {
+      // 没有选中SKU或SKU信息不完整，使用基础价格
+      newPrice = this.calculateInitialPrice(product, selectedOptions)
+      console.log('Using base price:', newPrice)
+    }
+    
+    this.setData({
+      currentSelectedPrice: (newPrice * this.data.currentQuantity).toFixed(2)
     })
   }
 })

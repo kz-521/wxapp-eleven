@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "点单",
   "navigationBarBackgroundColor": "#FFFFFF",
-  "navigationBarTextStyle": "black"
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+    "s-realm": "/components/realm/index"
+  }
 }

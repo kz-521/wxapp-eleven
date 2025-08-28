@@ -1049,6 +1049,28 @@ page {
   font-weight: 500;
 }
 
+/* SKU规格选择样式 */
+.sku-selection {
+  padding: 0 30rpx 20rpx 30rpx;
+}
+
+.sku-selection .options-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+/* 禁用状态的按钮 */
+.add-to-cart-btn.disabled {
+  background-color: #cccccc !important;
+}
+
+.add-to-cart-btn.disabled .add-to-cart-text {
+  color: #999999 !important;
+}
+
 /* 页面整体样式 */
 .order-page {
   background-color: #FFFFFF;

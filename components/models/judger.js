@@ -61,7 +61,7 @@ class Judger {
     }
 
     _initPathDict() {
-        this.fenceGroup.spu.sku_list.forEach(s => {
+        this.fenceGroup.spu.skuList.forEach(s => {
             const skuCode = new SkuCode(s.code)
             this.pathDict = this.pathDict.concat(skuCode.totalSegments)
         })

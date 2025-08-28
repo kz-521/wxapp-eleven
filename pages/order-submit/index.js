@@ -1,3 +1,5 @@
+import {User} from "../../models/user";
+
 const { api } = require('../../utils/api.js')
 import { Location } from '../../utils/location.js'
 
@@ -61,9 +63,9 @@ Page({
     loadCartDataFromGlobal() {
         const app = getApp()
         const cartItems = app.globalData.cartItems || []
-        
+
         console.log('从globalData获取的购物车数据:', cartItems)
-        
+
         if (cartItems.length === 0) {
             wx.showToast({
                 title: '购物车为空',
@@ -78,11 +80,11 @@ Page({
         // 计算总金额 - 使用SKU价格计算
         const totalAmount = cartItems.reduce((total, item) => {
             let itemPrice = 0
-            
+
             // 优先使用SKU价格
             if (item.sku && item.sku.price) {
                 itemPrice = item.sku.discount_price || item.sku.price
-            } 
+            }
             // 如果有skuPrice字段
             else if (item.skuPrice) {
                 itemPrice = item.skuPrice
@@ -91,14 +93,14 @@ Page({
             else {
                 itemPrice = parseFloat(item.price) || 0
             }
-            
+
             console.log('订单商品价格计算:', {
                 name: item.name,
                 count: item.count,
                 itemPrice: itemPrice,
                 total: itemPrice * item.count
             })
-            
+
             return total + (itemPrice * item.count)
         }, 0)
 
@@ -109,7 +111,7 @@ Page({
             totalAmount: totalAmount.toFixed(2),
             payAmount: totalAmount.toFixed(2)
         })
-        
+
         console.log('设置到页面的数据:', this.data.orderProducts, this.data.totalAmount)
     },
 
@@ -119,7 +121,7 @@ Page({
     getDefaultAddress() {
         const app = getApp()
         const defaultAddress = app.globalData.defaultAddress
-        
+
         if (defaultAddress) {
             this.setData({
                 address: defaultAddress
@@ -145,42 +147,6 @@ Page({
         })
     },
 
-    /**
-     * 测试优惠券逻辑
-     */
-    testCouponLogic() {
-        console.log('=== 测试优惠券逻辑开始 ===')
-        
-        // 模拟优惠券数据
-        const testCoupon = {
-            id: 'test_coupon_001',
-            name: '满30减5元',
-            type: 'discount',
-            discount_amount: 5,
-            min_amount: 30,
-            max_discount: 5
-        }
-        
-        console.log('测试优惠券:', testCoupon)
-        console.log('当前订单金额:', this.data.totalAmount)
-        
-        // 计算优惠
-        const result = this.calculateCouponDiscount(testCoupon)
-        console.log('优惠券计算结果:', result)
-        
-        if (result.success) {
-            console.log('优惠券可用，应用优惠')
-            this.setData({
-                selectedCoupon: testCoupon,
-                couponAmount: result.couponAmount.toFixed(2),
-                payAmount: result.payAmount.toFixed(2)
-            })
-        } else {
-            console.log('优惠券不可用:', result.message)
-        }
-        
-        console.log('=== 测试优惠券逻辑结束 ===')
-    },
 
     /**
      * 选择用餐类型
@@ -271,18 +237,18 @@ Page({
      */
     callPayment(orderId) {
         console.log('开始调用支付接口，订单ID:', orderId, '支付方式:', this.data.selectedPaymentMethod)
-        
+
         // 根据支付方式设置pay_way字段
         const payWay = this.data.selectedPaymentMethod === 'balance' ? 2 : 1
-        
+
         api.payPreorder(orderId, { pay_way: payWay }).then(res => {
             console.log('支付接口响应:', res)
-            
+
             if (res.code === 0 && res.result) {
                 console.log('支付参数:', res.result)
                 // 直接使用返回的支付参数
                 const data = res.result
-                
+
                 // 调用微信支付
                 wx.requestPayment({
                     'timeStamp': data.timeStamp,
@@ -299,19 +265,19 @@ Page({
                                 icon: 'success',
                                 duration: 3000
                             })
-                            
+
                             // 清空购物车
                             const app = getApp()
                             app.globalData.cartItems = []
                             app.globalData.cartCount = 0
                             app.globalData.totalPrice = 0
                             wx.setStorageSync('cartItems', [])
-                            
+
                             // 清除缓存的优惠券数据
                             wx.removeStorageSync('selectedCoupon')
                             wx.removeStorageSync('couponAmount')
                             wx.removeStorageSync('payAmount')
-                            
+
                             setTimeout(() => {
                                 wx.redirectTo({
                                     url: `/pages/order-detail/index?orderId=${orderId}`
@@ -345,7 +311,7 @@ Page({
                     icon: 'none',
                     duration: 2000
                 })
-                
+
                 // 支付接口失败，跳转到订单详情页
                 setTimeout(() => {
                     this.navigateToOrderDetail()
@@ -358,7 +324,7 @@ Page({
                 icon: 'none',
                 duration: 2000
             })
-            
+
             // 支付接口调用失败，跳转到订单详情页
             setTimeout(() => {
                 this.navigateToOrderDetail()
@@ -366,14 +332,6 @@ Page({
         })
     },
 
-    /**
-     * 备注输入
-     */
-    onRemarkInput(e) {
-        this.setData({
-            remark: e.detail.value
-        })
-    },
 
     /**
      * 检查选中的优惠券
@@ -381,35 +339,35 @@ Page({
     checkSelectedCoupon() {
         const app = getApp()
         const selectedCoupon = app.globalData.selectedCoupon
-        
+
         console.log('=== 优惠券检查开始 ===')
         console.log('当前订单总金额:', this.data.totalAmount)
         console.log('globalData中的优惠券:', selectedCoupon)
-        
+
         if (selectedCoupon) {
             console.log('检测到选中的优惠券:', selectedCoupon)
-            
+
             // 计算优惠后的价格
             const result = this.calculateCouponDiscount(selectedCoupon)
             console.log('优惠券计算结果:', result)
-            
+
             if (result.success) {
                 this.setData({
                     selectedCoupon: selectedCoupon,
                     couponAmount: result.couponAmount.toFixed(2),
                     payAmount: result.payAmount.toFixed(2)
                 })
-                
+
                 console.log('优惠券应用成功，设置数据:', {
                     couponAmount: result.couponAmount.toFixed(2),
                     payAmount: result.payAmount.toFixed(2)
                 })
-                
+
                 // 缓存优惠券数据到本地存储，避免页面刷新后丢失
                 wx.setStorageSync('selectedCoupon', selectedCoupon)
                 wx.setStorageSync('couponAmount', result.couponAmount.toFixed(2))
                 wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
-                
+
                 // 清空globalData中的优惠券，避免重复使用
                 app.globalData.selectedCoupon = null
             } else {
@@ -425,20 +383,20 @@ Page({
             const cachedCoupon = wx.getStorageSync('selectedCoupon')
             const cachedCouponAmount = wx.getStorageSync('couponAmount')
             const cachedPayAmount = wx.getStorageSync('payAmount')
-            
+
             if (cachedCoupon) {
                 console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
-                
+
                 // 重新验证优惠券是否仍然有效
                 const result = this.calculateCouponDiscount(cachedCoupon)
-                
+
                 if (result.success) {
                     this.setData({
                         selectedCoupon: cachedCoupon,
                         couponAmount: cachedCouponAmount || '0.00',
                         payAmount: cachedPayAmount || this.data.totalAmount
                     })
-                    
+
                     console.log('从缓存恢复优惠券数据:', {
                         couponAmount: cachedCouponAmount,
                         payAmount: cachedPayAmount
@@ -449,7 +407,7 @@ Page({
                 }
             }
         }
-        
+
         console.log('=== 优惠券检查结束 ===')
     },
 
@@ -465,7 +423,7 @@ Page({
         }
 
         const orderAmount = parseFloat(this.data.totalAmount)
-        
+
         // 检查优惠券类型和条件
         if (coupon.type === 'discount') {
             // 满减券
@@ -475,10 +433,10 @@ Page({
                     message: `订单金额不足${coupon.min_amount}元`
                 }
             }
-            
+
             const discountAmount = Math.min(coupon.discount_amount, orderAmount)
             const payAmount = orderAmount - discountAmount
-            
+
             return {
                 success: true,
                 couponAmount: discountAmount,
@@ -492,17 +450,17 @@ Page({
                     message: `订单金额不足${coupon.min_amount}元`
                 }
             }
-            
+
             const discountAmount = orderAmount * (1 - coupon.discount_rate / 100)
             const payAmount = Math.max(discountAmount, 0)
-            
+
             return {
                 success: true,
                 couponAmount: orderAmount - payAmount,
                 payAmount: payAmount
             }
         }
-        
+
         return {
             success: false,
             message: '不支持的优惠券类型'
@@ -518,12 +476,12 @@ Page({
             couponAmount: '0.00',
             payAmount: this.data.totalAmount
         })
-        
+
         // 清空缓存
         wx.removeStorageSync('selectedCoupon')
         wx.removeStorageSync('couponAmount')
         wx.removeStorageSync('payAmount')
-        
+
         // 清空globalData
         const app = getApp()
         app.globalData.selectedCoupon = null
@@ -537,17 +495,17 @@ Page({
 
         if (cachedCoupon) {
             console.log('从本地存储获取到缓存的优惠券:', cachedCoupon)
-            
+
             // 重新验证优惠券是否仍然有效
             const result = this.calculateCouponDiscount(cachedCoupon)
-            
+
             if (result.success) {
                 this.setData({
                     selectedCoupon: cachedCoupon,
                     couponAmount: result.couponAmount.toFixed(2),
                     payAmount: result.payAmount.toFixed(2)
                 })
-                
+
                 // 更新缓存
                 wx.setStorageSync('couponAmount', result.couponAmount.toFixed(2))
                 wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
@@ -568,6 +526,7 @@ Page({
 
         // 格式化当前时间作为下单时间
         const now = new Date()
+
         const createTime = now.toLocaleString('zh-CN', {
             year: 'numeric',
             month: '2-digit',
@@ -608,24 +567,24 @@ Page({
         api.submitOrder(apiOrderData).then(res => {
             wx.hideLoading()
             console.log('API响应:', res)
-            
+
             if (res.code === 0) {
                 wx.showToast({
                     title: '订单提交成功',
                     icon: 'success'
                 })
-                
+
                 // 获取订单ID，用于支付
                 const orderId = res.result?.id || res.result?.order_id
-                
+
                 if (orderId) {
                     console.log('订单提交成功，开始调用支付接口，订单ID:', orderId)
-                    
+
                     // 存储order_id到全局变量，用于取茶号生成
                     const app = getApp()
                     app.globalData.lastOrderId = orderId
                     console.log('已存储订单ID到全局变量:', orderId)
-                    
+
                     // 根据选择的支付方式执行不同的支付流程
                     if (this.data.selectedPaymentMethod === 'balance') {
                         // 余额支付
@@ -640,7 +599,7 @@ Page({
                         title: '订单提交成功，但支付失败',
                         icon: 'none'
                     })
-                    
+
                     // 使用辅助方法跳转到订单详情页
                     this.navigateToOrderDetail()
                 }
@@ -662,70 +621,114 @@ Page({
 
     /**
      * 处理余额支付
-     */
-    processBalancePayment(orderId) {
+     */ 
+    async processBalancePayment(orderId) {
         console.log('开始处理余额支付，订单ID:', orderId, '支付方式: 余额支付')
-        
-        // 检查用户余额是否足够
-        const userBalance = wx.getStorageSync('userBalance') || 0
-        const payAmount = parseFloat(this.data.payAmount)
-        
-        if (userBalance < payAmount) {
-            wx.showModal({
-                title: '余额不足',
-                content: `当前余额：¥${userBalance}\n需要支付：¥${payAmount}\n是否前往充值？`,
-                confirmText: '去充值',
-                cancelText: '取消',
-                success: (res) => {
-                    if (res.confirm) {
-                        // 跳转到充值页面
-                        wx.navigateTo({
-                            url: '/pages/recharge/index'
-                        })
-                    }
-                }
+
+        try {
+            // 获取用户信息检查余额
+            wx.showLoading({
+                title: '检查余额中...'
             })
-            return
-        }
-        
-        // 余额足够，执行支付
-        wx.showLoading({
-            title: '余额支付中...'
-        })
-        
-        // 模拟余额支付处理
-        setTimeout(() => {
-            wx.hideLoading()
+
+            const userInfoResponse = await User.getUserInfo()
+            let userBalance = 0
             
-            // 扣除余额
-            const newBalance = userBalance - payAmount
-            wx.setStorageSync('userBalance', newBalance)
+            // 检查响应格式并获取余额
+            if (userInfoResponse && (userInfoResponse.code === 0 || userInfoResponse.code === 200)) {
+                userBalance = parseFloat(userInfoResponse.result.balance || 0)
+            } else {
+                wx.hideLoading()
+                wx.showToast({
+                    title: '获取用户信息失败',
+                    icon: 'none'
+                })
+                return
+            }
+
+            const payAmount = parseFloat(this.data.payAmount)
+            wx.hideLoading()
+
+            // 检查余额是否足够
+            if (userBalance < payAmount) {
+                wx.showModal({
+                    title: '余额不足',
+                    content: `当前余额：¥${userBalance.toFixed(2)}\n需要支付：¥${payAmount.toFixed(2)}\n是否前往充值？`,
+                    confirmText: '去充值',
+                    cancelText: '取消',
+                    success: (res) => {
+                        if (res.confirm) {
+                            // 跳转到充值页面
+                            wx.navigateTo({
+                                url: '/pages/recharge/index'
+                            })
+                        }
+                    }
+                })
+                return
+            }
+
+            // 余额足够，执行支付
+            wx.showLoading({
+                title: '余额支付中...'
+            })
+
+            // 调用后台余额支付接口
+            const paymentResponse = await User.balancePayment(orderId)
+            wx.hideLoading()
+
+            // 检查支付结果
+            if (paymentResponse && (paymentResponse.code === 0 || paymentResponse.code === 200)) {
+                // 支付成功
+                wx.showToast({
+                    title: '余额支付成功！',
+                    icon: 'success',
+                    duration: 2000
+                })
+
+                // 清空购物车
+                const app = getApp()
+                app.globalData.cartItems = []
+                app.globalData.cartCount = 0
+                app.globalData.totalPrice = 0
+                wx.setStorageSync('cartItems', [])
+
+                // 清除缓存的优惠券数据
+                wx.removeStorageSync('selectedCoupon')
+                wx.removeStorageSync('couponAmount')
+                wx.removeStorageSync('payAmount')
+
+                // 跳转到订单详情页
+                setTimeout(() => {
+                    wx.redirectTo({
+                        url: `/pages/order-detail/index?orderId=${orderId}`
+                    })
+                }, 1500)
+            } else {
+                // 支付失败
+                const errorMsg = paymentResponse.msg || '余额支付失败'
+                wx.showToast({
+                    title: errorMsg,
+                    icon: 'none',
+                    duration: 3000
+                })
+            }
+
+        } catch (error) {
+            wx.hideLoading()
+            console.error('余额支付异常:', error)
+            
+            let errorMsg = '余额支付失败'
+            if (error.message) {
+                errorMsg = error.message
+            }
             
             wx.showToast({
-                title: '余额支付成功！',
-                icon: 'success',
+                title: errorMsg,
+                icon: 'none',
                 duration: 3000
             })
-            
-            // 清空购物车
-            const app = getApp()
-            app.globalData.cartItems = []
-            app.globalData.cartCount = 0
-            app.globalData.totalPrice = 0
-            wx.setStorageSync('cartItems', [])
-            
-            // 清除缓存的优惠券数据
-            wx.removeStorageSync('selectedCoupon')
-            wx.removeStorageSync('couponAmount')
-            wx.removeStorageSync('payAmount')
-            
-            // 跳转到订单详情页
-            setTimeout(() => {
-                wx.redirectTo({
-                    url: `/pages/order-detail/index?orderId=${orderId}`
-                })
-            }, 2000)
-        }, 2000)
+        }
     },
 
     /**
@@ -735,14 +738,14 @@ Page({
      */
     generatePickupNumber(orderId) {
         if (!orderId) return '0000'
-        
+
         // 将订单ID转换为字符串
         const orderIdStr = String(orderId)
-        
+
         // 获取最后4位，不足4位在前面补0
         const last4Digits = orderIdStr.slice(-4)
         const pickupNumber = last4Digits.padStart(4, '0')
-        
+
         console.log('生成取茶号:', { orderId, orderIdStr, last4Digits, pickupNumber })
         return pickupNumber
     },
@@ -754,7 +757,7 @@ Page({
      */
     formatTime(time) {
         if (!time) return ''
-        
+
         try {
             let date
             if (typeof time === 'string') {
@@ -765,12 +768,12 @@ Page({
             } else {
                 return String(time)
             }
-            
+
             // 检查日期是否有效
             if (isNaN(date.getTime())) {
                 return String(time)
             }
-            
+
             // 格式化为 yyyy/mm/dd hh:mm:ss
             const year = date.getFullYear()
             const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -778,7 +781,7 @@ Page({
             const hours = String(date.getHours()).padStart(2, '0')
             const minutes = String(date.getMinutes()).padStart(2, '0')
             const seconds = String(date.getSeconds()).padStart(2, '0')
-            
+
             return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
         } catch (error) {
             console.error('时间格式化失败:', error, time)
@@ -792,10 +795,10 @@ Page({
     async getStoreDistance() {
         try {
             console.log('开始获取门店距离')
-            
+
             // 先检查位置权限
             const permissionStatus = await Location.checkLocationPermission()
-            
+
             if (permissionStatus.status === 'denied') {
                 // 用户之前拒绝了权限，引导开启
                 try {
@@ -806,19 +809,19 @@ Page({
                     return
                 }
             }
-            
+
             // 获取位置并计算距离
             const result = await Location.getUserLocationAndDistance(this.data.storeLocation)
-            
+
             this.setData({
                 distance: result.distanceText
             })
-            
+
             console.log('门店距离获取成功:', result.distanceText)
-            
+
         } catch (error) {
             console.error('获取门店距离失败:', error)
-            
+
             // 根据错误类型显示不同的提示
             if (error.errMsg && error.errMsg.includes('auth deny')) {
                 this.setData({ distance: '位置权限被拒绝' })
@@ -830,27 +833,6 @@ Page({
         }
     },
 
-    /**
-     * 测试支付方式选择
-     */
-    testPaymentMethodSelection() {
-        console.log('=== 测试支付方式选择 ===')
-        console.log('当前选择的支付方式:', this.data.selectedPaymentMethod)
-        console.log('支付方式数组:', this.data.paymentMethods)
-        
-        // 测试pay_way字段计算
-        const payWay = this.data.selectedPaymentMethod === 'balance' ? 2 : 1
-        console.log('计算出的pay_way字段:', payWay)
-        
-        // 测试支付方式切换
-        const testMethods = ['wechat', 'balance']
-        testMethods.forEach(method => {
-            const testPayWay = method === 'balance' ? 2 : 1
-            console.log(`支付方式 ${method} -> pay_way: ${testPayWay}`)
-        })
-        
-        console.log('=== 测试完成 ===')
-    },
 
     /**
      * 选择支付方式
@@ -858,18 +840,18 @@ Page({
     selectPaymentMethod(e) {
         const methodId = e.currentTarget.dataset.method;
         console.log('选择支付方式:', methodId);
-        
+
         // 更新支付方式选择状态
         const updatedMethods = this.data.paymentMethods.map(method => ({
             ...method,
             selected: method.id === methodId
         }));
-        
+
         this.setData({
             selectedPaymentMethod: methodId,
             paymentMethods: updatedMethods
         });
-        
+
         console.log('支付方式已更新:', methodId);
     },
-}) 
+})

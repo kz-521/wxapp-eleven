@@ -7,7 +7,8 @@ import {Http} from "../utils/http";
 class Spu {
 
     static isNoSpec(spu) {
-        if (spu.sku_list.length === 1 && spu.sku_list[0].specs.length === 0) {
+        console.log("Spu", spu)
+        if (spu.skuList.length === 1 && spu.skuList[0].specs.length === 0) {
             return true
         }
         return false

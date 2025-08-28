@@ -2,6 +2,7 @@
   "component": true,
   "usingComponents": {
     "s-fence": "/components/fence/index",
-    "safe-area": "/components/safe-area/index"
+    "safe-area": "/components/safe-area/index",
+    "s-counter": "/components/counter/index"
   }
 }

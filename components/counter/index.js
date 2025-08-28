@@ -9,7 +9,7 @@ Component({
     properties: {
         count: {
             type: Number,
-            value: 1
+            value: Cart.SKU_MIN_COUNT
         },
         min: {
             type: Number,
@@ -24,16 +24,18 @@ Component({
     lifetimes:{
         attached(){
             this.setData({
-                //count:this.data.min;
+
             })
         }
     },
 
     observers:{
         'count,min,max':function (count,min,max) {
-
+            console.log(count,min,max)
         },
-
+        // 'min':function (min) {
+        //    console.log(min)
+        // }
     },
 
     /**
@@ -61,8 +63,6 @@ Component({
                     title: `最少需要购买${Cart.SKU_MIN_COUNT}件噢`
                 })
             }
-
-            this.data.count = 1
         }
     }
 })

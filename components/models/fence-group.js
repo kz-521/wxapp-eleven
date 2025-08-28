@@ -13,7 +13,7 @@ class FenceGroup {
 
     constructor(spu) {
         this.spu = spu
-        this.skuList = spu.sku_list
+        this.skuList = spu.skuList
     }
 
     getDefaultSku() {
@@ -25,9 +25,41 @@ class FenceGroup {
     }
 
     getSku(skuCode) {
+        if (!skuCode) {
+            return null
+        }
+        
         const fullSkuCode = this.spu.id + '$' + skuCode
-        const sku = this.spu.sku_list.find(s => s.code === fullSkuCode)
-        return sku ? sku : null
+        console.log('Looking for SKU with code:', fullSkuCode)
+        
+        let sku = this.skuList.find(s => s.code === fullSkuCode)
+        
+        if (!sku) {
+            console.log('Full code match failed, trying partial match')
+            // 尝试部分匹配
+            sku = this.skuList.find(s => s.code && s.code.includes(skuCode))
+        }
+        
+        if (!sku) {
+            console.log('Code match failed, trying specs match for:', skuCode)
+            // 尝试通过specs匹配
+            const specPairs = skuCode.split('#')
+            sku = this.skuList.find(s => {
+                if (!s.specs || s.specs.length === 0) {
+                    return false
+                }
+                
+                return specPairs.every(specCode => {
+                    const [keyId, valueId] = specCode.split('-')
+                    return s.specs.some(spec => 
+                        spec.key_id == keyId && spec.value_id == valueId
+                    )
+                })
+            })
+        }
+        
+        console.log('Found SKU:', sku)
+        return sku || null
     }
 
     setCellStatusById(cellId, status) {
