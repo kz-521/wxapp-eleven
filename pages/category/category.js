@@ -461,7 +461,7 @@ Page({
         const categoryProducts = res.result.list.map(item => ({
           id: item.id,
           name: item.title,
-          tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
+          tags: item.tags ? item.tags.includes(',') ? item.tags.split(',').filter(tag => tag.trim()) : item.tags.includes('，') ? item.tags.split('，').filter(tag => tag.trim()) : [] : [],
           price: item.discount_price || item.price,
           image: item.img,
           subtitle: item.subtitle,
@@ -489,7 +489,7 @@ Page({
         const allProducts = res.result.list.map(item => ({
           id: item.id,
           name: item.title,
-          tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
+          tags: item.tags ? item.tags.includes(',') ? item.tags.split(',').filter(tag => tag.trim()) : item.tags.includes('，') ? item.tags.split('，').filter(tag => tag.trim()) : [] : [],
           price: item.discount_price || item.price,
           image: item.img,
           subtitle: item.subtitle,
@@ -518,7 +518,7 @@ Page({
         const recommendProducts = res.result.list.map(item => ({
           id: item.id,
           name: item.title,
-          tags: item.tags ? item.tags.split(',').filter(tag => tag.trim()) : [],
+          tags: item.tags ? item.tags.includes(',') ? item.tags.split(',').filter(tag => tag.trim()) : item.tags.includes('，') ? item.tags.split('，').filter(tag => tag.trim()) : [] : [],
           price: item.discount_price || item.price,
           image: item.img,
           subtitle: item.subtitle,
@@ -1162,7 +1162,7 @@ Page({
         price: unitPrice.toFixed(2), // 单价
         originalPrice: product.price,
         specs: specsDescription,
-        tags: product.tags ? (typeof product.tags === 'string' ? product.tags.split(',') : product.tags) : [],
+        tags: product.tags ? (typeof product.tags === 'string' ? product.tags.includes(',') ? product.tags.split(',') : product.tags.includes('，') ? product.tags.split('，') : product.tags : product.tags) : [],
         subtitle: product.subtitle,
         description: product.description,
         selectedOptions: selectedOptions,
