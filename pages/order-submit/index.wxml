@@ -1,0 +1,120 @@
+<view class="page">
+  <!-- 配送信息 -->
+  <view class="delivery-section">
+    <!-- 上部分：到店取和店铺信息 -->
+    <view class="store-info">
+      <view class="pickup-tag">到店取</view>
+      <view class="store-details">
+        <text class="store-name">{{storeLocation.name}}</text>
+      </view>
+      <image src="/imgs/order-bg.png" class="order-bg"></image>
+    </view>
+    <view class="store-address" style="height: 30rpx;">
+      {{storeLocation.address}}
+    </view>
+    <view class="store-distance" wx:if="{{distance}}">
+      <text class="distance-text">{{distance}}</text>
+    </view>
+    <!-- 中部分：堂食和外带选项 -->
+    <view class="dining-options">
+      <view class="option-item {{diningType === 'dine-in' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="dine-in">
+        <view class="option-text">堂食</view>
+        <view class="option-tip">店内即喝</view>
+        <view class="triangle" wx:if="{{diningType === 'dine-in'}}"></view>
+        <image src="/imgs/yes.png" class="yes" mode="" wx:if="{{diningType === 'dine-in'}}"/>
+      </view>
+      <view class="option-item {{diningType === 'takeaway' ? 'selected' : ''}}" bindtap="selectDiningType" data-type="takeaway">
+        <view class="option-text">外带</view>
+        <view class="option-tip">纸袋打包</view>
+        <view class="triangle" wx:if="{{diningType === 'takeaway'}}"></view>
+        <image src="/imgs/yes.png" class="yes" mode="" wx:if="{{diningType === 'takeaway'}}"/>
+      </view>
+    </view>
+  </view>
+  <view class="group_8">
+    <text lines="1" class="text_15">商品明细</text>
+    <!-- 动态显示购物车中的商品 -->
+    <view class="box_8" wx:for="{{orderProducts}}" wx:key="id">
+      <view class="image-text_7">
+        <view class="image-wrapper_1">
+          <image src="{{item.image}}" class="image_3"></image>
+        </view>
+        <view class="text-group_10">
+          <text lines="1" class="text_16">{{item.name}}</text>
+          <text lines="1" class="text_17">
+            <text>{{item.specs}} </text>
+            数量：{{item.count}}杯
+          </text>
+        </view>
+      </view>
+      <text lines="1" class="text_18">¥{{item.price}}</text>
+    </view>
+  </view>
+    <view class="text-wrapper_5">
+      <view class="remark-header">
+        <text lines="1" class="text_22">备注</text>
+        <text class="remark-count">{{remark.length}}/200</text>
+      </view>
+      <textarea 
+        class="remark-input" 
+        placeholder="建议先与商家沟通一致再留言哦～" 
+        placeholder-class="remark-placeholder"
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+        auto-height="{{true}}"
+        maxlength="200"
+        show-confirm-bar="{{false}}"
+      ></textarea>
+    </view>
+    <view class="group_10" bindtap="selectCoupon">
+      <text lines="1" class="text_24">优惠劵</text>
+      <view class="image-text_9" wx:if="{{selectedCoupon}}">
+        <view class="text-group_6">
+          <text lines="1" class="text_25">{{selectedCoupon.name}}</text>
+          <text lines="1" class="text_26" />
+          <text lines="1" class="text_27">-{{couponAmount}}元</text>
+        </view>
+        <van-icon name="arrow" size="32rpx" color="#999" />
+      </view>
+      <view class="image-text_9" wx:else>
+        <view class="text-group_6">
+          <text lines="1" class="text_25">选择优惠券</text>
+          <text lines="1" class="text_26" />
+          <text lines="1" class="text_27">-0.00</text>
+        </view>
+        <van-icon name="arrow" size="32rpx" color="#999" />
+      </view>
+    </view>
+    <view class="group_11">
+      <text class="payment-title">选择支付方式</text>
+      <view class="pay-item" wx:for="{{paymentMethods}}" wx:key="id" bindtap="selectPaymentMethod" data-method="{{item.id}}">
+        <view class="image-text_10">
+          <image src="{{item.icon}}" class="image_8"></image>
+          <view class="text-group_12">
+            <text lines="1" class="text_28">{{item.name}}</text>
+            <text lines="1" class="text_29">{{item.description}}</text>
+          </view>
+        </view>
+        <view class="payment-selector">
+          <icon class="icon-box-img" type="success" size="18" wx:if="{{item.selected}}"></icon>
+          <view class="selector-circle {{item.selected ? 'selected' : 'unselected'}}" wx:if="{{!item.selected}}">
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="cart-bar">
+    <view class="cart-info">
+      <view class="cart-icon-wrapper" bindtap="showCartDetail">
+        <text lines="1" class="text_30">待支付</text>
+      </view>
+      <view class="cart-price">
+        <text lines="1" class="text_31">¥</text>
+          <text lines="1" class="text_32">{{payAmount}}</text>
+      </view>
+    </view>
+    <view class="checkout-btn" bindtap="goToCheckout">
+      <text class="checkout-text">提交订单</text>
+    </view>
+  </view>
+
+</view>

@@ -1,0 +1,85 @@
+<view class="coupon-page w">
+  <view class="page-body w">
+    <view class="coupon-content">
+      <!-- 头部标签 -->
+      <view class="tabs flexb">
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="available">
+          <text class="tab-item {{activeTab === 'available' ? 'active' : ''}}">未使用</text>
+          <image wx:if="{{activeTab === 'available'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="used">
+          <text class="tab-item {{activeTab === 'used' ? 'active' : ''}}">已使用</text>
+          <image wx:if="{{activeTab === 'used'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
+        <view class="tab-item-wrap" bindtap="switchTab" data-tab="expired">
+          <text class="tab-item {{activeTab === 'expired' ? 'active' : ''}}">已过期</text>
+          <image wx:if="{{activeTab === 'expired'}}" src="/imgs/item-bottom.png" class="tab-underline"></image>
+        </view>
+      </view>
+      
+      <!-- 可用优惠券 -->
+      <view class="coupon-card flex" wx:if="{{activeTab === 'available'}}" wx:for="{{availableCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-wrap">
+            <text lines="1" class="coupon-left-amount">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+          </view>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
+        </view>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
+        </view>
+        <view class="coupon-action">
+          <view class="action-button" bindtap="useCoupon" data-coupon="{{item}}">
+            <text lines="1" class="action-text">去使用</text>
+            <image src="/imgs/item-bottom.png" class="action-divider"></image>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 已使用优惠券 -->
+      <view class="coupon-card flex" wx:if="{{activeTab === 'used'}}" wx:for="{{usedCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-group">
+            <text lines="1" class="coupon-left-amount-large">{{item.amount}}</text>
+            <text lines="1" class="coupon-left-unit">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+          </view>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
+        </view>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
+        </view>
+        <view class="coupon-status">
+          <view class="status-badge">
+            <text lines="1" class="status-text">已使用</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 已过期优惠券 -->
+      <view class="coupon-card flex" wx:if="{{activeTab === 'expired'}}" wx:for="{{expiredCoupons}}" wx:key="id">
+        <view class="coupon-left flexdca">
+          <view class="coupon-left-amount-group">
+            <text lines="1" class="coupon-left-amount-large">{{item.amount}}</text>
+            <text lines="1" class="coupon-left-unit">{{item.type === 1 ? '满减' : item.type === 2 ? '折扣' : '元'}}</text>
+          </view>
+          <text lines="1" class="coupon-left-label">优惠劵</text>
+        </view>
+        <view class="coupon-info flexdca">
+          <text lines="1" class="coupon-name one-line-over">{{item.name}}</text>
+          <text lines="1" class="coupon-condition one-line-over">{{item.condition}}</text>
+          <text lines="1" decode="true" class="coupon-valid">{{item.validDate}}</text>
+        </view>
+        <view class="coupon-status">
+          <view class="status-badge">
+            <text lines="1" class="status-text">已过期</text>
+            <image src="/imgs/item-bottom.png" class="action-divider"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

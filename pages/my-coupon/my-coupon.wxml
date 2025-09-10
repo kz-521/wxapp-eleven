@@ -1,0 +1,43 @@
+<!--pages/my-coupon/my-coupon.wxml-->
+<view class="coupon-page">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的优惠券</text>
+  </view>
+
+  <!-- 优惠券列表 -->
+  <view class="coupon-list" wx:if="{{coupons.length > 0}}">
+    <view class="coupon-item" wx:for="{{coupons}}" wx:key="id">
+      <view class="coupon-content">
+        <view class="coupon-left">
+          <view class="coupon-amount">
+            <text class="amount-symbol">¥</text>
+            <text class="amount-value">{{item.amount}}</text>
+          </view>
+          <view class="coupon-condition">
+            <text class="condition-text">满{{item.minAmount}}可用</text>
+          </view>
+        </view>
+        <view class="coupon-right">
+          <view class="coupon-info">
+            <text class="coupon-name">{{item.name}}</text>
+            <text class="coupon-desc">{{item.description}}</text>
+            <text class="coupon-date">有效期至：{{item.expireDate}}</text>
+          </view>
+          <view class="coupon-status">
+            <text class="status-text {{item.status === 'available' ? 'available' : 'used'}}">
+              {{item.status === 'available' ? '可使用' : '已使用'}}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <image src="/components/imgs/empty.png" class="empty-icon"></image>
+    <text class="empty-text">暂无优惠券</text>
+    <text class="empty-desc">快去领取优惠券吧</text>
+  </view>
+</view>

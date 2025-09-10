@@ -1,0 +1,201 @@
+.coupon-page {
+  background-color: rgba(249,248,250,1);
+  width: 750rpx;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.page-body {
+  position: relative;
+}
+.coupon-content {
+  position: relative;
+  margin-bottom: 67rpx;
+  display: flex;
+  flex-direction: column;
+  padding: 29rpx 6rpx 211rpx 0;
+}
+
+/* 顶部tabs */
+.tabs {
+  width: 572rpx;
+  margin: 0rpx 83rpx 20rpx 89rpx;
+}
+.tab-item-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tab-item {
+  color: rgba(0,0,0,0.65);
+  font-size: 28rpx;
+  font-family: PingFang-SC-Medium;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+.tab-item.active {
+  color: rgba(0,0,0,0.85);
+  font-weight: 600;
+}
+.tab-underline {
+  width: 56rpx;
+  height: 8rpx;
+  margin-top: 6rpx;
+}
+
+/* 卡片通用 */
+.coupon-card {
+  box-sizing: border-box;
+  width: 690rpx;
+  height: 214rpx;
+  background: #FFFFFF;
+  padding-left: 32rpx;
+  justify-content: flex-end;
+  margin: 10rpx auto;
+}
+.coupon-left {
+  flex-direction: column;
+  margin: 39rpx 0 46rpx 0;
+}
+.coupon-left-amount-wrap {
+  height: 92rpx;
+  line-height: 93rpx;
+}
+.coupon-left-amount {
+  height: 92rpx;
+  color: rgba(131, 208, 106);
+  font-size: 54rpx;
+  font-family: DINPro-Bold;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+.coupon-left-amount-group {
+  height: 92rpx;
+  line-height: 93rpx;
+}
+.coupon-left-amount-large {
+  height: 92rpx;
+  color: rgba(0,0,0,0.85);
+  font-size: 72rpx;
+  font-family: DINPro-Bold;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+}
+.coupon-left-unit {
+  height: 92rpx;
+  color: rgba(0,0,0,0.85);
+  font-size: 26rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+}
+.coupon-left-label {
+  color: rgba(131, 208, 106);
+  font-size: 26rpx;
+  font-family: PingFang-SC-Medium;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 37rpx;
+  margin: 0 13rpx 0 14rpx;
+}
+.coupon-info {
+  flex-direction: column;
+  margin: 40rpx 0 39rpx 24rpx;
+}
+.coupon-name {
+  color: rgba(0,0,0,0.85);
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 45rpx;
+  margin-right: 31rpx;
+}
+.coupon-condition {
+  color: rgba(0,0,0,0.45);
+  font-size: 24rpx;
+  font-family: PingFang-SC-Medium;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 33rpx;
+  margin: 16rpx 119rpx 0 0;
+}
+.coupon-valid {
+  color: rgba(0,0,0,0.45);
+  font-size: 24rpx;
+  font-family: PingFang-SC-Medium;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 33rpx;
+  margin-top: 8rpx;
+}
+.coupon-action {
+  margin-left: 43rpx;
+  display: flex;
+  flex-direction: column;
+}
+.action-button {
+  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/028f44bcc05542e3ace976ddd57abf8a_mergeImage.png);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 81rpx 41rpx 83rpx 50rpx;
+}
+.action-text {
+  color: rgba(255,255,255,1);
+  font-size: 36rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 50rpx;
+}
+.action-divider {
+  position: absolute;
+  left: -1rpx;
+  top: 17rpx;
+  width: 2rpx;
+  height: 175rpx;
+}
+
+/* 状态卡片右侧 */
+.coupon-status {
+  margin-left: 43rpx;
+  display: flex;
+  flex-direction: column;
+}
+.status-badge {
+  background-image: url(https://lanhu-dds-backend.oss-cn-beijing.aliyuncs.com/merge_image/imgs/ad4d0746744a49508d66455ecf229ebe_mergeImage.png);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 81rpx 41rpx 83rpx 50rpx;
+}
+.status-text {
+  color: rgba(255,255,255,1);
+  font-size: 36rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 50rpx;
+}
+.status-divider {
+  position: absolute;
+  left: -1rpx;
+  top: 17rpx;
+  width: 2rpx;
+  height: 175rpx;
+}
+
+/* 底部装饰 */
+.bottom-decoration {
+  width: 750rpx;
+  height: 68rpx;
+  margin: 1556rpx 0 0 -750rpx;
+}

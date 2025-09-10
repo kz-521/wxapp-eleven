@@ -1,0 +1,177 @@
+.container{
+    background-color: #DCEBE6;
+    height: 360rpx;
+    width: 100%;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+}
+.inner-container{
+    position: relative;
+    box-sizing: border-box;
+    width: 690rpx;
+    height: 260rpx;
+    background-color: #ffffff;
+    padding-left:38rpx;
+    padding-right:38rpx;
+    box-shadow:0px 0px 8px 0px rgba(119,163,149,0.2);
+    border-radius: 4rpx;
+}
+
+.sleeve {
+    font-family: sleeve !important;
+    font-size: 24rpx;
+    font-style: normal;
+    color: #157658 !important;
+}
+
+/* 头像和昵称区域 */
+.user-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10rpx 0;
+    gap: 30rpx;
+}
+.avatar-wrapper {
+    position: relative;
+    width: 140rpx;
+    height: 140rpx;
+}
+.avatar-overlay-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 140rpx;
+    height: 140rpx;
+    background: transparent;
+    border: none;
+    padding: 0;
+    opacity: 0;
+}
+
+.row-top{
+}
+
+.avatar-container{
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.avatar-container:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
+.avatar{
+    border-radius: 4rpx;
+}
+
+.user-info-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8rpx;
+}
+
+.user-nickname {
+    font-size: 32rpx;
+    color: #333333;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.user-phone {
+    font-size: 24rpx;
+    color: #666666;
+    line-height: 1.2;
+}
+
+.phone-btn{
+    position: absolute;
+    top: 28rpx;
+    right: 0;
+    border-top-left-radius: 60rpx;
+    border-bottom-left-radius: 60rpx;
+    font-size: 24rpx;
+    color: #FFFFFF;
+}
+
+.auth-btn{
+    position: absolute;
+    top: 88rpx;
+    right: 0;
+    border-top-left-radius: 60rpx;
+    border-bottom-left-radius: 60rpx;
+    font-size: 24rpx;
+    color: #157658;
+}
+
+.row-bottom{
+    display:flex;
+    flex-direction:row;
+    justify-content: center;
+    position: absolute;
+    bottom: 20rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+}
+
+.bottom-container{
+    display:flex;
+    flex-direction:row;
+    align-items: center;
+    height:80rpx;
+    font-size:24rpx;
+    color:#999999;
+    width:580rpx;
+    justify-content: space-around;
+}
+
+.left{
+    height: 100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content: space-between;
+}
+
+.left text:first-child{
+    font-size:36rpx;
+    line-height: 36rpx;
+    color: #157658;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+}
+
+.v-line{
+    width:3rpx;
+    height: 50rpx;
+    background-color: #dddddd;
+}
+
+.right{
+    height: 100%;
+    flex-direction:column;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+}
+
+.right text:first-child{
+    font-size:36rpx;
+    line-height: 36rpx;
+    color: #157658;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:center;
+}
+

@@ -1,0 +1,279 @@
+// components/my-banner/index.js
+import {User} from "../../models/user";
+import {promisic} from "../../utils/util";
+
+Component({
+    /**
+     * 组件的属性列表
+     */
+    properties: {
+        couponCount: Number,
+        balance: {
+            type: Number,
+            value: 0
+        }
+    },
+
+    /**
+     * 组件的初始数据
+     */
+    data: {
+        showLoginBtn: false,
+        couponCount: Number,
+        balance: 0,
+        userInfo: null
+    },
+
+    lifetimes: {
+        async attached() {
+            // 检查用户信息状态
+            const userInfo = wx.getStorageSync('userInfo')
+            const hasAuth = await this.hasAuthUserInfo()
+            
+            // 设置用户信息到组件数据
+            this.setData({
+                userInfo: userInfo
+            })
+            
+            // 如果用户信息完整或已授权，隐藏登录按钮
+            if ((userInfo && userInfo.avatarUrl && userInfo.nickName) || hasAuth) {
+                this.setData({
+                    showLoginBtn: false,
+                    userInfo: userInfo
+                })
+            } else {
+                this.setData({
+                    showLoginBtn: true,
+                    userInfo: null
+                })
+            }
+        }
+    },
+
+    observers:{
+        'couponCount':function (couponCount) {
+            // console.log('my-banner组件接收到优惠券数量更新:', couponCount)
+        },
+        'balance':function (balance) {
+            // console.log('my-banner组件接收到余额更新:', balance)
+        }
+    },
+
+    /**
+     * 组件的方法列表
+     */
+    methods: {
+        /**
+         * 点击头像事件
+         */
+        onAvatarTap() {
+            // 检查是否已经有完整的用户信息
+            const userInfo = wx.getStorageSync('userInfo')
+            
+            if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
+                wx.showToast({
+                    title: '用户信息已授权',
+                    icon: 'success',
+                    duration: 1500
+                })
+                return
+            }
+
+            // 显示授权提示
+            wx.showModal({
+                title: '授权提示',
+                content: '需要获取您的头像和昵称信息，是否授权？',
+                success: (res) => {
+                    if (res.confirm) {
+                        // 用户确认授权，开始获取用户信息
+                        this.getUserProfile()
+                    } else {
+                        wx.showToast({
+                            title: '您取消了授权',
+                            icon: 'none',
+                            duration: 1500
+                        })
+                    }
+                }
+            })
+        },
+
+        /**
+         * 检查并获取用户信息
+         */
+        async checkAndGetUserInfo() {
+            const userInfo = wx.getStorageSync('userInfo')
+            if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
+                return
+            }
+
+            // 先尝试一次性获取用户信息
+            this.getUserProfile()
+        },
+
+        /**
+         * 一次性获取用户信息
+         */
+        getUserProfile() {
+            wx.getUserProfile({
+                desc: '用于完善用户资料',
+                success: (res) => {
+                    this.handleUserInfoSuccess(res.userInfo)
+                },
+                fail: (err) => {
+                    if (err.errMsg.includes('cancel')) {
+                        wx.showToast({ title: '用户取消授权', icon: 'none' })
+                    } else {
+                        // 如果一次性获取失败，尝试分别授权
+                        this.getUserInfoSeparately()
+                    }
+                }
+            })
+        },
+
+        /**
+         * 分别授权获取用户信息
+         */
+        getUserInfoSeparately() {
+            // 由于wx.chooseAvatar不兼容，直接获取昵称并使用默认头像
+            const userInfo = wx.getStorageSync('userInfo') || {}
+            userInfo.avatarUrl = '/imgs/logo.png' // 使用默认头像
+            wx.setStorageSync('userInfo', userInfo)
+            
+            // 直接获取昵称
+            this.getNickName()
+        },
+
+        /**
+         * 获取用户昵称
+         */
+        getNickName() {
+            wx.showModal({
+                title: '获取昵称',
+                content: '请输入您的昵称',
+                editable: true,
+                placeholderText: '请输入昵称',
+                success: (res) => {
+                    if (res.confirm && res.content) {
+                        const userInfo = wx.getStorageSync('userInfo') || {}
+                        userInfo.nickName = res.content
+                        wx.setStorageSync('userInfo', userInfo)
+                        
+                        // 完成用户信息获取
+                        this.completeUserInfo(userInfo)
+                    } else {
+                        wx.showToast({ title: '请输入昵称', icon: 'none' })
+                    }
+                }
+            })
+        },
+
+        /**
+         * 完成用户信息获取
+         */
+        completeUserInfo(userInfo) {
+            this.handleUserInfoSuccess(userInfo)
+        },
+
+        /**
+         * 处理用户信息获取成功
+         */
+        async handleUserInfoSuccess(userInfo) {
+            try {
+                // 保存用户信息到本地存储
+                wx.setStorageSync('userInfo', userInfo)
+                
+                // 更新组件状态
+                this.setData({
+                    showLoginBtn: false,
+                    userInfo: userInfo
+                })
+
+                wx.showToast({ 
+                    title: '获取用户信息成功', 
+                    icon: 'success' 
+                })
+
+                // 调用User模型更新用户信息
+                const success = await User.updateUserInfo(userInfo)
+                if (success) {
+                    // console.log('用户信息更新到服务器成功')
+                }
+                
+                // 通知父组件用户信息已更新
+                this.triggerEvent('userInfoUpdated', { userInfo })
+                
+            } catch (error) {
+                wx.showToast({ 
+                    title: '获取用户信息失败', 
+                    icon: 'none' 
+                })
+            }
+        },
+
+        /**
+         * 刷新用户信息状态
+         */
+        refreshUserInfo() {
+            const userInfo = wx.getStorageSync('userInfo')
+            
+            if (userInfo && userInfo.avatarUrl && userInfo.nickName) {
+                this.setData({
+                    showLoginBtn: false,
+                    userInfo: userInfo
+                })
+            } else {
+                this.setData({
+                    showLoginBtn: true,
+                    userInfo: null
+                })
+            }
+        },
+
+        async onAuthUserInfo(event) {
+            if (event.detail.userInfo) {
+                this.handleUserInfoSuccess(event.detail.userInfo)
+            }
+        },
+
+        async hasAuthUserInfo() {
+            const setting = await promisic(wx.getSetting)();
+            const userInfo = setting.authSetting['scope.userInfo']
+            return !!userInfo;
+        },
+
+        onGotoMyCoupon(event) {
+            wx.navigateTo({
+                url:`/pages/coupon-select/index`
+            })
+        },
+
+        onGotoBalance(event) {
+            wx.navigateTo({
+                url: '/pages/recharge/index'
+            })
+        },
+
+        /**
+         * 选择头像回调（微信开放能力）
+         */
+        onChooseAvatar(e) {
+            try {
+                const avatarUrl = e.detail && e.detail.avatarUrl
+                if (!avatarUrl) {
+                    wx.showToast({ title: '未选择头像', icon: 'none' })
+                    return
+                }
+                const userInfo = wx.getStorageSync('userInfo') || {}
+                userInfo.avatarUrl = avatarUrl
+                wx.setStorageSync('userInfo', userInfo)
+                this.setData({ userInfo, showLoginBtn: !(userInfo && userInfo.nickName) })
+                wx.showToast({ title: '头像已更新', icon: 'success' })
+                // 通知父组件已更新
+                this.triggerEvent('userInfoUpdated', { userInfo })
+            } catch (err) {
+                wx.showToast({ title: '选择头像失败', icon: 'none' })
+            }
+        }
+    }
+})

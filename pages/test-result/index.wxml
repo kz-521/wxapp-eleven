@@ -1,0 +1,42 @@
+<view class="page">
+  <view class="box_2" wx:if="{{result}}">
+    <text lines="1" class="text_3">您的体质是</text>
+    <view class="box_3" style="background-image: url('{{backgroundImage}}');">
+    <image src="{{rightImage}}" style="position: absolute;top: 0;right: 0; width: 214rpx;height: 214rpx;" mode=""/>
+      <view class="text-group_1">
+        <text lines="1" class="text_4">{{result.primary_constitution.type}}</text>
+        <text lines="1" class="text_5">核心特征：{{result.primary_constitution.features}}</text>
+        <text lines="1" class="text_6">易患问题：{{result.primary_constitution.problems}}</text>
+      </view>
+      <text lines="1" class="text_7">养生关键词：{{result.primary_constitution.keywords}}</text>
+    </view>
+  </view>
+  <view class="box_4">
+    <text lines="1" class="text_8">推荐饮品</text>
+    <view class="list_1">
+      <view class="list-items_1-0" wx:for="{{recommendProducts}}" wx:key="id">
+        <view class="group_1-0">
+          <image src="{{item.image}}" class="image_4-0"></image>
+          <view class="group_2-0">
+            <text lines="1" class="text_9-0">{{item.name}}</text>
+            <view class="section_3-0">
+              <view class="text-wrapper_1-0" wx:for="{{item.tags}}" wx:key="index">
+                <text lines="1" class="text_10-0">{{item}}</text>
+              </view>
+            </view>
+            <view class="group_3-0">
+          <view class="text-wrapper_3-0">
+            <text lines="1" class="text_12-0">¥</text>
+            <text lines="1" class="text_13-0">{{item.price}}</text>
+            <text lines="1" class="text_14-0" />
+            <text lines="1" class="text_15-0">起</text>
+          </view>
+          <image src="/imgs/plus-circle-fill.png" class="label_4-0 add-btn" bindtap="addToCart" data-index="{{index}}"></image>
+        </view>
+          </view>
+        </view>
+        
+      </view>
+    </view>
+  </view>
+</view>

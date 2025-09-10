@@ -1,0 +1,53 @@
+.topbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    background-color: #ff6456;
+}
+.status {
+    width: 100%;
+}
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+}
+
+.navbar_back {
+    padding: 0 32rpx;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+}
+
+.navbar_back image {
+    width: 32rpx;
+    height: 32rpx;
+}
+
+.navbar_title {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.navbar_title-a{
+    margin-left: 20rpx;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 35rpx;
+    color: #ffffff;
+}
+
+/*.search-input-top{
+
+}*/

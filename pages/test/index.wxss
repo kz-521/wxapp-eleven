@@ -1,0 +1,294 @@
+/* 页面容器 */
+.page {
+  background-color: #fff;
+  position: relative;
+  width: 750rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* 页面内边距与布局 */
+.page-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 50rpx;
+}
+
+/* 性别选择模块 */
+.gender-title {
+  color: #000;
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 40rpx;
+  margin: 50rpx 0 20rpx 0;
+}
+
+.gender-options {
+  width: 650rpx;
+}
+
+.gender-card {
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.gender-card.male {
+  border: 2px solid #ccc;
+  padding: 51rpx 50rpx 50rpx 128rpx;
+}
+.gender-card.male.selected {
+  border-color: rgba(58,154,198,1);
+}
+
+.gender-card.female {
+  border: 3px solid #ccc;
+  padding: 50rpx 34rpx 49rpx 142rpx;
+}
+.gender-card.female.selected {
+  border-color: rgba(235,155,180,1);
+}
+
+.gender-label {
+  color: #000;
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 45rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.gender-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16rpx;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+}
+
+/* 问题模块 */
+.questions-title {
+  display: block;
+  color: rgba(0,0,0,0.65);
+  font-size: 22rpx;
+  font-family: PingFang-SC-Medium;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 30rpx;
+  margin: 50rpx 0 20rpx 0;
+}
+
+.answer-selector {
+  box-sizing: border-box;
+  background: #F9F8FA;
+  border-radius: 16rpx;
+  width: 650rpx;
+  height: 90rpx;
+  display: flex;
+  justify-content: space-between;
+  padding: 26rpx 0 27rpx 40rpx;
+}
+
+.option-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.option-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 80rpx;
+  gap: 8rpx;
+}
+
+.selector-arrow {
+  margin-left: 12rpx;
+  margin-right: 32rpx;
+}
+
+/* 列表与文本 */
+.question-item { margin-bottom: 40rpx; }
+
+.question-title {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.85);
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  line-height: 40rpx;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.question-type {
+  font-size: 24rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFangSC-Regular;
+  line-height: 32rpx;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.option-text {
+  font-size: 26rpx;
+  color: rgba(0,0,0,0.65);
+  font-family: PingFangSC-Regular;
+  line-height: 36rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 500rpx;
+}
+
+/* 加载 */
+.loading-state { height: 200rpx; }
+.loading-text {
+  font-size: 28rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFangSC-Regular;
+}
+
+/* 弹窗 */
+.van-popup--bottom.van-popup--safe{ padding-bottom: 0 !important; }
+.question-popup {
+  background: #FFFFFF;
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 40rpx 40rpx 0 40rpx;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30rpx;
+  position: relative;
+}
+
+.popup-title {
+  font-size: 32rpx;
+  color: rgba(0,0,0,0.85);
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  line-height: 45rpx;
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.popup-subtitle {
+  font-size: 24rpx;
+  color: rgba(0,0,0,0.45);
+  font-family: PingFangSC-Regular;
+  line-height: 32rpx;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.options-scroll { flex: 1; max-height: 60vh; margin-bottom: 0; }
+
+.single-option-item { margin-bottom: 20rpx; }
+
+.single-option-inner {
+  background: #F9F8FA;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+.single-option-inner:active { background: #F0F0F0; transform: scale(0.98); }
+
+.multi-option-item { margin-bottom: 20rpx; }
+
+.multi-option-inner {
+  background: #F9F8FA;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.multi-option-inner.selected { background: #E8F5E8; }
+.multi-option-inner:active { transform: scale(0.98); }
+
+.option-label {
+  font-size: 28rpx;
+  color: #080E0E;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  margin-right: 16rpx;
+  min-width: 40rpx;
+}
+
+.option-content { display: flex; align-items: center; flex: 1; }
+
+.check-icon {
+  width: 32rpx;
+  height: 32rpx;
+  background: #080E0E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20rpx;
+  font-weight: bold;
+}
+
+/* 提交按钮 */
+.submit-btn {
+  width: 528rpx;
+  background: linear-gradient(180deg, #080E0E 0%, #080E0E 100%), #F9F8FA;
+  border-radius: 41rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 60rpx auto 80rpx auto;
+  border: none;
+  outline: none;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+}
+
+/* 弹窗中的确定按钮样式 */
+.question-popup .submit-btn {
+  height: 82rpx;
+  background: linear-gradient(180deg, #080E0E 0%, #080E0E 100%);
+  border-radius: 41rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20rpx auto;
+  border: none;
+  outline: none;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+  z-index: 10;
+}

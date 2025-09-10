@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "提交订单",
+  "usingComponents": {
+    "l-radio": "/miniprogram_npm/lin-ui/radio/index",
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

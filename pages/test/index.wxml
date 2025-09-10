@@ -1,0 +1,82 @@
+<view class="page">
+    <view class="page-content">
+      <!-- 性别选择 -->
+      <text  class="gender-title">你是男生还是女生？</text>
+      <view class="gender-options flexb">
+        <view class="gender-card male {{gender === 'male' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="male">
+          <image src="/imgs/boy.png" class="gender-img"></image>
+          <text  class="gender-label">我是男生</text>
+        </view>
+        <view class="gender-card female {{gender === 'female' ? 'selected' : ''}}" bindtap="onGenderSelect" data-gender="female">
+          <image src="/imgs/woman.png" class="gender-img"></image>
+          <text  class="gender-label">我是女生</text>
+        </view>
+      </view>
+      
+      <!-- 体质问题动态渲染 -->
+      <view wx:if="{{questions.length > 0}}">
+        <view  class="questions-title">体质测评问题</view>
+        
+        <!-- 问题列表 -->
+        <view wx:for="{{questions}}" wx:key="id" class="question-item">
+          <!-- 问题类型标题（只在类型变化时显示） -->
+          <text wx:if="{{shouldShowTypeTitle(index)}}"  class="question-type">{{getQuestionTypeTitle(item.question_type)}}</text>
+          
+          <!-- 问题标题 -->
+          <text  class="question-title">{{item.question}}</text>
+          
+          <!-- 问题选择框 -->
+          <view class="answer-selector" bindtap="showQuestionPopup" data-question-index="{{index}}">
+            <view class="option-left flexa">
+              <text  class="option-text">{{displayTexts[item.id] || '请选择'}}</text>
+            </view>
+            <view class="option-right">
+              <van-icon name="arrow-down" size="32rpx" color="#999" class="selector-arrow" />
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 加载状态 -->
+      <view wx:else class="loading-state flexca">
+        <text class="loading-text">正在加载问题...</text>
+      </view>
+    </view>
+    
+    <!-- 问题选择弹窗 -->
+    <van-popup show="{{showQuestionPopup}}" position="bottom" bind:close="closeQuestionPopup">
+      <view class="question-popup">
+        <view class="popup-header">
+          <text  class="popup-title">{{currentQuestion.question}}</text>
+          <text  class="popup-subtitle">{{currentQuestion.question_type === 1 ? '（单选）' : '（多选）'}}</text>
+        </view>
+        
+        <scroll-view scroll-y="true" class="options-scroll">
+          <!-- 单选选项 -->
+          <view wx:if="{{currentQuestion.question_type === 1}}" wx:for="{{currentOptions}}" wx:key="label" class="single-option-item" catchtap="onSingleOptionSelect" data-index="{{index}}">
+            <view class="single-option-inner">
+              <text class="option-label">{{item.label}}</text>
+              <text class="option-text">{{item.text}}</text>
+            </view>
+          </view>
+          
+          <!-- 多选选项 -->
+          <view wx:if="{{currentQuestion.question_type === 2}}" wx:for="{{currentOptions}}" wx:key="label" class="multi-option-item" catchtap="onMultiOptionSelect" data-index="{{index}}">
+            <view class="multi-option-inner {{item.isSelected ? 'selected' : ''}}">
+              <view class="option-content">
+                <text class="option-label">{{item.label}}</text>
+                <text class="option-text">{{item.text}}</text>
+              </view>
+              <view wx:if="{{item.isSelected}}" class="check-icon">✓</view>
+            </view>
+          </view>
+        </scroll-view>
+        
+        <!-- 多选确认按钮 -->
+        <button wx:if="{{currentQuestion.question_type === 2}}" class="submit-btn" bindtap="confirmMultiSelect">确定</button>
+      </view>
+    </van-popup>
+    
+    <!-- 提交按钮 -->
+    <button class="submit-btn" bindtap="submitTest">提交测评</button>
+</view>
