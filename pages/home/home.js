@@ -17,7 +17,10 @@ Page({
         }
     },
 
-    async onLoad() {
+    async onLoad(options) {
+        // 处理扫码桌号参数
+        this.handleTableParam(options)
+        
         this.checkLoginStatus()
         
         // 获取今日推荐数据
@@ -25,6 +28,26 @@ Page({
         
         // 获取用户位置和计算距离
         this.initUserLocation()
+    },
+
+    /**
+     * 处理扫码桌号参数
+     */
+    handleTableParam(options) {
+        if (options && options.table) {
+            const tableId = parseInt(options.table)
+            // 验证桌号参数是否为合法数字
+            if (Number.isInteger(tableId) && tableId > 0) {
+                // 保存到缓存
+                wx.setStorageSync('tableId', tableId)
+                // 同时保存到全局数据
+                const app = getApp()
+                app.globalData.tableId = tableId
+                console.log('桌号保存成功:', tableId)
+            } else {
+                console.log('无效的桌号参数:', options.table)
+            }
+        }
     },
 
     onShow() {

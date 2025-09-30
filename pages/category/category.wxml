@@ -77,7 +77,7 @@
             </view>
         </view>
         <view class="checkout-btn" bindtap="goToCheckout">
-            <text class="checkout-text">去结算</text>
+            <text class="checkout-text">下单</text>
         </view>
     </view>
 

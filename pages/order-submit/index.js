@@ -62,7 +62,7 @@ Page({
      */
     loadCartDataFromGlobal() {
         const app = getApp()
-        const cartItems = app.globalData.cartItems || []
+        const cartItems = (app && app.globalData && app.globalData.cartItems) || []
 
         console.log('从globalData获取的购物车数据:', cartItems)
 
@@ -120,7 +120,7 @@ Page({
      */
     getDefaultAddress() {
         const app = getApp()
-        const defaultAddress = app.globalData.defaultAddress
+        const defaultAddress = (app && app.globalData && app.globalData.defaultAddress)
 
         if (defaultAddress) {
             this.setData({
@@ -212,7 +212,26 @@ Page({
 
         // 直接调用submitOrder方法
         this.submitOrder()
+        this.clearCart()
     },
+
+    clearCart() {
+        // 清空购物车
+        const app = getApp()
+        if (app && app.globalData) {
+            app.globalData.cartItems = []
+            app.globalData.cartCount = 0
+            app.globalData.totalPrice = 0
+        }
+        wx.setStorageSync('cartItems', [])
+
+        // 清除缓存的优惠券数据
+        wx.removeStorageSync('selectedCoupon')
+        wx.removeStorageSync('couponAmount')
+        wx.removeStorageSync('payAmount')
+
+    },
+
 
     /**
      * 跳转到订单详情页的辅助方法
@@ -220,7 +239,7 @@ Page({
     navigateToOrderDetail() {
         // 从全局变量获取最后提交的订单ID
         const app = getApp()
-        const lastOrderId = app.globalData.lastOrderId
+        const lastOrderId = (app && app.globalData && app.globalData.lastOrderId)
 
         // 统一通过 URL 参数跳转，避免依赖 eventChannel
         const url = lastOrderId
@@ -268,9 +287,11 @@ Page({
 
                             // 清空购物车
                             const app = getApp()
-                            app.globalData.cartItems = []
-                            app.globalData.cartCount = 0
-                            app.globalData.totalPrice = 0
+                            if (app && app.globalData) {
+                                app.globalData.cartItems = []
+                                app.globalData.cartCount = 0
+                                app.globalData.totalPrice = 0
+                            }
                             wx.setStorageSync('cartItems', [])
 
                             // 清除缓存的优惠券数据
@@ -338,7 +359,7 @@ Page({
      */
     checkSelectedCoupon() {
         const app = getApp()
-        const selectedCoupon = app.globalData.selectedCoupon
+        const selectedCoupon = (app && app.globalData && app.globalData.selectedCoupon)
 
         console.log('=== 优惠券检查开始 ===')
         console.log('当前订单总金额:', this.data.totalAmount)
@@ -369,7 +390,9 @@ Page({
                 wx.setStorageSync('payAmount', result.payAmount.toFixed(2))
 
                 // 清空globalData中的优惠券，避免重复使用
-                app.globalData.selectedCoupon = null
+                if (app && app.globalData) {
+                    app.globalData.selectedCoupon = null
+                }
             } else {
                 // 优惠券不满足条件，清空选择
                 wx.showToast({
@@ -484,7 +507,9 @@ Page({
 
         // 清空globalData
         const app = getApp()
-        app.globalData.selectedCoupon = null
+        if (app && app.globalData) {
+            app.globalData.selectedCoupon = null
+        }
     },
 
     /**
@@ -540,6 +565,10 @@ Page({
         console.log('生成的下单时间:', createTime)
         console.log('选择的支付方式:', this.data.selectedPaymentMethod)
 
+        // 获取桌号参数
+        const app = getApp()
+        const tableId = (app && app.globalData && app.globalData.tableId) || wx.getStorageSync('tableId')
+
         // 构建API期望的订单数据格式
         const apiOrderData = {
             sku_info_list: this.data.orderProducts.map(item => ({
@@ -554,7 +583,8 @@ Page({
             pay_amount: parseFloat(this.data.payAmount),
             coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null,
             payment_method: this.data.selectedPaymentMethod, // 添加支付方式
-            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1 // 添加pay_way字段
+            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1, // 添加pay_way字段
+            table_id: tableId // 添加桌号参数
         }
 
         console.log('发送给API的订单数据:', apiOrderData)
@@ -582,17 +612,25 @@ Page({
 
                     // 存储order_id到全局变量，用于取茶号生成
                     const app = getApp()
-                    app.globalData.lastOrderId = orderId
+                    if (app && app.globalData) {
+                        app.globalData.lastOrderId = orderId
+                    }
                     console.log('已存储订单ID到全局变量:', orderId)
 
+
+                    wx.redirectTo({
+                        url: `/pages/order-detail/index?orderId=${orderId}`
+                    })
+
+
                     // 根据选择的支付方式执行不同的支付流程
-                    if (this.data.selectedPaymentMethod === 'balance') {
+/*                    if (this.data.selectedPaymentMethod === 'balance') {
                         // 余额支付
                         this.processBalancePayment(orderId)
                     } else {
                         // 微信支付
                         this.callPayment(orderId)
-                    }
+                    }*/
                 } else {
                     console.error('订单提交成功但未获取到订单ID:', res)
                     wx.showToast({
@@ -621,7 +659,7 @@ Page({
 
     /**
      * 处理余额支付
-     */ 
+     */
     async processBalancePayment(orderId) {
         console.log('开始处理余额支付，订单ID:', orderId, '支付方式: 余额支付')
 
@@ -633,7 +671,7 @@ Page({
 
             const userInfoResponse = await User.getUserInfo()
             let userBalance = 0
-            
+
             // 检查响应格式并获取余额
             if (userInfoResponse && (userInfoResponse.code === 0 || userInfoResponse.code === 200)) {
                 userBalance = parseFloat(userInfoResponse.result.balance || 0)
@@ -688,9 +726,11 @@ Page({
 
                 // 清空购物车
                 const app = getApp()
-                app.globalData.cartItems = []
-                app.globalData.cartCount = 0
-                app.globalData.totalPrice = 0
+                if (app && app.globalData) {
+                    app.globalData.cartItems = []
+                    app.globalData.cartCount = 0
+                    app.globalData.totalPrice = 0
+                }
                 wx.setStorageSync('cartItems', [])
 
                 // 清除缓存的优惠券数据
@@ -717,12 +757,12 @@ Page({
         } catch (error) {
             wx.hideLoading()
             console.error('余额支付异常:', error)
-            
+
             let errorMsg = '余额支付失败'
             if (error.message) {
                 errorMsg = error.message
             }
-            
+
             wx.showToast({
                 title: errorMsg,
                 icon: 'none',

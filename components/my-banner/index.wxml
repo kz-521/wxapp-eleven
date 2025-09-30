@@ -3,41 +3,62 @@
         <!-- 头像和昵称区域 -->
         <view class="user-section">
             <view class="avatar-wrapper">
+                <!-- 头像上传状态遮罩 -->
+                <view wx:if="{{isUploading}}" class="upload-mask">
+                    <text class="upload-text">上传中...</text>
+                </view>
+                
                 <!-- 用户头像显示 -->
-                <l-avatar wx:if="{{userInfo && userInfo.avatarUrl}}" 
-                          size="140" class="avatar-container"
+                <l-avatar wx:if="{{displayUserInfo && displayUserInfo.avatarUrl}}" 
+                          size="140" class="avatar-container {{isUploading ? 'uploading' : ''}}"
                           l-class="avatar" shape="square"
-                          src="{{userInfo.avatarUrl}}"
+                          src="{{displayUserInfo.avatarUrl}}"
                           bind:tap="onAvatarTap">
                 </l-avatar>
                 
                 <!-- 默认头像 -->
                 <l-avatar wx:else
-                          size="140" class="avatar-container"
+                          size="140" class="avatar-container {{isUploading ? 'uploading' : ''}}"
                           l-class="avatar" shape="square"
                           src="/imgs/logo.png"
                           bind:tap="onAvatarTap">
                 </l-avatar>
 
-                <!-- 透明覆盖按钮：点击头像选择头像 -->
-                <button class="avatar-overlay-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar"></button>
+                <!-- 透明覆盖按钮：点击头像选择头像（随时可选择） -->
+                <button wx:if="{{!isUploading}}" 
+                        class="avatar-overlay-btn" 
+                        open-type="chooseAvatar" 
+                        bind:chooseavatar="onChooseAvatar"></button>
             </view>
             
             <!-- 用户昵称显示 -->
             <view class="user-info-container">
-                <text class="user-nickname" wx:if="{{userInfo && userInfo.nickName}}">{{userInfo.nickName}}</text>
-                <text class="user-nickname" wx:else>点击头像登录</text>
+                <text class="user-nickname" wx:if="{{displayUserInfo && displayUserInfo.nickName}}">
+                    {{displayUserInfo.nickName}}
+                    <text wx:if="{{!isLoggedIn}}" class="login-tip">（点击登录）</text>
+                </text>
+                <text class="user-nickname" wx:else>点击头像授权</text>
             </view>
         </view>
         
-        <l-button wx:if="{{showLoginBtn}}" l-class="auth-btn"
-                  bg-color="#DCEBE6"
-                  open-type="getUserInfo"
-                  bind:getuserinfo="onAuthUserInfo"
-                  height="48"
-                  width="120">
-            登 陆
-        </l-button>
+        <view class="login-section">
+            <l-button wx:if="{{showLoginBtn && !displayUserInfo}}" l-class="auth-btn"
+                      bg-color="#DCEBE6"
+                      open-type="getUserInfo"
+                      bind:getuserinfo="onAuthUserInfo"
+                      height="48"
+                      width="120">
+                授权登录
+            </l-button>
+            
+            <l-button wx:elif="{{showLoginBtn && displayUserInfo && !isLoggedIn}}" l-class="login-btn"
+                      bg-color="#157658"
+                      bind:tap="navigateToLogin"
+                      height="48"
+                      width="120">
+                立即登录
+            </l-button>
+        </view>
         <view class="row-bottom">
             <view class="bottom-container">
                 <view bind:tap="onGotoBalance" class="left">

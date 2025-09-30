@@ -39,6 +39,31 @@
     width: 140rpx;
     height: 140rpx;
 }
+
+/* 头像上传状态 */
+.upload-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 140rpx;
+    height: 140rpx;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.upload-text {
+    color: white;
+    font-size: 24rpx;
+}
+
+.avatar-container.uploading {
+    opacity: 0.7;
+}
+
 .avatar-overlay-btn {
     position: absolute;
     left: 0;

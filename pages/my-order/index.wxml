@@ -23,7 +23,7 @@
       <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng691d7939005bfbefde8c100224afa8d615d8a32c4bf7a012731f3ddb754eeaec" class="divider-line"></image>
     </view>
   </view>
-  
+
   <!-- 订单列表 -->
   <view class="order-list" wx:if="{{orders.length > 0}}">
     <view class="order-item" wx:for="{{orders}}" wx:key="id" bindtap="goToOrderDetail" data-order-id="{{item.id}}">
@@ -37,7 +37,7 @@
         </view>
         <text class="order-status">{{item.statusText}}</text>
       </view>
-      
+
       <!-- 商品列表 -->
       <view class="product-item" wx:for="{{item.products}}" wx:key="id" wx:for-item="product">
         <view class="product-info">
@@ -51,7 +51,7 @@
         </view>
         <text class="product-count">x {{product.count}}</text>
       </view>
-      
+
       <!-- 订单底部信息 -->
       <view class="order-footer">
         <text class="order-time">{{item.createTime}}</text>
@@ -60,18 +60,58 @@
           <text class="order-total-price">¥{{item.totalPrice}}</text>
         </view>
       </view>
+
+      <!-- 订单操作按钮 -->
+      <view class="order-actions" wx:if="{{item.status === 1}}">
+        <view class="pay-button-wrapper" catchtap="goToPay" data-id="{{item.id}}" data-total-price="{{item.totalPrice}}">
+          <text class="pay-button-text">去支付</text>
+        </view>
+      </view>
     </view>
     <image src="https://lanhu-oss-proxy.lanhuapp.com/SketchPng78f8f9efda663741e8c554d0bbb1c6c3dcee97e0a6860271affc0586bb19695b" class="order-separator" wx:if="{{index < orders.length - 1}}"></image>
   </view>
-  
+
   <!-- 空状态 -->
   <view wx:else class="empty-state">
     <view class="empty-icon">📦</view>
     <view class="empty-text">暂无订单</view>
   </view>
-  
+
   <!-- 加载状态 -->
   <view wx:if="{{loading}}" class="loading-state">
     <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 支付方式选择弹窗 -->
+  <view class="payment-modal" wx:if="{{showPaymentModal}}" catchtap="hidePaymentModal">
+    <view class="payment-modal-content" catchtap="stopPropagation">
+      <view class="payment-modal-header">
+        <text class="payment-modal-title">选择支付方式</text>
+        <view class="payment-modal-close" bindtap="hidePaymentModal">
+          <text class="close-text">✕</text>
+        </view>
+      </view>
+
+      <view class="payment-methods">
+        <view class="payment-method-item" wx:for="{{paymentMethods}}" wx:key="id" bindtap="selectPaymentMethod" data-method="{{item.id}}">
+          <view class="payment-method-left">
+            <image src="{{item.icon}}" class="payment-method-icon"></image>
+            <view class="payment-method-info">
+              <text class="payment-method-name">{{item.name}}</text>
+              <text class="payment-method-desc">{{item.description}}</text>
+            </view>
+          </view>
+          <view class="payment-method-selector">
+            <view class="selector-circle {{item.selected ? 'selected' : 'unselected'}}">
+              <view class="selector-dot" wx:if="{{item.selected}}"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="payment-modal-footer">
+        <button class="confirm-payment-btn" bindtap="confirmPayment">确认支付</button>
+      </view>
+    </view>
   </view>
 </view>

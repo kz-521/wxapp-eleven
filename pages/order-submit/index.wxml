@@ -55,9 +55,9 @@
         <text lines="1" class="text_22">备注</text>
         <text class="remark-count">{{remark.length}}/200</text>
       </view>
-      <textarea 
-        class="remark-input" 
-        placeholder="建议先与商家沟通一致再留言哦～" 
+      <textarea
+        class="remark-input"
+        placeholder="建议先与商家沟通一致再留言哦～"
         placeholder-class="remark-placeholder"
         value="{{remark}}"
         bindinput="onRemarkInput"
@@ -66,7 +66,7 @@
         show-confirm-bar="{{false}}"
       ></textarea>
     </view>
-    <view class="group_10" bindtap="selectCoupon">
+    <!--<view class="group_10" bindtap="selectCoupon">
       <text lines="1" class="text_24">优惠劵</text>
       <view class="image-text_9" wx:if="{{selectedCoupon}}">
         <view class="text-group_6">
@@ -84,8 +84,8 @@
         </view>
         <van-icon name="arrow" size="32rpx" color="#999" />
       </view>
-    </view>
-    <view class="group_11">
+    </view>-->
+    <!--<view class="group_11">
       <text class="payment-title">选择支付方式</text>
       <view class="pay-item" wx:for="{{paymentMethods}}" wx:key="id" bindtap="selectPaymentMethod" data-method="{{item.id}}">
         <view class="image-text_10">
@@ -101,7 +101,7 @@
           </view>
         </view>
       </view>
-    </view>
+    </view>-->
     <view class="cart-bar">
     <view class="cart-info">
       <view class="cart-icon-wrapper" bindtap="showCartDetail">

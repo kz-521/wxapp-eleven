@@ -8,7 +8,8 @@ App({
         cartCount: 0,  // 购物车商品总数
         totalPrice: 0, // 购物车总价格
         selectedCoupon: null, // 选中的优惠券
-        lastOrderId: null // 最后提交的订单ID，用于取茶号生成
+        lastOrderId: null, // 最后提交的订单ID，用于取茶号生成
+        tableId: null // 桌号ID
     },
     async onLaunch() {
         await (new Token()).verify();
@@ -33,5 +34,12 @@ App({
                 content: '当前微信版本过低，无法完好兼容，请升级到最新微信版本后重试。'
             })
         }
+    },
+
+    onHide() {
+        // 小程序退出时清理桌号数据
+        this.globalData.tableId = null
+        wx.removeStorageSync('tableId')
+        console.log('小程序退出，清理桌号数据')
     }
 })

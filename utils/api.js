@@ -6,13 +6,13 @@ const getToken = () => {
   const wechatToken = wx.getStorageSync('wechat_token')
   const accessToken = wx.getStorageSync('access_token')
   const token = wechatToken || accessToken || ''
-  
+
   console.log('Token获取状态:', {
     wechatToken: wechatToken ? '存在' : '不存在',
     accessToken: accessToken ? '存在' : '不存在',
     finalToken: token ? '已获取' : '未获取'
   })
-  
+
   return token
 }
 
@@ -20,13 +20,13 @@ const getToken = () => {
 const request = (options) => {
   const token = getToken()
   console.log('API请求 - URL:', options.url, 'Token:', token ? '已获取' : '未获取')
-  
+
   const headers = {
     'Content-Type': 'application/json',
     "token": token || '',
     ...options.header
   }
-  
+
   // 如果有token，添加到请求头
   if (token) {
     console.log('API请求 - 已添加token header')
@@ -155,7 +155,7 @@ const api = {
     return request({
       url: `/qingting/v1/pay/preorder`,
       method: 'POST',
-      data: { 
+      data: {
         order_id: orderId,
         ...extraData  // 支持传递额外参数，如pay_way
       }
@@ -257,10 +257,18 @@ const api = {
       method: 'POST',
       data: { amount }
     })
+  },
+
+  // 获取七牛云上传token
+  getQiniuToken: () => {
+    return request({
+      url: '/api/v1/token/qn',
+      method: 'GET'
+    })
   }
 }
 
 module.exports = {
   request,
   api
-} 
+}
