@@ -73,4 +73,15 @@
     <text  class="text_27">备注</text>
     <text  class="text_28">{{remark || '无备注'}}</text>
   </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions" wx:if="{{orderStatus === 'pending'}}">
+    <view class="action-buttons">
+      <button class="cancel-button" bindtap="cancelOrder">取消订单</button>
+      <button class="pay-button" bindtap="continuePay">继续支付</button>
+    </view>
+  </view>
+
+  <!-- 底部安全区域占位 -->
+  <view class="safe-area-bottom" wx:if="{{orderStatus === 'pending'}}"></view>
 </view>

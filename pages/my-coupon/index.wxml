@@ -1,0 +1,67 @@
+<view class="page">
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-container" wx:elif="{{coupons.length === 0}}">
+    <view class="empty-text">暂无可用优惠券</view>
+    <view class="empty-tip">快去领取优惠券吧～</view>
+  </view>
+
+  <!-- 优惠券列表 -->
+  <view class="coupon-list" wx:else>
+    <view class="coupon-item {{item.canUse ? 'available' : 'unavailable'}}" 
+          wx:for="{{coupons}}" 
+          wx:key="id" 
+          bindtap="selectCoupon" 
+          data-index="{{index}}">
+      
+      <!-- 优惠券左侧 -->
+      <view class="coupon-left">
+        <view class="coupon-value">
+          <text class="value-symbol" wx:if="{{item.coupon.type === 1}}">¥</text>
+          <text class="value-number" wx:if="{{item.coupon.type === 1}}">{{item.coupon.minus}}</text>
+          <text class="value-number" wx:elif="{{item.coupon.type === 2}}">{{item.discountDisplay}}</text>
+          <text class="value-unit" wx:elif="{{item.coupon.type === 2}}">折</text>
+        </view>
+        <view class="coupon-condition" wx:if="{{item.coupon.full_money}}">
+          满{{item.coupon.full_money}}元可用
+        </view>
+        <view class="coupon-condition" wx:else>
+          无门槛
+        </view>
+      </view>
+
+      <!-- 优惠券右侧 -->
+      <view class="coupon-right">
+        <view class="coupon-title">{{item.coupon.title}}</view>
+        <view class="coupon-desc">{{item.coupon.description}}</view>
+        <view class="coupon-time">
+          {{item.coupon.start_time}} - {{item.coupon.end_time}}
+        </view>
+        
+        <!-- 不可用原因 -->
+        <view class="unavailable-reason" wx:if="{{!item.canUse}}">
+          {{item.reason}}
+        </view>
+      </view>
+
+      <!-- 选择按钮 -->
+      <view class="coupon-select" wx:if="{{item.canUse}}">
+        使用
+      </view>
+      <view class="coupon-disabled" wx:else>
+        不可用
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="no-use-btn" bindtap="noUseCoupon">
+      不使用优惠券
+    </view>
+  </view>
+</view>

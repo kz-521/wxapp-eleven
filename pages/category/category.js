@@ -10,7 +10,7 @@ Page({
     showCartDetail: false,
     userInfo: null, // 用户信息
     allProducts: [], // 所有商品数据
-    constitutionQuestions: [], // 体质测试问题
+    constitutionQuestions: [], // 体质测试问题测试
     currentQuestionIndex: 0, // 当前问题索引
     testAnswers: [], // 测试答案
     testResult: null, // 测试结果
@@ -39,8 +39,19 @@ Page({
     await this.loadCategories()
     // 获取所有商品数据
     this.getAllProducts()
-    // 初始化加载第一个分类的商品
-    this.loadProductsByCategory(1)
+    
+    // 检查是否有传递的分类ID参数
+    const app = getApp()
+    if (app.globalData.currentCategory) {
+      const targetCategoryId = app.globalData.currentCategory
+      // 清除全局数据中的分类ID
+      app.globalData.currentCategory = null
+      console.log('接收到全局分类ID:', targetCategoryId)
+      this.setCategoryByID(targetCategoryId)
+    } else {
+      // 初始化加载第一个分类的商品
+      this.loadProductsByCategory(1)
+    }
   },
   onShow() {
     // 只在必要时重新加载购物车数据
@@ -51,12 +62,126 @@ Page({
     if (currentCartCount !== globalCartCount) {
       this.loadCartData()
     }
+
+    // 检查是否有通过switchTab传递的分类ID参数
+    if (app.globalData.currentCategory) {
+      const targetCategoryId = app.globalData.currentCategory
+      // 清除全局数据中的分类ID
+      app.globalData.currentCategory = null
+      console.log('onShow接收到全局分类ID:', targetCategoryId)
+      this.setCategoryByID(targetCategoryId)
+    }
   },
   onHide() {
     // 移除tabBar相关代码
   },
   onUnload() {
     // 移除tabBar相关代码
+  },
+
+  /**
+   * 选择订单选项
+   */
+  selectOrderOption(event) {
+    const { optionId, valueId } = event.currentTarget.dataset
+    console.log('选择订单选项:', { optionId, valueId })
+    
+    // 更新选中的订单选项
+    const selectedOptions = { ...this.data.selectedOptions }
+    selectedOptions[optionId] = valueId
+    
+    this.setData({
+      selectedOptions: selectedOptions
+    })
+    
+    // 重新计算价格
+    this.recalculatePrice()
+    
+    // 检查是否所有必选项都已选择
+    this.checkCanAddToCart()
+  },
+
+  /**
+   * 检查是否可以加入购物车
+   */
+  checkCanAddToCart() {
+    const product = this.data.currentProduct
+    const selectedOptions = this.data.selectedOptions
+    
+    if (!product) return
+    
+    // 检查是否有order_options且是否都已选择
+    if (product.order_options && product.order_options.length > 0) {
+      const requiredOptions = product.order_options.filter(option => option.type === 1) // type 1 表示必选
+      const allRequiredSelected = requiredOptions.every(option => selectedOptions[option.id])
+      
+      if (!allRequiredSelected) {
+        this.setData({
+          canAddToCart: false,
+          addToCartText: '请选择完整规格'
+        })
+        return
+      }
+    }
+    
+    // 如果有SKU规格要求，检查SKU是否已选择
+    const isNoSpecProduct = this.data.isNoSpecProduct
+    const currentSelectedSku = this.data.currentSelectedSku
+    
+    if (!isNoSpecProduct && !currentSelectedSku) {
+      this.setData({
+        canAddToCart: false,
+        addToCartText: '请选择规格'
+      })
+      return
+    }
+    
+    // 所有条件都满足，可以加入购物车
+    this.setData({
+      canAddToCart: true,
+      addToCartText: '加入购物车'
+    })
+  },
+
+  /**
+   * 根据分类ID设置当前分类
+   */
+  setCategoryByID(targetCategoryId) {
+    const categories = this.data.categories
+    
+    if (!categories || categories.length === 0) {
+      console.warn('分类数据未加载完成，延迟设置分类')
+      setTimeout(() => {
+        this.setCategoryByID(targetCategoryId)
+      }, 100)
+      return
+    }
+    
+    const categoryIndex = categories.findIndex(cat => cat.id === targetCategoryId)
+    
+    if (categoryIndex !== -1) {
+      console.log('找到分类索引:', categoryIndex, '分类名称:', categories[categoryIndex].name)
+      // 模拟点击事件，复用switchCategory逻辑
+      const mockEvent = {
+        currentTarget: {
+          dataset: {
+            index: categoryIndex
+          }
+        }
+      }
+      this.switchCategory(mockEvent)
+    } else {
+      console.warn('未找到对应的分类ID:', targetCategoryId, '现有分类:', categories)
+      // 如果找不到对应分类，加载第一个分类
+      const mockEvent = {
+        currentTarget: {
+          dataset: {
+            index: 0
+          }
+        }
+      }
+      this.switchCategory(mockEvent)
+    }
   },
 
   // 加载购物车数据
@@ -642,9 +767,12 @@ Page({
         currentSelectedPrice: (initialPrice * 1).toFixed(2), // 初始数量为1
         currentSelectedSku: initialSelectedSku, // 设置初始选中的SKU
         isNoSpecProduct: isNoSpec,
-        canAddToCart: isNoSpec, // 无规格商品可以直接加入购物车
-        addToCartText: isNoSpec ? '加入购物车' : '请选择规格'
+        canAddToCart: false, // 初始状态设为false，由checkCanAddToCart判断
+        addToCartText: '请选择规格'
       })
+      
+      // 检查是否可以加入购物车（包括order_options的验证）
+      this.checkCanAddToCart()
     }
   },
 
@@ -830,159 +958,7 @@ Page({
     })
   },
 
-  /**
-   * 测试商品详情弹出层
-   */
-  testProductDetail() {
-    // 模拟商品详情数据
-    const mockProduct = {
-      id: 1,
-      title: "佛手映月",
-      subtitle: "大乔木白茶，五行属金，对应肺，可止咳平喘，清热解毒",
-      price: "38",
-      discount_price: "32",
-      description: "清热解毒、止咳平喘，适合肺热咳嗽、咽喉不适人群",
-      img: "https://qn.jixiangjiaoyu.com/2025/8/6d6421a35c54686e3614123366bf0bb941754456860367.png",
-      category_id: 1,
-      tags: "白茶,肺,金",
-      recommend_for_constitution: "金",
-      is_package: 0,
-      status: 1,
-      sort: 0,
-      sales_count: 0,
-      stock_total: 0,
-      create_time: "2025-07-22 07:07:08",
-      update_time: "2025-08-06 15:09:36",
-      order_options: [
-        {
-          id: 1,
-          name: "冷热",
-          type: 1,
-          type_text: "单选",
-          values: [
-            {
-              id: 1,
-              value: "冰",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "冰"
-            },
-            {
-              id: 2,
-              value: "热",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "热"
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: "糖度",
-          type: 1,
-          type_text: "单选",
-          values: [
-            {
-              id: 3,
-              value: "无糖",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "无糖"
-            },
-            {
-              id: 4,
-              value: "三分糖",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "三分糖"
-            },
-            {
-              id: 5,
-              value: "五分糖",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "五分糖"
-            },
-            {
-              id: 6,
-              value: "七分糖",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "七分糖"
-            },
-            {
-              id: 7,
-              value: "全糖",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "全糖"
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: "口味",
-          type: 1,
-          type_text: "单选",
-          values: [
-            {
-              id: 8,
-              value: "原味",
-              extra_price: 0,
-              formatted_price: "",
-              full_text: "原味"
-            },
-            {
-              id: 9,
-              value: "柠檬",
-              extra_price: 1,
-              formatted_price: "+￥1.00",
-              full_text: "柠檬 (+￥1.00)"
-            },
-            {
-              id: 10,
-              value: "蜂蜜",
-              extra_price: 2,
-              formatted_price: "+￥2.00",
-              full_text: "蜂蜜 (+￥2.00)"
-            }
-          ]
-        }
-      ],
-      has_order_options: true,
-      skuList: [
-        {
-          id: 1,
-          spu_id: 1,
-          price: "0.01",
-          stock: 976,
-          img: "/img/spu/foshou.jpg",
-          title: "佛手映月",
-          specs: null,
-          status: 1,
-          sales_count: 0,
-          create_time: "2025-07-22 07:07:08"
-        }
-      ]
-    }
 
-    // 设置默认选中的选项
-    const selectedOptions = {}
-    if (mockProduct.order_options && mockProduct.order_options.length > 0) {
-      mockProduct.order_options.forEach(option => {
-        if (option.values && option.values.length > 0) {
-          selectedOptions[option.id] = option.values[0].id
-        }
-      })
-    }
-    
-    this.setData({
-      showProductDetail: true,
-      currentProduct: mockProduct,
-      selectedOptions: selectedOptions,
-      currentQuantity: 1
-    })
-  },
 
   /**
    * 格式化商品数据以适配Realm组件

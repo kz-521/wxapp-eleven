@@ -445,9 +445,12 @@ Page({
      */
     getOrderStatus(status) {
         const statusMap = {
-            1: 'ready',      // 待取茶
-            2: 'completed',  // 已完成
-            3: 'cancelled'   // 已取消
+            1: 'pending',    // 未支付/待支付
+            2: 'paid',       // 已支付
+            3: 'preparing',  // 制作中
+            4: 'ready',      // 待取茶
+            5: 'completed',  // 已完成
+            6: 'cancelled'   // 已取消
         }
         return statusMap[status] || 'pending'
     },
@@ -464,7 +467,7 @@ Page({
             'completed': '已完成',
             'cancelled': '已取消'
         }
-        return statusMap[status] || '未知状态'
+        return statusMap[status] || '待支付'
     },
 
     /**

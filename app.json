@@ -8,7 +8,9 @@
     "pages/order-submit/index",
     "pages/order-detail/index",
     "pages/my-order/index",
+    "pages/my-coupon/index",
     "pages/coupon-select/index",
+    "pages/coupon-receive/index",
     "pages/recharge/index"
   ],
   "window": {

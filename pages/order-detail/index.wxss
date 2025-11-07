@@ -589,6 +589,71 @@
   white-space: nowrap;
   line-height: 40rpx;
 }
+
+/* 底部操作按钮样式 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-top: 1rpx solid #f0f0f0;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.action-buttons {
+  display: flex;
+  padding: 24rpx 32rpx;
+  gap: 24rpx;
+}
+
+.cancel-button {
+  flex: 1;
+  height: 80rpx;
+  background: #FFFFFF;
+  color: #666666;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 76rpx;
+  text-align: center;
+}
+
+.cancel-button::after {
+  border: none;
+}
+
+.cancel-button:active {
+  background: #F5F5F5;
+}
+
+.pay-button {
+  flex: 2;
+  height: 80rpx;
+  background: linear-gradient(135deg, #83d06a 0%, #5bb85c 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 76rpx;
+  text-align: center;
+  box-shadow: 0 4rpx 12rpx rgba(131, 208, 106, 0.3);
+}
+
+.pay-button::after {
+  border: none;
+}
+
+.pay-button:active {
+  opacity: 0.8;
+}
+
+.safe-area-bottom {
+  height: calc(env(safe-area-inset-bottom) + 132rpx);
+}
 .text_17 {
   width: 386rpx;
   height: 56rpx;

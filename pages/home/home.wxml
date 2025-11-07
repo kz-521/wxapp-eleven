@@ -19,7 +19,7 @@
     <view class="test-card" bindtap="goToTest">
       <image src="/imgs/test-icon.png" class="test-icon"></image>
       <text class="test-text">去测测体质</text>
-      <image src="/imgs/test-user.png" class="refresh-icon"></image>
+-     <image src="/imgs/test-user.png" class="refresh-icon"></image>
     </view>
   </view>
 
@@ -50,7 +50,7 @@
     </view>
     <scroll-view class="drink-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}">
       <view class="drink-container">
-        <view class="drink-card" wx:for="{{drinks}}" wx:key="id" bindtap="goToCart">
+        <view class="drink-card" wx:for="{{drinks}}" wx:key="id" bindtap="goToCategoryWithRecommend" data-category-id="{{item.categoryId}}">
           <image src="{{item.image}}" class="drink-img" mode="aspectFill"></image>
           <view class="drink-content">
             <text class="drink-name">{{item.name}}</text>

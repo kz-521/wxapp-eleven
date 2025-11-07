@@ -1,0 +1,285 @@
+/* 页面容器 */
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40rpx 24rpx;
+  box-sizing: border-box;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #f3f3f3;
+  border-top: 4rpx solid #83d06a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 优惠券容器 */
+.coupon-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40rpx;
+}
+
+/* 优惠券卡片 */
+.coupon-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 40rpx;
+  display: flex;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.coupon-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8rpx;
+  height: 100%;
+  background: linear-gradient(to bottom, #83d06a, #5bb85c);
+}
+
+.coupon-card.small {
+  padding: 32rpx;
+}
+
+/* 优惠券左侧 */
+.coupon-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 180rpx;
+  margin-right: 32rpx;
+  position: relative;
+}
+
+.coupon-left::after {
+  content: '';
+  position: absolute;
+  right: -16rpx;
+  top: 20%;
+  bottom: 20%;
+  width: 2rpx;
+  background: linear-gradient(to bottom, transparent, #e5e5e5, transparent);
+}
+
+.coupon-value {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8rpx;
+}
+
+.value-symbol {
+  font-size: 32rpx;
+  color: #83d06a;
+  font-weight: 600;
+}
+
+.value-number {
+  font-size: 72rpx;
+  color: #83d06a;
+  font-weight: 700;
+  font-family: 'DINPro-Bold', sans-serif;
+}
+
+.value-unit {
+  font-size: 32rpx;
+  color: #83d06a;
+  font-weight: 600;
+  margin-left: 4rpx;
+}
+
+.coupon-type {
+  color: #83d06a;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+/* 优惠券右侧 */
+.coupon-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.coupon-title {
+  font-size: 36rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+  line-height: 1.3;
+}
+
+.coupon-condition {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.coupon-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.coupon-desc {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+}
+
+/* 使用说明 */
+.coupon-rules {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.rules-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 24rpx;
+}
+
+.rules-item {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+}
+
+/* 领取按钮 */
+.receive-button-container {
+  margin-top: 40rpx;
+}
+
+.receive-button {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #83d06a 0%, #5bb85c 100%);
+  color: #ffffff;
+  font-size: 36rpx;
+  font-weight: 600;
+  border-radius: 44rpx;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(131, 208, 106, 0.4);
+  transition: all 0.3s ease;
+}
+
+.receive-button.loading {
+  opacity: 0.7;
+  background: #ccc;
+  box-shadow: none;
+}
+
+.receive-button::after {
+  border: none;
+}
+
+/* 成功状态 */
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 60rpx;
+}
+
+.success-icon {
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, #83d06a 0%, #5bb85c 100%);
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+  animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+  0% { transform: scale(0.3); }
+  50% { transform: scale(1.1); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.success-title {
+  font-size: 40rpx;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.success-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+.success-coupon {
+  width: 100%;
+  margin-bottom: 60rpx;
+}
+
+/* 成功页面操作按钮 */
+.success-actions {
+  width: 100%;
+  display: flex;
+  gap: 24rpx;
+}
+
+.action-button {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #83d06a 0%, #5bb85c 100%);
+  color: #ffffff;
+  box-shadow: 0 6rpx 20rpx rgba(131, 208, 106, 0.3);
+}
+
+.action-button.secondary {
+  background: #ffffff;
+  color: #83d06a;
+  border: 2rpx solid #83d06a;
+}
+
+.action-button::after {
+  border: none;
+}

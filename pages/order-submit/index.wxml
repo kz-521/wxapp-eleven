@@ -50,6 +50,47 @@
       <text lines="1" class="text_18">¥{{item.price}}</text>
     </view>
   </view>
+  
+  <!-- 支付方式选择 -->
+  <view class="group_11">
+    <text class="payment-title">选择支付方式</text>
+    <view class="pay-item" wx:for="{{paymentMethods}}" wx:key="id" bindtap="selectPaymentMethod" data-method="{{item.id}}">
+      <view class="image-text_10">
+        <image src="{{item.icon}}" class="image_8"></image>
+        <view class="text-group_12">
+          <text lines="1" class="text_28">{{item.name}}</text>
+          <text lines="1" class="text_29">{{item.description}}</text>
+        </view>
+      </view>
+      <view class="payment-selector">
+        <icon class="icon-box-img" type="success" size="18" wx:if="{{item.selected}}"></icon>
+        <view class="selector-circle {{item.selected ? 'selected' : 'unselected'}}" wx:if="{{!item.selected}}">
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 优惠券选择 -->
+  <view class="group_10" bindtap="selectCoupon">
+    <text lines="1" class="text_24">优惠券</text>
+    <view class="image-text_9" wx:if="{{selectedCoupon}}">
+      <view class="text-group_6">
+        <text lines="1" class="text_25">{{selectedCoupon.coupon.title}}</text>
+        <text lines="1" class="text_26" />
+        <text lines="1" class="text_27">-¥{{couponAmount}}</text>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#999" />
+    </view>
+    <view class="image-text_9" wx:else>
+      <view class="text-group_6">
+        <text lines="1" class="text_25">选择优惠券</text>
+        <text lines="1" class="text_26" />
+        <text lines="1" class="text_27">-¥0.00</text>
+      </view>
+      <van-icon name="arrow" size="32rpx" color="#999" />
+    </view>
+  </view>
+
     <view class="text-wrapper_5">
       <view class="remark-header">
         <text lines="1" class="text_22">备注</text>

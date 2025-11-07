@@ -265,6 +265,16 @@ const api = {
       url: '/api/v1/token/qn',
       method: 'GET'
     })
+  },
+
+  // 线下支付
+  offlinePay: (orderId) => {
+    console.log('调用线下支付接口，订单ID:', orderId)
+    return request({
+      url: `/qingting/v1/pay/offlinePay`,
+      method: 'POST',
+      data: { order_id: orderId }
+    })
   }
 }
 

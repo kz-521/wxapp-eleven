@@ -20,12 +20,12 @@ Page({
     async onLoad(options) {
         // 处理扫码桌号参数
         this.handleTableParam(options)
-        
+
         this.checkLoginStatus()
-        
+
         // 获取今日推荐数据
         this.getRecommendData()
-        
+
         // 获取用户位置和计算距离
         this.initUserLocation()
     },
@@ -40,6 +40,9 @@ Page({
             if (Number.isInteger(tableId) && tableId > 0) {
                 // 保存到缓存
                 wx.setStorageSync('tableId', tableId)
+                this.setData({
+                    table:options.table
+                })
                 // 同时保存到全局数据
                 const app = getApp()
                 app.globalData.tableId = tableId
@@ -92,7 +95,7 @@ Page({
             if (res.code === 200 && res.result && res.result.token) {
                 wx.setStorageSync('wechat_token', res.result.token)
                 console.log('Token保存成功:', res.result.token)
-                
+
                 // 获取用户信息
                 this.getUserProfile()
             } else {
@@ -112,15 +115,15 @@ Page({
             success: (res) => {
                 // 保存用户信息到本地存储
                 wx.setStorageSync('userInfo', res.userInfo)
-                
+
                 // 更新页面状态
                 this.setData({
                     isLogin: true
                 })
 
-                wx.showToast({ 
-                    title: '登录成功', 
-                    icon: 'success' 
+                wx.showToast({
+                    title: '登录成功',
+                    icon: 'success'
                 })
             },
             fail: (err) => {
@@ -164,7 +167,7 @@ Page({
                         userInfo.avatarUrl = '/imgs/logo.png'
                     }
                     wx.setStorageSync('userInfo', userInfo)
-                    
+
                     // 完成用户信息获取
                     this.completeUserInfo(userInfo)
                 } else {
@@ -183,17 +186,42 @@ Page({
             isLogin: true
         })
 
-        wx.showToast({ 
-            title: '登录成功', 
-            icon: 'success' 
+        wx.showToast({
+            title: '登录成功',
+            icon: 'success'
         })
+    },
+
+    /**
+     * 跳转到分类页面并定位到指定分类
+     */
+    goToCategoryWithRecommend(event) {
+        const categoryId = event.currentTarget.dataset.categoryId
+        console.log('点击推荐茶饮，分类ID:', categoryId)
+
+        // 使用全局app传递分类ID（switchTab不支持queryString）
+        if (categoryId) {
+            wx.switchTab({
+                url: '/pages/category/category',
+                success() {
+                    // 通过全局数据传递当前分类ID
+                    const app = getApp()
+                    app.globalData.currentCategory = parseInt(categoryId)
+                    console.log('设置全局分类ID:', parseInt(categoryId))
+                }
+            })
+        } else {
+            wx.switchTab({
+                url: '/pages/category/category'
+            })
+        }
     },
 
     /**
      * 跳转到购物车页面
      */
     goToCart() {
-        wx.switchTab({  
+        wx.switchTab({
             url: '/pages/category/category'
         })
     },
@@ -223,7 +251,7 @@ Page({
     async getRecommendData() {
         try {
             const response = await Spu.getRecommendSpu(3)
-            
+
             // 检查response是否有效
             if (!response) return
             const formattedDrinks = Spu.formatRecommendData(response)

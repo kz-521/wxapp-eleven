@@ -159,6 +159,22 @@
                 </s-realm>
             </view>
 
+            <!-- 订单选项选择区域 -->
+            <view class="order-options-section" wx:if="{{currentProduct.order_options && currentProduct.order_options.length > 0}}">
+                <view class="option-group" wx:for="{{currentProduct.order_options}}" wx:key="id" wx:for-item="option">
+                    <text class="option-title">{{option.name}}</text>
+                    <view class="option-values">
+                        <view class="option-value {{selectedOptions[option.id] == value.id ? 'selected' : ''}}" 
+                              wx:for="{{option.values}}" wx:key="id" wx:for-item="value"
+                              bindtap="selectOrderOption" 
+                              data-option-id="{{option.id}}" 
+                              data-value-id="{{value.id}}">
+                            <text class="option-text">{{value.full_text || value.value}}</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+
             <!-- 底部价格和操作栏 -->
             <view class="product-detail-footer">
                 <view class="price-section">

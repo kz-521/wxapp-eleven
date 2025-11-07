@@ -24,6 +24,13 @@ Page({
         selectedPaymentMethod: 'wechat', // 默认选择微信支付
         paymentMethods: [
             {
+                id: 'balance',
+                name: '余额支付',
+                description: '使用钱包余额支付',
+                icon: '/imgs/balance.png',
+                selected: false
+            },
+            {
                 id: 'wechat',
                 name: '微信支付',
                 description: '使用微信快捷支付',
@@ -31,10 +38,10 @@ Page({
                 selected: true
             },
             {
-                id: 'balance',
-                name: '余额支付',
-                description: '使用钱包余额支付',
-                icon: '/imgs/balance.png', // 余额图标
+                id: 'offline',
+                name: '线下支付',
+                description: '到店现金或刷卡支付',
+                icon: '/imgs/offline.png',
                 selected: false
             }
         ]
@@ -142,8 +149,24 @@ Page({
      * 选择优惠券
      */
     selectCoupon() {
+        // 检查是否选择了线下支付
+        if (this.data.selectedPaymentMethod === 'offline') {
+            wx.showToast({
+                title: '线下支付不支持使用优惠券',
+                icon: 'none',
+                duration: 2000
+            })
+            return
+        }
+
+        // 将订单金额传递给全局变量，供优惠券页面使用
+        const app = getApp()
+        if (app && app.globalData) {
+            app.globalData.orderAmount = parseFloat(this.data.totalAmount)
+        }
+
         wx.navigateTo({
-            url: '/pages/coupon-select/index'
+            url: '/pages/my-coupon/index'
         })
     },
 
@@ -191,7 +214,7 @@ Page({
         }
 
         // 验证购物车商品数据格式
-        const invalidItems = this.data.orderProducts.filter(item => !item.id || !item.count)
+        const invalidItems = this.data.orderProducts.filter(item => !item.skuId || !item.count)
         if (invalidItems.length > 0) {
             console.error('购物车中存在无效商品数据:', invalidItems)
             wx.showToast({
@@ -319,9 +342,27 @@ Page({
                                 icon: 'none',
                                 duration: 2000
                             })
+
+                            // 支付失败后跳转到订单详情页
+                            setTimeout(() => {
+                                wx.redirectTo({
+                                    url: `/pages/order-detail/index?orderId=${orderId}`
+                                })
+                            }, 2000)
                         } else {
-                            // 用户取消支付，静默处理
-                            console.log("用户取消支付")
+                            // 用户取消支付，跳转到订单详情页（因为订单已创建，处于待支付状态）
+                            console.log("用户取消支付，跳转到订单详情页")
+                            wx.showToast({
+                                title: '取消支付',
+                                icon: 'none',
+                                duration: 2000
+                            })
+
+                            setTimeout(() => {
+                                wx.redirectTo({
+                                    url: `/pages/order-detail/index?orderId=${orderId}`
+                                })
+                            }, 2000)
                         }
                     }
                 })
@@ -437,27 +478,28 @@ Page({
     /**
      * 计算优惠券折扣
      */
-    calculateCouponDiscount(coupon) {
-        if (!coupon) {
+    calculateCouponDiscount(selectedCoupon) {
+        if (!selectedCoupon || !selectedCoupon.coupon) {
             return {
                 success: false,
                 message: '优惠券数据无效'
             }
         }
 
+        const coupon = selectedCoupon.coupon
         const orderAmount = parseFloat(this.data.totalAmount)
 
         // 检查优惠券类型和条件
-        if (coupon.type === 'discount') {
+        if (coupon.type === 1) {
             // 满减券
-            if (coupon.min_amount && orderAmount < coupon.min_amount) {
+            if (coupon.full_money && orderAmount < coupon.full_money) {
                 return {
                     success: false,
-                    message: `订单金额不足${coupon.min_amount}元`
+                    message: `订单金额不足${coupon.full_money}元`
                 }
             }
 
-            const discountAmount = Math.min(coupon.discount_amount, orderAmount)
+            const discountAmount = Math.min(coupon.minus, orderAmount)
             const payAmount = orderAmount - discountAmount
 
             return {
@@ -465,21 +507,15 @@ Page({
                 couponAmount: discountAmount,
                 payAmount: payAmount
             }
-        } else if (coupon.type === 'percentage') {
+        } else if (coupon.type === 2) {
             // 折扣券
-            if (coupon.min_amount && orderAmount < coupon.min_amount) {
-                return {
-                    success: false,
-                    message: `订单金额不足${coupon.min_amount}元`
-                }
-            }
-
-            const discountAmount = orderAmount * (1 - coupon.discount_rate / 100)
-            const payAmount = Math.max(discountAmount, 0)
+            const discountRate = parseFloat(coupon.rate)
+            const payAmount = orderAmount * discountRate
+            const discountAmount = orderAmount - payAmount
 
             return {
                 success: true,
-                couponAmount: orderAmount - payAmount,
+                couponAmount: discountAmount,
                 payAmount: payAmount
             }
         }
@@ -572,7 +608,7 @@ Page({
         // 构建API期望的订单数据格式
         const apiOrderData = {
             sku_info_list: this.data.orderProducts.map(item => ({
-                id: item.id,
+                id: item.skuId, // 必须使用sku的id
                 count: parseInt(item.count) || 1,
                 order_options: item.order_options || [] // 添加口味选择数据
             })),
@@ -581,16 +617,16 @@ Page({
             total_amount: parseFloat(this.data.totalAmount),
             coupon_amount: parseFloat(this.data.couponAmount) || 0,
             pay_amount: parseFloat(this.data.payAmount),
-            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null,
+            coupon_id: this.data.selectedCoupon ? this.data.selectedCoupon.id : null, // 使用用户优惠券ID
             payment_method: this.data.selectedPaymentMethod, // 添加支付方式
-            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1, // 添加pay_way字段
+            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : (this.data.selectedPaymentMethod === 'offline' ? 3 : 1), // 1:微信支付 2:余额支付 3:线下支付
             table_id: tableId // 添加桌号参数
         }
 
         console.log('发送给API的订单数据:', apiOrderData)
         console.log('支付方式字段:', {
             selectedPaymentMethod: this.data.selectedPaymentMethod,
-            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : 1
+            pay_way: this.data.selectedPaymentMethod === 'balance' ? 2 : (this.data.selectedPaymentMethod === 'offline' ? 3 : 1)
         })
 
         // 调用提交订单API
@@ -608,7 +644,7 @@ Page({
                 const orderId = res.result?.id || res.result?.order_id
 
                 if (orderId) {
-                    console.log('订单提交成功，开始调用支付接口，订单ID:', orderId)
+                    console.log('订单提交成功，开始处理支付，订单ID:', orderId, '支付方式:', this.data.selectedPaymentMethod)
 
                     // 存储order_id到全局变量，用于取茶号生成
                     const app = getApp()
@@ -617,20 +653,17 @@ Page({
                     }
                     console.log('已存储订单ID到全局变量:', orderId)
 
-
-                    wx.redirectTo({
-                        url: `/pages/order-detail/index?orderId=${orderId}`
-                    })
-
-
                     // 根据选择的支付方式执行不同的支付流程
-/*                    if (this.data.selectedPaymentMethod === 'balance') {
+                    if (this.data.selectedPaymentMethod === 'balance') {
                         // 余额支付
                         this.processBalancePayment(orderId)
+                    } else if (this.data.selectedPaymentMethod === 'offline') {
+                        // 线下支付 - 调用线下支付接口
+                        this.processOfflinePayment(orderId)
                     } else {
                         // 微信支付
                         this.callPayment(orderId)
-                    }*/
+                    }
                 } else {
                     console.error('订单提交成功但未获取到订单ID:', res)
                     wx.showToast({
@@ -791,6 +824,67 @@ Page({
     },
 
     /**
+     * 处理线下支付
+     */
+    async processOfflinePayment(orderId) {
+        console.log('开始处理线下支付，订单ID:', orderId)
+
+        try {
+
+            // 调用线下支付接口
+            const response = await api.offlinePay(orderId)
+
+
+            if (response.result.success) {
+
+                // 清空购物车
+                this.clearCart()
+
+                // 跳转到订单详情页
+                setTimeout(() => {
+                    wx.redirectTo({
+                        url: `/pages/order-detail/index?orderId=${orderId}`
+                    })
+                }, 2000)
+
+            } else {
+                // 线下支付失败
+                console.error('线下支付失败:', response)
+
+                wx.showToast({
+                    title: response.message || '线下支付失败',
+                    icon: 'none',
+                    duration: 2000
+                })
+
+                // 失败时跳转到订单列表
+                setTimeout(() => {
+                    wx.redirectTo({
+                        url: '/pages/my-order/index'
+                    })
+                }, 2000)
+            }
+
+        } catch (error) {
+            wx.hideLoading()
+            console.error('线下支付异常:', error)
+
+            wx.showToast({
+                title: '线下支付异常',
+                icon: 'none',
+                duration: 2000
+            })
+
+            // 异常时跳转到订单列表
+            setTimeout(() => {
+                wx.redirectTo({
+                    url: '/pages/my-order/index'
+                })
+            }, 2000)
+        }
+    },
+
+    /**
      * 格式化时间
      * @param {string|Date} time 时间字符串或Date对象
      * @returns {string} 格式化后的时间字符串
@@ -891,6 +985,19 @@ Page({
             selectedPaymentMethod: methodId,
             paymentMethods: updatedMethods
         });
+
+        // 如果切换到线下支付，清空已选择的优惠券
+        if (methodId === 'offline' && this.data.selectedCoupon) {
+            wx.showModal({
+                title: '提示',
+                content: '线下支付不支持使用优惠券，已选择的优惠券将被清除',
+                showCancel: false,
+                confirmText: '确定',
+                success: () => {
+                    this.clearSelectedCoupon()
+                }
+            })
+        }
 
         console.log('支付方式已更新:', methodId);
     },

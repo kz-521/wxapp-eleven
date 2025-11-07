@@ -1820,3 +1820,51 @@ page {
   line-height: 40rpx;
   text-align: center;
 }
+
+/* 订单选项选择样式 */
+.order-options-section {
+  margin: 20rpx 0;
+  padding: 0 30rpx;
+}
+
+.option-group {
+  margin-bottom: 30rpx;
+}
+
+.option-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.option-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15rpx;
+}
+
+.option-value {
+  padding: 15rpx 25rpx;
+  border: 2rpx solid #E8E8E8;
+  border-radius: 8rpx;
+  background-color: #FFFFFF;
+  min-width: 80rpx;
+  text-align: center;
+}
+
+.option-value.selected {
+  border-color: #477676;
+  background-color: #F0F7F7;
+}
+
+.option-text {
+  font-size: 26rpx;
+  color: #666666;
+}
+
+.option-value.selected .option-text {
+  color: #477676;
+  font-weight: 500;
+}

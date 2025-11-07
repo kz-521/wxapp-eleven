@@ -53,7 +53,8 @@ class Spu {
                 id: item.id,
                 name: item.title,
                 price: item.discount_price || item.price,
-                image: item.img
+                image: item.img,
+                categoryId: item.category_id || 1 // 添加分类ID，默认为1
             }))
         }
         return null
